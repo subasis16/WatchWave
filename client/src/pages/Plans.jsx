@@ -22,7 +22,7 @@ const Plans = () => {
         'Cancel Anytime',
       ],
       highlight: 'Most Popular',
-      gradient: 'from-brand-red/20 to-brand-dark-red/10',
+      // Removed complex gradient string
     },
     {
       id: 'group',
@@ -42,7 +42,6 @@ const Plans = () => {
         'Priority Support',
       ],
       highlight: 'Best Value',
-      gradient: 'from-brand-dark-red/40 to-black',
       minUsers: 5,
     },
   ];
@@ -71,8 +70,9 @@ const Plans = () => {
             return (
               <div
                 key={plan.id}
-                className={`relative bg-gradient-to-br ${plan.gradient} border-2 ${isSelected ? 'border-brand-red' : 'border-white/10'
-                  } rounded-2xl p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl cursor-pointer`}
+                className={`relative border-2 ${isSelected ? 'border-brand-red' : 'border-white/10'} 
+                  ${plan.id === 'solo' ? 'bg-rich-gray' : 'bg-rich-gray'}
+                  rounded-2xl p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl cursor-pointer hover:bg-white/5`}
                 onClick={() => handlePlanSelect(plan.id)}
               >
                 {/* Highlight Badge */}
@@ -135,8 +135,8 @@ const Plans = () => {
                 {/* CTA Button */}
                 <button
                   className={`w-full py-4 rounded-xl font-bold transition-all transform hover:scale-105 ${isSelected
-                      ? 'bg-brand-red text-white shadow-lg shadow-brand-red/50'
-                      : 'bg-white/10 hover:bg-white/20 text-white'
+                    ? 'bg-brand-red text-white shadow-lg shadow-brand-red/50'
+                    : 'bg-white/10 hover:bg-white/20 text-white'
                     }`}
                   onClick={(e) => {
                     e.stopPropagation();

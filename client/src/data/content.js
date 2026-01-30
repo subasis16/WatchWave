@@ -34,6 +34,14 @@ export const movies = [
   { id: 'm10', title: 'Pulp Fiction', image: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', year: '1994', match: '98', age: 'R' },
 ];
 
+export const bollywood = [
+  { id: 'b1', title: '3 Idiots', image: 'https://image.tmdb.org/t/p/w500/66A9MqXOyVFCssoloscw79z8Tew.jpg', year: '2009', match: '99', age: 'PG-13' },
+  { id: 'b2', title: 'RRR', image: 'https://image.tmdb.org/t/p/w500/nEufeZlyAOLqO2brrs0yeF1lgXO.jpg', year: '2022', match: '98', age: 'R' },
+  { id: 'b3', title: 'Dilwale Dulhania...', image: 'https://upload.wikimedia.org/wikipedia/en/8/80/Dilwale_Dulhania_Le_Jayenge_poster.jpg', year: '1995', match: '99', age: 'PG' },
+  { id: 'b4', title: 'Dangal', image: 'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg', year: '2016', match: '98', age: 'PG' },
+  { id: 'b5', title: 'Kantara', image: 'https://upload.wikimedia.org/wikipedia/en/8/84/Kantara_poster.jpeg', year: '2022', match: '96', age: 'TV-14' },
+];
+
 export const series = [
   { id: 's1', title: 'Breaking Bad', image: 'https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg', year: '2008', match: '99', age: 'TV-MA' },
   { id: 's2', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2016', match: '97', age: 'TV-14' },
@@ -44,6 +52,5 @@ export const series = [
   { id: 's6', title: 'The Last of Us', image: 'https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg', year: '2023', match: '98', age: 'TV-MA' },
   { id: 's7', title: 'Arcane', image: 'https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg', year: '2021', match: '99', age: 'TV-14' },
   { id: 's8', title: 'Wednesday', image: 'https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg', year: '2022', match: '96', age: 'TV-14' },
-  { id: 's9', title: 'House of the Dragon', image: 'https://image.tmdb.org/t/p/w500/1X4h40nqsUAuWaHzmcCiRuVDVkO.jpg', year: '2022', match: '97', age: 'TV-MA' },
   { id: 's10', title: 'Loki', image: 'https://image.tmdb.org/t/p/w500/voHUmluYmKyleFkTu3lOXQG702u.jpg', year: '2021', match: '95', age: 'TV-14' },
 ];

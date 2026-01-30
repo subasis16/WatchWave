@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, User, Menu, X } from 'lucide-react';
+import { Search, Bell, User, Menu, X, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
@@ -24,6 +24,7 @@ const Navbar = () => {
     { name: 'Series', path: '/series' },
     { name: 'Movies', path: '/movies' },
     { name: 'Anime', path: '/anime' },
+    { name: 'Party', path: '/room' },
     { name: 'Plans & Prices', path: '/plans' },
   ];
 
@@ -59,6 +60,9 @@ const Navbar = () => {
               <button className="text-gray-300 hover:text-white transition-colors">
                 <Bell size={20} />
               </button>
+              <Link to="/settings" className="text-gray-300 hover:text-white transition-colors">
+                <Settings size={20} />
+              </Link>
               <Link to="/profile" className="text-gray-300 hover:text-white transition-colors">
                 <User size={20} />
               </Link>

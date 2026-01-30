@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -7,9 +7,15 @@ import Series from './pages/Series';
 import Anime from './pages/Anime';
 import Plans from './pages/Plans';
 import Profile from './pages/Profile';
+import WatchRoom from './pages/WatchRoom';
+import Clips from './pages/Clips';
+import Player from './pages/Player';
+import Settings from './pages/Settings';
+import OpeningAnimation from './components/OpeningAnimation';
 
 const App = () => {
   const { pathname } = useLocation();
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -21,6 +27,7 @@ const App = () => {
 
   return (
     <div className="bg-deep-black min-h-screen font-sans text-white selection:bg-brand-red selection:text-white pb-10">
+      {showIntro && <OpeningAnimation onComplete={() => setShowIntro(false)} />}
       <Navbar />
 
       <Routes>
@@ -28,8 +35,12 @@ const App = () => {
         <Route path="/movies" element={<Movies />} />
         <Route path="/series" element={<Series />} />
         <Route path="/anime" element={<Anime />} />
-        <Route path="/plans" element={<Plans />} />
+        <Route path="/room" element={<WatchRoom />} />
+        <Route path="/clips" element={<Clips />} />
+        <Route path="/player/:id" element={<Player />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/plans" element={<Plans />} />
       </Routes>
 
       {/* Footer */}

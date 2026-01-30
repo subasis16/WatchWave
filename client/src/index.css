@@ -7,9 +7,10 @@
 }
 
 body {
-  @apply bg-deep-black text-white font-sans overflow-x-hidden;
+  @apply bg-deep-black text-white font-sans overflow-x-hidden antialiased;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 /* Custom Scrollbar */
