@@ -1,9 +1,9 @@
 export const trending = [
-  { id: 't1', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2022', match: '99', age: '16+' },
-  { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+' },
-  { id: 't3', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '2024', match: '98', age: '14+' },
-  { id: 't4', title: 'Oppenheimer', image: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', year: '2023', match: '97', age: '18+' },
-  { id: 't5', title: 'Solo Leveling', image: 'https://cdn.myanimelist.net/images/anime/1739/140995.jpg', year: '2024', match: '96', age: '16+' },
+  { id: 't1', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2022', match: '99', age: '16+', trailerUrl: 'https://www.youtube.com/embed/b9EkMc79ZSU' },
+  { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+', trailerUrl: 'https://www.youtube.com/embed/TcMBFSGVi1c' },
+  { id: 't3', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '2024', match: '98', age: '14+', trailerUrl: 'https://www.youtube.com/embed/A6S9p_Y_TIE' },
+  { id: 't4', title: 'Oppenheimer', image: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', year: '2023', match: '97', age: '18+', trailerUrl: 'https://www.youtube.com/embed/uYPbbksJxIg' },
+  { id: 't5', title: 'Solo Leveling', image: 'https://cdn.myanimelist.net/images/anime/1739/140995.jpg', year: '2024', match: '96', age: '16+', trailerUrl: 'https://www.youtube.com/embed/hO_8I_Y6Y-k' },
 ];
 
 export const anime = [
@@ -21,17 +21,17 @@ export const anime = [
 ];
 
 export const movies = [
-  { id: 'm1', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '99', age: 'PG-13' },
-  { id: 'm2', title: 'Spider-Man: ATSV', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', year: '2023', match: '98', age: 'PG' },
-  { id: 'm3', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', year: '2008', match: '99', age: 'PG-13' },
-  { id: 'm4', title: 'Interstellar', image: 'https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', year: '2014', match: '97', age: 'PG-13' },
-  { id: 'm5', title: 'Inception', image: 'https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg', year: '2010', match: '96', age: 'PG-13' },
+  { id: 'm1', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/TcMBFSGVi1c' },
+  { id: 'm2', title: 'Spider-Man: ATSV', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', year: '2023', match: '98', age: 'PG', trailerUrl: 'https://www.youtube.com/embed/shW9i6k8cB0' },
+  { id: 'm3', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', year: '2008', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/EXeTwQWrcwY' },
+  { id: 'm4', title: 'Interstellar', image: 'https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', year: '2014', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/zSWdZVtXT7E' },
+  { id: 'm5', title: 'Inception', image: 'https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg', year: '2010', match: '96', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/YoHD9XEInc0' },
   // Extended
-  { id: 'm6', title: 'Dune: Part Two', image: 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg', year: '2024', match: '97', age: 'PG-13' },
-  { id: 'm7', title: 'The Batman', image: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg', year: '2022', match: '95', age: 'PG-13' },
-  { id: 'm8', title: 'Fight Club', image: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', year: '1999', match: '98', age: 'R' },
-  { id: 'm9', title: 'The Matrix', image: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', year: '1999', match: '99', age: 'R' },
-  { id: 'm10', title: 'Pulp Fiction', image: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', year: '1994', match: '98', age: 'R' },
+  { id: 'm6', title: 'Dune: Part Two', image: 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg', year: '2024', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/Way9Dexny3w' },
+  { id: 'm7', title: 'The Batman', image: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg', year: '2022', match: '95', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/mqqft2x_Aa4' },
+  { id: 'm8', title: 'Fight Club', image: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', year: '1999', match: '98', age: 'R', trailerUrl: 'https://www.youtube.com/embed/O1ot9f8D4FeE' },
+  { id: 'm9', title: 'The Matrix', image: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', year: '1999', match: '99', age: 'R', trailerUrl: 'https://www.youtube.com/embed/vKQi3bBA1y8' },
+  { id: 'm10', title: 'Pulp Fiction', image: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', year: '1994', match: '98', age: 'R', trailerUrl: 'https://www.youtube.com/embed/s7EdQ4FqbhY' },
 ];
 
 export const bollywood = [

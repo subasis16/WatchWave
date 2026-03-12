@@ -4,6 +4,25 @@ import { Play, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ContentRow = ({ title, data, ranked = false }) => {
+  const [hoveredId, setHoveredId] = React.useState(null);
+  const [showTrailer, setShowTrailer] = React.useState(false);
+  const trailerTimerRef = React.useRef(null);
+
+  const handleMouseEnter = (id) => {
+    setHoveredId(id);
+    trailerTimerRef.current = setTimeout(() => {
+      setShowTrailer(true);
+    }, 1500); // Start trailer after 1.5s hover
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredId(null);
+    setShowTrailer(false);
+    if (trailerTimerRef.current) {
+      clearTimeout(trailerTimerRef.current);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -26,6 +45,8 @@ const ContentRow = ({ title, data, ranked = false }) => {
               <motion.div
                 key={item.id}
                 whileHover={{ scale: 1.05, zIndex: 10 }}
+                onMouseEnter={() => handleMouseEnter(item.id)}
+                onMouseLeave={handleMouseLeave}
                 className="relative min-w-[300px] h-[180px] flex items-center group cursor-pointer"
               >
                 <span className="text-[12rem] font-bold text-transparent leading-none -mb-8 z-0 translate-y-2 font-outline-2"
@@ -33,11 +54,22 @@ const ContentRow = ({ title, data, ranked = false }) => {
                   {index + 1}
                 </span>
                 <div className="absolute left-[70px] top-0 bottom-0 right-0 z-10 rounded-lg overflow-hidden border border-white/10 shadow-lg transition-transform duration-300 group-hover:border-white/30">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
+                  {showTrailer && hoveredId === item.id && item.trailerUrl ? (
+                    <iframe
+                      src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.trailerUrl.split('/').pop()}`}
+                      className="w-full h-full object-cover pointer-events-none scale-110"
+                      title={item.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -51,17 +83,32 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
+                onMouseEnter={() => handleMouseEnter(item.id)}
+                onMouseLeave={handleMouseLeave}
                 className="relative w-full aspect-[2/3] rounded-xl overflow-hidden cursor-pointer group/card border border-white/5 bg-rich-gray hover:shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-shadow duration-300"
               >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
-                  loading="lazy"
-                />
+                {showTrailer && hoveredId === item.id && item.trailerUrl ? (
+                  <div className="absolute inset-0 z-0">
+                    <iframe
+                      src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.trailerUrl.split('/').pop()}`}
+                      className="w-full h-full object-cover pointer-events-none scale-[1.5]"
+                      title={item.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                ) : (
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                    loading="lazy"
+                  />
+                )}
 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 z-10">
                   <h3 className="text-white font-bold text-lg mb-1 leading-tight">{item.title}</h3>
                   <div className="flex items-center space-x-2 text-xs text-gray-300 mb-3 font-medium">
                     <span className="text-brand-red">{item.match}% Match</span>
