@@ -1,9 +1,118 @@
-import React, { useState } from 'react';
-import { Check, Users, Crown, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Check, Users, Crown, Sparkles, Loader2 } from 'lucide-react';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Plans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [groupSize, setGroupSize] = useState(5);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Utility to inject Razorpay Checkout script
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async () => {
+    if (!selectedPlan) return;
+    if (!currentUser) {
+      alert("You must be signed in to purchase a premium plan.");
+      navigate('/auth');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // 1. Load Razorpay script
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert("Razorpay SDK failed to load. Check your connection.");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Define amount based on Solo or Group logic
+      const planConfig = plans.find(p => p.id === selectedPlan);
+      const finalAmount = selectedPlan === 'group' ? planConfig.price : planConfig.price;
+
+      // 2. Contact Backend to create the order
+      const response = await fetch('http://localhost:5000/api/payments/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: finalAmount,
+          currency: 'INR',
+          receipt: `wv_rct_${Date.now()}`
+        })
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        alert("Could not initialize payment wrapper.");
+        setIsProcessing(false);
+        return;
+      }
+
+      // 3. Mount the Razorpay Checkout Modal
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_YourKeyID", // Requires VITE_RAZORPAY_KEY_ID in .env
+        amount: data.amount,
+        currency: data.currency,
+        name: "WatchWave Entertainment",
+        description: `${planConfig.name} Subscription`,
+        image: "https://i.imgur.com/3g7nmJC.png", // A red logo placeholder
+        order_id: data.orderId,
+        handler: function (response) {
+          // This is the SUCCESS handler. Real verification happens in the backend webhook.
+          alert(`Payment Successful! Welcome to ${planConfig.name}. ID: ${response.razorpay_payment_id}`);
+          navigate('/profile');
+        },
+        prefill: {
+          name: currentUser.displayName || "Premium User",
+          email: currentUser.email,
+        },
+        notes: {
+          firebase_uid: currentUser.uid, // PASSING SECURE UID TO BACKEND WEBHOOK!
+          plan_id: selectedPlan
+        },
+        theme: {
+          color: "#E50914" // WatchWave Brand Code Theme
+        }
+      };
+
+      const paymentObject = new window.Razorpay(options);
+
+      paymentObject.on('payment.failed', function (response) {
+        alert(`Payment Failed. Reason: ${response.error.description}`);
+        setIsProcessing(false);
+      });
+
+      paymentObject.open();
+
+    } catch (error) {
+      console.error("Payment flow error: ", error);
+      alert("A critical error occurred initializing the payment window.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const plans = [
     {
@@ -153,11 +262,19 @@ const Plans = () => {
         {/* Subscribe Button */}
         {selectedPlan && (
           <div className="mt-12 text-center animate-slide-up">
-            <button className="bg-gradient-to-r from-brand-red to-brand-dark-red hover:from-brand-dark-red hover:to-brand-red text-white font-bold px-12 py-4 rounded-xl transition-all transform hover:scale-105 shadow-2xl shadow-brand-red/30">
-              Subscribe Now
+            <button
+              onClick={handlePayment}
+              disabled={isProcessing}
+              className="bg-gradient-to-r from-brand-red to-brand-dark-red hover:from-brand-dark-red hover:to-brand-red text-white font-bold px-12 py-4 rounded-xl transition-all transform hover:scale-105 shadow-2xl shadow-brand-red/30 flex items-center justify-center mx-auto disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isProcessing ? (
+                <><Loader2 className="w-5 h-5 mr-3 animate-spin" /> Securing Connection...</>
+              ) : (
+                'Subscribe Now'
+              )}
             </button>
             <p className="text-gray-400 text-sm mt-4">
-              Cancel anytime. No hidden fees. 30-day money-back guarantee.
+              Secured by 256-bit encryption. Cancel anytime.
             </p>
           </div>
         )}
