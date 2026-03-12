@@ -13,7 +13,21 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app;
+try {
+    if (!firebaseConfig.apiKey) {
+        throw new Error("VITE_FIREBASE_API_KEY is missing. Please check your .env file.");
+    }
+    app = initializeApp(firebaseConfig);
+} catch (error) {
+    console.error("Firebase initialization failed:", error.message);
+    // Provide a dummy app object to prevent downstream crashes during initialization
+    app = {
+        options: {},
+        name: '[DEFAULT]',
+        automaticDataCollectionEnabled: false
+    };
+}
 
 // Initialize Firebase services to export
 export const auth = getAuth(app);
