@@ -3,13 +3,13 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ./backend
+      context: ./server
       dockerfile: Dockerfile
     container_name: watchwave_backend
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
+      - ./server:/app
       - /app/node_modules
     environment:
       - PORT=5000

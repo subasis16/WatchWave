@@ -50,13 +50,9 @@ const ContentRow = ({ title, data, ranked = false }) => {
         {ranked ? (
           <div className="flex flex-nowrap overflow-x-visible gap-2 md:gap-4 pb-12 px-2 md:px-6 scroll-smooth no-scrollbar">
             {data.map((item, index) => (
-              <motion.div
+              <div
                 key={item.id}
-                onClick={() => handleCardClick(item)}
-                whileHover={{ scale: 1.05, zIndex: 10 }}
-                onMouseEnter={() => handleMouseEnter(item.id)}
-                onMouseLeave={handleMouseLeave}
-                className="relative shrink-0 h-[180px] sm:h-[220px] md:h-[260px] flex items-end group cursor-pointer pr-4 md:pr-6"
+                className="relative shrink-0 h-[180px] sm:h-[220px] md:h-[260px] flex items-end pr-4 md:pr-6"
               >
                 {/* Number Overlay Layer */}
                 <span
@@ -70,31 +66,14 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 </span>
 
                 {/* Portrait Image Container */}
-                <div className="ml-[45px] sm:ml-[60px] md:ml-[85px] h-full aspect-[2/3] z-10 rounded-md overflow-hidden relative shadow-[8px_0_20px_rgba(0,0,0,0.8)] bg-zinc-900 border border-transparent group-hover:border-white/20 transition-colors">
-                  {showTrailer && hoveredId === item.id && item.trailerUrl ? (
-                    <iframe
-                      src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.trailerUrl.split('/').pop()}`}
-                      className="w-full h-full object-cover pointer-events-none scale-110"
-                      title={item.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  ) : (
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                  {/* Subtle hover play overlay */}
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="w-10 h-10 md:w-14 md:h-14 bg-black/50 border-2 border-white rounded-full flex items-center justify-center pt-0.5 pl-0.5 md:pl-1 shadow-[0_0_15px_rgba(255,255,255,0.5)] transform scale-90 group-hover:scale-100 transition-all duration-300 group-hover:bg-[#e50914] group-hover:border-[#e50914]">
-                      <Play className="w-4 h-4 md:w-6 md:h-6 text-white fill-current" />
-                    </div>
-                  </div>
+                <div className="ml-[45px] sm:ml-[60px] md:ml-[85px] h-full aspect-[2/3] z-10 rounded-md overflow-hidden relative shadow-[8px_0_20px_rgba(0,0,0,0.8)] bg-zinc-900">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (

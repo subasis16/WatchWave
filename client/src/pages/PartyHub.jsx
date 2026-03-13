@@ -4,75 +4,6 @@ import { Settings, Play, Copy, Search, Share2, Video, Smile, Users } from 'lucid
 import { useNavigate } from 'react-router-dom';
 import SocialSidebar from '../components/Party/SocialSidebar';
 
-const mockLiveParties = [
-    {
-        id: 1,
-        host: 'Arjun',
-        avatar: 'https://i.pravatar.cc/150?u=1',
-        roomName: 'Avengers Endgame Marathon',
-        image: 'https://image.tmdb.org/t/p/w500/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg',
-        year: '2019',
-        age: 'U/A',
-        quality: '4K',
-        dominantColor: 'rgba(59, 130, 246, 0.5)' // Blue tint for Avengers
-    },
-    {
-        id: 2,
-        host: 'Sarah',
-        avatar: 'https://i.pravatar.cc/150?u=2',
-        roomName: 'Spider-Man: Spider-Verse',
-        image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg',
-        year: '2007',
-        age: '16+',
-        quality: 'HD',
-        dominantColor: 'rgba(249, 115, 22, 0.5)' // Orange tint for Naruto
-    },
-    {
-        id: 3,
-        host: 'Dev',
-        avatar: 'https://i.pravatar.cc/150?u=4',
-        roomName: 'Interstellar Watch Party',
-        image: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-        year: '2023',
-        age: '18+',
-        quality: '4K',
-        dominantColor: 'rgba(168, 85, 247, 0.5)' // Purple tint
-    },
-    {
-        id: 4,
-        host: 'Priya',
-        avatar: 'https://i.pravatar.cc/150?u=5',
-        roomName: 'Deadpool 2 Movie Night',
-        image: 'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1000&auto=format&fit=crop',
-        year: '2025',
-        age: 'U',
-        quality: 'HD',
-        dominantColor: 'rgba(234, 179, 8, 0.5)' // Yellow tint
-    },
-    {
-        id: 5,
-        host: 'Rohan',
-        avatar: 'https://i.pravatar.cc/150?u=6',
-        roomName: 'Joker (2019) Watch Party',
-        image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000&auto=format&fit=crop',
-        year: '2024',
-        age: '13+',
-        quality: '1080p',
-        dominantColor: 'rgba(239, 68, 68, 0.5)' // Red tint
-    },
-    {
-        id: 6,
-        host: 'Elena',
-        avatar: 'https://i.pravatar.cc/150?u=10',
-        roomName: 'Dune: Part Two Experience',
-        image: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1000&auto=format&fit=crop',
-        year: '2022',
-        age: 'U/A',
-        quality: '4K',
-        dominantColor: 'rgba(16, 185, 129, 0.5)' // Green tint
-    }
-];
-
 const PartyHub = () => {
     const [isLive, setIsLive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -85,7 +16,8 @@ const PartyHub = () => {
     const handleGoLive = () => {
         setIsLive(true);
         // "AI" feature: Set room color to match a currently active/selected movie's dominant color.
-        setRoomThemeColor(mockLiveParties[0].dominantColor);
+        // Using a default color since mockLiveParties is removed.
+        setRoomThemeColor('rgba(229, 9, 20, 0.5)');
     };
 
     const copyLink = () => {
@@ -112,7 +44,7 @@ const PartyHub = () => {
             {/* Cinematic High-Blur Global Backdrop */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none">
                 <img
-                    src={mockLiveParties[0].image}
+                    src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1000&auto=format&fit=crop" // Static image after removing mock data
                     alt="Backdrop"
                     className="w-full h-full object-cover opacity-80"
                 />
@@ -197,89 +129,33 @@ const PartyHub = () => {
                             </div>
                         </motion.section>
 
-                        {/* 2. "Live Now" High-Fidelity Cards Section */}
+                        {/* 2. Hidden Public Parties Info - Explaining Private Logic */}
                         <motion.section
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2, duration: 0.6 }}
-                            className="space-y-6"
+                            className="bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 text-center"
                         >
-                            {/* Search & Header Row */}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-                                <div className="flex items-center gap-6 px-2">
-                                    <h3 className="text-sm uppercase font-bold text-gray-400 tracking-widest hover:text-white transition-colors cursor-pointer">Suggested</h3>
-                                    <div className="h-4 w-px bg-white/20"></div>
-                                    <h3 className="text-sm uppercase font-bold text-white tracking-widest flex items-center gap-2 border-b-2 border-[#E50914] pb-1 cursor-pointer">
-                                        Live Now
-                                    </h3>
+                            <div className="max-w-2xl mx-auto space-y-4">
+                                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Users className="text-red-500" size={32} />
                                 </div>
-                                <div className="relative w-full md:w-80">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search rooms or friends..."
-                                        className="w-full bg-[#000]/40 backdrop-blur-md text-white rounded-xl pl-12 pr-6 py-3 focus:outline-none border border-white/10 focus:border-[#E50914]/50 placeholder:text-gray-500 text-sm transition-all shadow-inner"
-                                    />
+                                <h3 className="text-2xl font-bold text-white tracking-tight">Private Watch Parties</h3>
+                                <p className="text-gray-400 leading-relaxed">
+                                    To ensure the best experience, WatchWave parties are private by default. 
+                                    Create your theater above and share the unique invite link with your friends to start watching together.
+                                </p>
+                                <div className="pt-6 flex flex-wrap justify-center gap-4">
+                                    <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/5 text-xs font-mono text-gray-400">
+                                        End-to-End Synced Playback
+                                    </div>
+                                    <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/5 text-xs font-mono text-gray-400">
+                                        Real-time Voice & Chat
+                                    </div>
+                                    <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/5 text-xs font-mono text-gray-400">
+                                        Spatial Audio Support
+                                    </div>
                                 </div>
-                            </div>
-
-                            {/* Perspective Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" style={{ perspective: '1200px' }}>
-                                {mockLiveParties.map((party, idx) => (
-                                    <motion.div
-                                        key={party.id}
-                                        initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
-                                        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                                        transition={{ delay: 0.3 + (idx * 0.1), duration: 0.5 }}
-                                        className="sheen-card bg-[#141414]/80 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 group flex flex-col shadow-[0_15px_35px_rgba(0,0,0,0.6)] cursor-pointer"
-                                        style={{ transformStyle: 'preserve-3d' }}
-                                    >
-                                        <div className="relative h-48 w-full overflow-hidden">
-                                            {/* CSS Shine Sweep effect via sheen-card class */}
-                                            <div className="sheen-layer absolute inset-0 z-20 pointer-events-none" />
-
-                                            <img src={party.image} alt={party.roomName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-90" />
-
-                                            {/* Cinematic Image Gradient */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#141414]/90 via-transparent to-black/30 z-10" />
-
-                                            {/* LIVE Indicator Pill */}
-                                            <div className="absolute top-4 right-4 bg-red-600/20 backdrop-blur-md border border-red-500/30 px-3 py-1.5 rounded-full flex items-center gap-2 z-20 shadow-[0_0_15px_rgba(229,9,20,0.2)]">
-                                                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,1)]" />
-                                                <span className="text-[10px] font-black tracking-widest text-red-100 uppercase">Live</span>
-                                            </div>
-
-                                            {/* Pills Container */}
-                                            <div className="absolute top-4 left-4 flex gap-2 z-20">
-                                                <span className="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm">{party.quality}</span>
-                                                <span className="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm">{party.age}</span>
-                                            </div>
-
-                                            <div className="absolute inset-x-0 bottom-0 p-5 flex items-end gap-4 z-20">
-                                                {/* Simulated Spatial Audio border on Host Avatar */}
-                                                <div className="relative group-hover:-translate-y-1 transition-transform">
-                                                    <div className="absolute inset-0 rounded-full bg-white opacity-20 group-hover:animate-ping mix-blend-screen" />
-                                                    <img src={party.avatar} alt={party.host} className="w-12 h-12 rounded-full border-2 border-white/20 shadow-[-5px_5px_15px_rgba(0,0,0,0.8)] object-cover relative z-10" />
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-0.5">Host: {party.host}</p>
-                                                    <h3 className="font-extrabold text-white text-base leading-tight truncate drop-shadow-md">{party.roomName}</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="px-5 py-4 flex-1 flex flex-col justify-end bg-transparent border-t border-white/5 relative z-20">
-                                            <button
-                                                onClick={() => navigate('/room')}
-                                                className="w-full bg-white/5 hover:bg-[#E50914] text-gray-300 hover:text-white border border-white/10 hover:border-[#E50914] font-bold py-3 rounded-xl text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(229,9,20,0.4)]"
-                                            >
-                                                <Users size={16} /> Join Party
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                ))}
                             </div>
                         </motion.section>
                     </div>

@@ -1,9 +1,11 @@
+import soloLevelingImg from '../assets/solo-leveling.png';
+
 export const trending = [
   { id: 't1', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2022', match: '99', age: '16+', trailerUrl: 'https://www.youtube.com/embed/b9EkMc79ZSU' },
   { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+', trailerUrl: 'https://www.youtube.com/embed/TcMBFSGVi1c' },
   { id: 't3', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '2024', match: '98', age: '14+', trailerUrl: 'https://www.youtube.com/embed/A6S9p_Y_TIE' },
   { id: 't4', title: 'Oppenheimer', image: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', year: '2023', match: '97', age: '18+', trailerUrl: 'https://www.youtube.com/embed/uYPbbksJxIg' },
-  { id: 't5', title: 'Solo Leveling', image: 'https://cdn.myanimelist.net/images/anime/1739/140995.jpg', year: '2024', match: '96', age: '16+', trailerUrl: 'https://www.youtube.com/embed/hO_8I_Y6Y-k' },
+  { id: 't5', title: 'Solo Leveling', image: soloLevelingImg, year: '2024', match: '96', age: '16+', trailerUrl: 'https://www.youtube.com/embed/hO_8I_Y6Y-k' },
 ];
 
 export const anime = [
