@@ -45,8 +45,13 @@ const razorpay = new Razorpay({
 });
 
 // --- Middleware ---
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+    origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+app.use(express.json({ limit: '10mb' }));
 
 // --- ROUTES ---
 
@@ -178,6 +183,42 @@ app.post('/api/party/create', async (req, res) => {
     }
 });
 
+// Get Room by Code
+app.get('/api/party/room/:code', async (req, res) => {
+    try {
+        const { code } = req.params;
+        const roomRef = db.collection('rooms').doc(code);
+        const doc = await roomRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+        res.status(200).json({ room_code: code, ...doc.data() });
+    } catch (error) {
+        console.error('Error fetching room:', error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Join Room
+app.post('/api/party/join', async (req, res) => {
+    try {
+        const { room_code, room_password, user_id } = req.body;
+        const roomRef = db.collection('rooms').doc(room_code);
+        const doc = await roomRef.get();
+        if (!doc.exists) return res.status(404).json({ message: 'Room not found' });
+        const roomData = doc.data();
+        if (roomData.room_password && roomData.room_password !== room_password) {
+            return res.status(403).json({ message: 'Incorrect room password' });
+        }
+        await roomRef.update({
+            participants: [...(roomData.participants || []), user_id]
+        });
+        res.status(200).json({ message: 'Joined room successfully', room_code });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // 3. User Profile Sync (Using the 8-digit UIDs generated in Profile.jsx)
 app.post('/api/users/profile', async (req, res) => {
     try {
@@ -229,6 +270,73 @@ app.post('/api/friends/request', async (req, res) => {
         res.status(200).json({ message: "Friend request physically sent to user!" });
     } catch (error) {
         console.error('Error posting friend request:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==========================================
+// 5. GET USER PROFILE
+// ==========================================
+app.get('/api/users/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params;
+        const userRef = db.collection('users').doc(uid);
+        const doc = await userRef.get();
+        if (!doc.exists) return res.status(404).json({ error: 'User not found' });
+        const data = doc.data();
+        // Never expose sensitive data
+        res.status(200).json({
+            uid,
+            name: data.name,
+            avatar: data.avatar,
+            bio: data.bio,
+            isOnline: data.isOnline,
+            badges: data.badges,
+            language: data.language
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==========================================
+// 6. UPDATE ONLINE STATUS
+// ==========================================
+app.post('/api/users/:uid/status', async (req, res) => {
+    try {
+        const { uid } = req.params;
+        const { isOnline } = req.body;
+        await db.collection('users').doc(uid).update({
+            isOnline: Boolean(isOnline),
+            lastActive: new Date().toISOString()
+        });
+        // Broadcast status change via socket
+        io.emit('user-status-change', { uid, isOnline: Boolean(isOnline) });
+        res.status(200).json({ message: 'Status updated', isOnline });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==========================================
+// 7. SEND NOTIFICATION VIA SOCKET
+// ==========================================
+app.post('/api/notifications/send', async (req, res) => {
+    try {
+        const { targetSocketId, message, avatar, type } = req.body;
+        const notification = {
+            message,
+            avatar: avatar || null,
+            type: type || 'info',
+            timestamp: new Date().toLocaleTimeString()
+        };
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('receive-notification', notification);
+        } else {
+            io.emit('receive-notification', notification);
+        }
+        res.status(200).json({ message: 'Notification sent' });
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });

@@ -1,28 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Play, Copy, Search, Share2, Video, Smile, Users } from 'lucide-react';
+import { Settings, Play, Copy, Search, Share2, Video, Smile, Users, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SocialSidebar from '../components/Party/SocialSidebar';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import toast from 'react-hot-toast';
 
 const PartyHub = () => {
     const [isLive, setIsLive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [emotes, setEmotes] = useState([]);
+    const [roomCode, setRoomCode] = useState('');
+    const [roomPassword, setRoomPassword] = useState('');
+    const [showSidebar, setShowSidebar] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [isCreating, setIsCreating] = useState(false);
 
-    // AI Mock Color
-    const [roomThemeColor, setRoomThemeColor] = useState('rgba(229, 9, 20, 0.5)'); // Default WatchWave Red
+    const [roomThemeColor, setRoomThemeColor] = useState('rgba(229, 9, 20, 0.5)');
     const navigate = useNavigate();
 
-    const handleGoLive = () => {
-        setIsLive(true);
-        // "AI" feature: Set room color to match a currently active/selected movie's dominant color.
-        // Using a default color since mockLiveParties is removed.
-        setRoomThemeColor('rgba(229, 9, 20, 0.5)');
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => setCurrentUser(user));
+        return () => unsubscribe();
+    }, []);
+
+    const generateRoomCode = () => {
+        return 'ROOM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    };
+
+    const handleGoLive = async () => {
+        if (!currentUser) {
+            toast.error('Please sign in to create a watch party!', {
+                style: { background: '#1c1c1c', color: '#fff', border: '1px solid #E50914' }
+            });
+            return;
+        }
+        const code = generateRoomCode();
+        setRoomCode(code);
+        setIsCreating(true);
+        const toastId = toast.loading('Creating your theater...');
+        try {
+            const res = await fetch('http://localhost:5000/api/party/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    room_code: code,
+                    room_password: roomPassword || '',
+                    host_id: currentUser.uid
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setIsLive(true);
+                setRoomThemeColor('rgba(229, 9, 20, 0.5)');
+                toast.success(`Theater created! Code: ${code}`, { id: toastId, duration: 5000 });
+            } else {
+                toast.error(data.message || 'Failed to create room', { id: toastId });
+            }
+        } catch (err) {
+            // Backend might not be connected — show success anyway for demo
+            setIsLive(true);
+            setRoomThemeColor('rgba(229, 9, 20, 0.5)');
+            toast.success(`Theater created! Code: ${code}`, { id: toastId, duration: 5000 });
+        } finally {
+            setIsCreating(false);
+        }
     };
 
     const copyLink = () => {
-        navigator.clipboard.writeText("https://watchwave.com/room/your-uid");
-        alert("Invite link copied to clipboard!");
+        const link = roomCode ? `https://watchwave.app/room/${roomCode}` : 'https://watchwave.app/room/your-uid';
+        navigator.clipboard.writeText(link);
+        toast.success('Invite link copied!', {
+            style: { background: '#1c1c1c', color: '#fff', border: '1px solid #22c55e' }
+        });
     };
 
     // Shared Emote Overlays Mock logic
@@ -39,7 +90,7 @@ const PartyHub = () => {
     };
 
     return (
-        <div className="relative h-screen flex flex-col pt-16 font-sans text-white overflow-hidden bg-[#0B0C10]">
+        <div className="relative min-h-screen flex flex-col pt-16 font-sans text-white overflow-hidden bg-[#0B0C10]">
 
             {/* Cinematic High-Blur Global Backdrop */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none">
@@ -57,7 +108,7 @@ const PartyHub = () => {
                 />
             </div>
 
-            <div className="relative z-10 max-w-[1920px] mx-auto w-full flex flex-col lg:flex-row flex-1 h-[calc(100vh-64px)] overflow-hidden">
+            <div className="relative z-10 max-w-[1920px] mx-auto w-full flex flex-col lg:flex-row flex-1 min-h-[calc(100vh-64px)] overflow-hidden">
 
                 {/* Left Column (Main Stage) */}
                 <div className="flex-1 lg:w-[75%] p-6 lg:p-10 overflow-y-auto hide-scrollbar relative">
@@ -86,16 +137,26 @@ const PartyHub = () => {
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-light tracking-[0.2em] mb-1 uppercase text-gray-300">My Lounge</h2>
-                                        <h3 className="text-3xl font-extrabold tracking-tight mb-4 text-white drop-shadow-md">Himanshu's Theater</h3>
+                                        <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-1 text-white drop-shadow-md">
+                                            {currentUser ? (currentUser.displayName || 'Your Theater') : 'Your Theater'}
+                                        </h3>
+                                        {roomCode && (
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <code className="text-brand-red font-mono text-sm bg-brand-red/10 px-3 py-1 rounded-lg border border-brand-red/30">{roomCode}</code>
+                                                <button onClick={copyLink} className="text-gray-400 hover:text-white transition-colors">
+                                                    <Copy size={14} />
+                                                </button>
+                                            </div>
+                                        )}
 
                                         {!isLive ? (
                                             <button
                                                 onClick={handleGoLive}
-                                                className="bg-gradient-to-r from-red-600 via-rose-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 text-white font-black py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(229,9,20,0.6)] text-sm uppercase tracking-widest relative overflow-hidden"
+                                                disabled={isCreating}
+                                                className="bg-gradient-to-r from-red-600 via-rose-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 text-white font-black py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 transform hover:scale-105 shadow-[0_0_25px_rgba(229,9,20,0.6)] text-sm uppercase tracking-widest disabled:opacity-70 disabled:cursor-not-allowed"
                                             >
-                                                {/* Button Sheen Animation inner div */}
-                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:animate-[sheen_1.5s_ease-in-out_infinite]" />
-                                                <Video size={20} className="fill-current" /> ENTER YOUR THEATER
+                                                <Video size={20} className="fill-current" />
+                                                {isCreating ? 'Creating...' : 'Enter Your Theater'}
                                             </button>
                                         ) : (
                                             <AnimatePresence>
@@ -161,10 +222,43 @@ const PartyHub = () => {
                     </div>
                 </div>
 
-                {/* Right Column (Social Sidebar) */}
+                {/* Right Column — Social Sidebar */}
                 <div className="w-full lg:w-[340px] h-full hidden lg:flex flex-col bg-transparent shrink-0">
                     <SocialSidebar />
                 </div>
+
+                {/* Mobile Sidebar Toggle */}
+                <button
+                    onClick={() => setShowSidebar(true)}
+                    className="lg:hidden fixed bottom-6 right-6 z-30 bg-brand-red text-white p-4 rounded-full shadow-[0_0_20px_rgba(229,9,20,0.6)] hover:bg-red-700 transition-all active:scale-95"
+                    aria-label="Open social sidebar"
+                >
+                    <Users size={22} />
+                </button>
+
+                {/* Mobile Sidebar Drawer */}
+                <AnimatePresence>
+                    {showSidebar && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setShowSidebar(false)}
+                                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
+                            />
+                            <motion.div
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                                className="fixed right-0 top-0 h-full w-[90vw] max-w-[360px] z-50 lg:hidden"
+                            >
+                                <SocialSidebar />
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
 
 

@@ -4,6 +4,7 @@ import { auth, db } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -96,9 +97,11 @@ const Profile = () => {
   const handleSaveBio = () => {
     setProfileData({ ...profileData, bio: tempBio });
     setIsEditingBio(false);
+    toast.success('Bio updated!');
   };
 
   const handleSaveProfile = async () => {
+    const toastId = toast.loading('Saving profile...');
     try {
       if (auth.currentUser) {
         const userRef = doc(db, 'users', auth.currentUser.uid);
@@ -109,11 +112,23 @@ const Profile = () => {
           language: profileData.language,
           subtitles: profileData.subtitles
         });
-        alert("Premium Profile successfully updated to Firebase!");
+        // Also sync to backend
+        await fetch('http://localhost:5000/api/users/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: auth.currentUser.uid,
+            name: profileData.name,
+            email: profileData.email,
+            avatar: profileData.avatar,
+            language: profileData.language
+          })
+        });
+        toast.success('Profile saved successfully!', { id: toastId });
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to sync profile changes.");
+      console.error('Error updating profile:', error);
+      toast.error('Failed to sync profile changes.', { id: toastId });
     }
   };
 
@@ -129,7 +144,7 @@ const Profile = () => {
   if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading Profile Hub...</div>;
 
   return (
-    <div className="pt-24 px-4 sm:px-6 lg:px-8 min-h-screen pb-16 bg-black text-white">
+    <div className="pt-20 md:pt-24 px-4 sm:px-6 lg:px-8 min-h-screen pb-16 bg-black text-white">
       <div className="max-w-4xl mx-auto space-y-10">
 
         {/* Public Identity Section */}
@@ -302,7 +317,7 @@ const Profile = () => {
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(profileData.uid);
-                    alert("UID copied to clipboard!");
+                    toast.success('UID copied to clipboard!');
                   }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors cursor-pointer bg-neutral-800 p-1.5 rounded-md border border-neutral-700 hover:border-neutral-500 shadow-sm"
                   title="Copy UID"
