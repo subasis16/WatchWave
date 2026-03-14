@@ -1,13 +1,18 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { trending, anime, movies, bollywood, series } from '../data/content';
 
 const VideoPlayer = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // A dummy placeholder video source since we don't have the real backend URLs yet.
-    const videoSrc = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_5MB.mp4";
+    // Find the item by ID in all data arrays
+    const allContent = [...trending, ...anime, ...movies, ...bollywood, ...series];
+    const item = allContent.find(c => c.id === id);
+
+    // Get the trailer URL or default if not found
+    const trailerUrl = item?.trailerUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ";
 
     return (
         <div className="w-full h-screen bg-black relative flex items-center justify-center overflow-hidden group">
@@ -20,15 +25,21 @@ const VideoPlayer = () => {
                 <ArrowLeft className="w-8 h-8" />
             </button>
 
-            {/* Video Element */}
-            <video
-                className="w-full h-full object-contain"
-                autoPlay
-                controls
-                src={videoSrc}
-            >
-                Your browser does not support the video tag.
-            </video>
+            {/* Video Player — YouTube Trailer with branded elements hidden */}
+            <div className="relative w-full h-full">
+                <iframe
+                    className="w-full h-full border-0"
+                    src={`${trailerUrl}?autoplay=1&controls=1&modestbranding=1&rel=0&iv_load_policy=3&showinfo=0`}
+                    title={item?.title || "Video Player"}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                ></iframe>
+                {/* Overlay to hide the YouTube logo (bottom-right of the player bar) */}
+                <div
+                    className="absolute pointer-events-none z-10"
+                    style={{ bottom: '40px', right: '0px', width: '130px', height: '42px', background: '#000' }}
+                />
+            </div>
         </div>
     );
 };

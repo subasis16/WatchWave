@@ -1,240 +1,195 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { db, auth } = require('./firebase');
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
+const helmet = require('helmet');
 const http = require('http');
-const { Server } = require("socket.io");
+const { Server } = require('socket.io');
+const { generalLimiter } = require('./middleware/rateLimit');
 
+// ==========================================
+// ROUTE IMPORTS
+// ==========================================
+const contentRoutes = require('./routes/content');
+const userRoutes = require('./routes/users');
+const friendRoutes = require('./routes/friends');
+const paymentRoutes = require('./routes/payments');
+const partyRoutes = require('./routes/party');
+const feedbackRoutes = require('./routes/feedback');
+const adminRoutes = require('./routes/admin');
+
+// ==========================================
+// APP SETUP
+// ==========================================
 const app = express();
 const server = http.createServer(app);
 
-// Initialize Socket.io
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+// ==========================================
+// MIDDLEWARE
+// ==========================================
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: false,
+}));
+
+app.use(cors({
+    origin: [CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+}));
+
+// Raw body for Razorpay webhook signature verification
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
+// JSON body parser for all other routes
+app.use(express.json({ limit: '5mb' }));
+
+// General rate limiter for all routes
+app.use(generalLimiter);
+
+// ==========================================
+// ROUTES
+// ==========================================
+app.use('/api/content', contentRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/friends', friendRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/party', partyRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/contact', feedbackRoutes);
+app.use('/api/admin', adminRoutes);
+
+// Health check
+app.get('/', (req, res) => {
+    res.json({
+        message: '🎬 WatchWave API is running.',
+        version: '2.0.0',
+        endpoints: {
+            content: '/api/content',
+            users: '/api/users',
+            friends: '/api/friends',
+            payments: '/api/payments',
+            party: '/api/party',
+            feedback: '/api/feedback',
+            admin: '/api/admin',
+        }
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled Error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+});
+
+// ==========================================
+// SOCKET.IO — Real-Time Features
+// ==========================================
 const io = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: [CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'],
+        methods: ['GET', 'POST'],
+        credentials: true,
     }
 });
 
-// Real-Time Chat WebSocket Handlers
-io.on("connection", (socket) => {
-    console.log(`🔌 User Connected: ${socket.id}`);
+io.on('connection', (socket) => {
+    console.log(`🔌 Connected: ${socket.id}`);
 
-    // Join a unique 1-on-1 private room for chatting
-    socket.on("join_chat", (room) => {
+    // ---- Private 1-on-1 Chat ----
+    socket.on('join_chat', (room) => {
         socket.join(room);
-        console.log(`User ${socket.id} joined room ${room}`);
     });
 
-    // Listen for incoming messages and broadcast to the specific room
-    socket.on("send_message", (data) => {
-        socket.to(data.room).emit("receive_message", data);
+    socket.on('send_message', (data) => {
+        socket.to(data.room).emit('receive_message', data);
     });
 
-    socket.on("disconnect", () => {
-        console.log("User Disconnected", socket.id);
+    // ---- Watch Party Room ----
+    socket.on('join_watch_room', ({ roomCode, userId, username }) => {
+        socket.join(`room_${roomCode}`);
+        socket.to(`room_${roomCode}`).emit('user_joined', { userId, username });
+        console.log(`🎬 ${username} joined room ${roomCode}`);
+    });
+
+    socket.on('leave_watch_room', ({ roomCode, userId, username }) => {
+        socket.leave(`room_${roomCode}`);
+        socket.to(`room_${roomCode}`).emit('user_left', { userId, username });
+    });
+
+    // Sync: play/pause/seek/content change
+    socket.on('sync_play', ({ roomCode, progress }) => {
+        socket.to(`room_${roomCode}`).emit('sync_play', { progress });
+    });
+
+    socket.on('sync_pause', ({ roomCode, progress }) => {
+        socket.to(`room_${roomCode}`).emit('sync_pause', { progress });
+    });
+
+    socket.on('sync_seek', ({ roomCode, progress }) => {
+        socket.to(`room_${roomCode}`).emit('sync_seek', { progress });
+    });
+
+    socket.on('sync_content', ({ roomCode, content }) => {
+        socket.to(`room_${roomCode}`).emit('sync_content', { content });
+    });
+
+    // Watch Party Chat message
+    socket.on('room_message', ({ roomCode, message }) => {
+        socket.to(`room_${roomCode}`).emit('room_message', message);
+    });
+
+    // Entry request (knock-to-enter system)
+    socket.on('entry-request', ({ roomCode, userId }) => {
+        socket.to(`room_${roomCode}`).emit('receive-entry-request', { userId, socketId: socket.id });
+    });
+
+    socket.on('entry-accepted', ({ socketId }) => {
+        io.to(socketId).emit('entry-accepted');
+    });
+
+    socket.on('entry-declined', ({ socketId }) => {
+        io.to(socketId).emit('entry-declined');
+    });
+
+    // Reactions
+    socket.on('send_reaction', ({ roomCode, reaction }) => {
+        socket.to(`room_${roomCode}`).emit('receive_reaction', reaction);
+    });
+
+    // ---- Notifications ----
+    // Admin can emit 'send-notification' to a user's personal room
+    socket.on('join_user_room', (uid) => {
+        socket.join(`user_${uid}`);
+    });
+
+    // Admin broadcast (server-side only, kept for reference)
+    socket.on('broadcast_notification', (notification) => {
+        io.emit('receive-notification', notification);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`🔌 Disconnected: ${socket.id}`);
     });
 });
 
-// Initialize Razorpay
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-// --- Middleware ---
-app.use(cors());
-app.use(express.json());
-
-// --- ROUTES ---
+// Export io so routes can emit notifications
+module.exports.io = io;
 
 // ==========================================
-// 1. PAYMENT ROUTES (RAZORPAY)
+// START SERVER
 // ==========================================
-
-// Create Razorpay Order
-app.post('/api/payments/create-order', async (req, res) => {
-    try {
-        const { amount, currency = "INR", receipt } = req.body;
-
-        // Razorpay requires amount in smallest currency unit (paise)
-        const options = {
-            amount: amount * 100,
-            currency,
-            receipt: receipt || `receipt_${Date.now()}`
-        };
-
-        const order = await razorpay.orders.create(options);
-
-        if (!order) {
-            return res.status(500).json({ success: false, message: "Order creation failed" });
-        }
-
-        res.status(200).json({
-            success: true,
-            orderId: order.id,
-            amount: order.amount,
-            currency: order.currency
-        });
-    } catch (error) {
-        console.error("Razorpay Order Error: ", error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-
-// Razorpay Webhook for secure payment verification
-app.post('/api/payments/webhook', async (req, res) => {
-    try {
-        const webhookSignature = req.headers['x-razorpay-signature'];
-        const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
-
-        // Create exactly what Razorpay expects using crypto
-        const expectedSignature = crypto
-            .createHmac('sha256', webhookSecret)
-            .update(JSON.stringify(req.body))
-            .digest('hex');
-
-        if (expectedSignature === webhookSignature) {
-            // Signature is valid. Payment is authentic!
-            const paymentEntity = req.body.payload.payment.entity;
-            const eventType = req.body.event;
-
-            if (eventType === 'payment.captured') {
-                const firebaseUid = paymentEntity.notes.firebase_uid; // Read custom notes passed from frontend
-                const planId = paymentEntity.notes.plan_id;
-
-                if (firebaseUid) {
-                    // Update the user's document in Firestore via the Admin SDK
-                    const userRef = db.collection('users').doc(firebaseUid);
-
-                    // Add 30 days to current date for premium expiration
-                    const premiumUntil = new Date();
-                    premiumUntil.setDate(premiumUntil.getDate() + 30);
-
-                    await userRef.update({
-                        subscriptionStatus: 'active',
-                        subscriptionPlan: planId,
-                        premiumUntil: premiumUntil.toISOString(),
-                        subscriptionId: paymentEntity.order_id
-                    });
-
-                    console.log(`Successfully upgraded user ${firebaseUid} to Premium!`);
-                }
-            }
-            res.status(200).json({ success: true });
-        } else {
-            // Bad signature! Attempted spoofing!
-            res.status(400).json({ success: false, message: 'Invalid Webhook Signature' });
-        }
-    } catch (error) {
-        console.error("Razorpay Webhook Error:", error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-
-// ==========================================
-// 2. ROOT & HEALTH
-// ==========================================
-app.get('/', (req, res) => {
-    res.json({ message: 'WatchWave API is running with Firebase Admin Backend!' });
-});
-
-// 2. Watch Party Management API
-app.post('/api/party/create', async (req, res) => {
-    try {
-        const { room_code, room_password, host_id } = req.body;
-
-        if (!room_code) {
-            return res.status(400).json({ message: 'Room code is required' });
-        }
-
-        // Save room data to Firestore
-        const roomRef = db.collection('rooms').doc(room_code);
-        const doc = await roomRef.get();
-
-        if (doc.exists) {
-            return res.status(400).json({ message: 'Room already exists' });
-        }
-
-        // Add to Firebase Firestore Database via Admin SDK
-        await roomRef.set({
-            room_password: room_password || '',
-            host_id: host_id || 'anonymous',
-            created_at: new Date().toISOString(),
-            status: 'active',
-            participants: [] // Empty array by default
-        });
-
-        res.status(201).json({ message: 'Room created successfully', room_code });
-    } catch (error) {
-        console.error('Error creating room:', error);
-        res.status(500).json({
-            message: 'Server error while creating room',
-            error: error.message,
-            details: error
-        });
-    }
-});
-
-// 3. User Profile Sync (Using the 8-digit UIDs generated in Profile.jsx)
-app.post('/api/users/profile', async (req, res) => {
-    try {
-        const { uid, name, email, avatar, language } = req.body;
-
-        if (!uid) {
-            return res.status(400).json({ error: "Client-side UID is required" });
-        }
-
-        // Merge Data safely into the Users collection
-        await db.collection('users').doc(String(uid)).set({
-            name: name || 'Anonymous',
-            email: email || '',
-            avatar: avatar || null,
-            language: language || 'English',
-            lastActive: new Date().toISOString()
-        }, { merge: true });
-
-        res.status(200).json({ message: "Profile saved securely", uid });
-    } catch (error) {
-        console.error('Error synchronizing profile:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 4. Friend Request System (Via Add UID functionality in Sidebar)
-app.post('/api/friends/request', async (req, res) => {
-    try {
-        const { senderUid, targetUid } = req.body;
-
-        if (!senderUid || !targetUid) {
-            return res.status(400).json({ error: "Both sender and target UIDs are required" });
-        }
-
-        if (String(senderUid) === String(targetUid)) {
-            return res.status(400).json({ error: "Cannot send a friend request to yourself" });
-        }
-
-        // Add a document inside the target user's "friendRequests" Sub-collection
-        await db.collection('users')
-            .doc(String(targetUid))
-            .collection('friendRequests')
-            .doc(String(senderUid)).set({
-                from: String(senderUid),
-                status: 'pending',
-                timestamp: new Date().toISOString()
-            });
-
-        res.status(200).json({ message: "Friend request physically sent to user!" });
-    } catch (error) {
-        console.error('Error posting friend request:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
 const PORT = process.env.PORT || 5000;
-
 server.listen(PORT, () => {
-    console.log(`🚀 WatchWave Backend & Socket.io are actively running on port ${PORT}`);
+    console.log(`🚀 WatchWave API & Socket.io running on port ${PORT}`);
+    console.log(`   CLIENT_URL: ${CLIENT_URL}`);
+    console.log(`   TMDB API:   ${process.env.TMDB_API_KEY ? '✅ Configured' : '❌ Missing TMDB_API_KEY'}`);
+    console.log(`   Razorpay:   ${process.env.RAZORPAY_KEY_ID ? '✅ Configured' : '⚠️  Missing (payments disabled)'}`);
 });

@@ -1,58 +1,58 @@
 import soloLevelingImg from '../assets/solo-leveling.png';
 
 export const trending = [
-  { id: 't1', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2022', match: '99', age: '16+', trailerUrl: 'https://www.youtube.com/embed/b9EkMc79ZSU' },
-  { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+', trailerUrl: 'https://www.youtube.com/embed/TcMBFSGVi1c' },
-  { id: 't3', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '2024', match: '98', age: '14+', trailerUrl: 'https://www.youtube.com/embed/A6S9p_Y_TIE' },
-  { id: 't4', title: 'Oppenheimer', image: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', year: '2023', match: '97', age: '18+', trailerUrl: 'https://www.youtube.com/embed/uYPbbksJxIg' },
-  { id: 't5', title: 'Solo Leveling', image: soloLevelingImg, year: '2024', match: '96', age: '16+', trailerUrl: 'https://www.youtube.com/embed/hO_8I_Y6Y-k' },
+  { id: 't1', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2022', match: '99', age: '16+', trailerUrl: 'https://www.youtube-nocookie.com/embed/b9EkMc79ZSU' },
+  { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+', trailerUrl: 'https://www.youtube-nocookie.com/embed/TcMBFSGVi1c' },
+  { id: 't3', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '2024', match: '98', age: '14+', trailerUrl: 'https://www.youtube-nocookie.com/embed/A6S9p_Y_TIE' },
+  { id: 't4', title: 'Oppenheimer', image: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', year: '2023', match: '97', age: '18+', trailerUrl: 'https://www.youtube-nocookie.com/embed/uYPbbksJxIg' },
+  { id: 't5', title: 'Solo Leveling', image: soloLevelingImg, year: '2024', match: '96', age: '16+', trailerUrl: 'https://www.youtube-nocookie.com/embed/hO_8I_Y6Y-k' },
 ];
 
 export const anime = [
-  { id: 'a1', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '1999', match: '99', age: 'TV-14' },
-  { id: 'a2', title: 'Naruto Shippuden', image: 'https://cdn.myanimelist.net/images/anime/1565/111305.jpg', year: '2007', match: '98', age: 'TV-14' },
-  { id: 'a3', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg', year: '2019', match: '99', age: 'TV-MA' },
-  { id: 'a4', title: 'Jujutsu Kaisen', image: 'https://cdn.myanimelist.net/images/anime/1171/109222.jpg', year: '2020', match: '98', age: 'TV-MA' },
-  { id: 'a5', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg', year: '2013', match: '99', age: 'TV-MA' },
+  { id: 'a1', title: 'One Piece', image: 'https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg', year: '1999', match: '99', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/l_98K4_6UQ0' },
+  { id: 'a2', title: 'Naruto Shippuden', image: 'https://cdn.myanimelist.net/images/anime/1565/111305.jpg', year: '2007', match: '98', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/17S6XshW4oI' },
+  { id: 'a3', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg', year: '2019', match: '99', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/VQGCyd0jP0Q' },
+  { id: 'a4', title: 'Jujutsu Kaisen', image: 'https://cdn.myanimelist.net/images/anime/1171/109222.jpg', year: '2020', match: '98', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/06OonPB0vH8' },
+  { id: 'a5', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg', year: '2013', match: '99', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/MGRm4IzK1SQ' },
   // Extended for grid
-  { id: 'a6', title: 'Bleach', image: 'https://cdn.myanimelist.net/images/anime/3/40451.jpg', year: '2004', match: '97', age: 'TV-14' },
-  { id: 'a7', title: 'Fullmetal Alchemist: Brotherhood', image: 'https://cdn.myanimelist.net/images/anime/1223/96541.jpg', year: '2009', match: '99', age: 'TV-14' },
-  { id: 'a8', title: 'Hunter x Hunter', image: 'https://cdn.myanimelist.net/images/anime/1337/99013.jpg', year: '2011', match: '98', age: 'TV-14' },
-  { id: 'a9', title: 'My Hero Academia', image: 'https://cdn.myanimelist.net/images/anime/10/78745.jpg', year: '2016', match: '96', age: 'TV-14' },
-  { id: 'a10', title: 'Death Note', image: 'https://cdn.myanimelist.net/images/anime/9/9453.jpg', year: '2006', match: '99', age: 'TV-14' },
+  { id: 'a6', title: 'Bleach', image: 'https://cdn.myanimelist.net/images/anime/3/40451.jpg', year: '2004', match: '97', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/e883v6SOf6Y' },
+  { id: 'a7', title: 'Fullmetal Alchemist: Brotherhood', image: 'https://cdn.myanimelist.net/images/anime/1223/96541.jpg', year: '2009', match: '99', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/B8M_S3oYn2M' },
+  { id: 'a8', title: 'Hunter x Hunter', image: 'https://cdn.myanimelist.net/images/anime/1337/99013.jpg', year: '2011', match: '98', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/d6kBeJjWVn8' },
+  { id: 'a9', title: 'My Hero Academia', image: 'https://cdn.myanimelist.net/images/anime/10/78745.jpg', year: '2016', match: '96', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/D5fyC6_I3U4' },
+  { id: 'a10', title: 'Death Note', image: 'https://cdn.myanimelist.net/images/anime/9/9453.jpg', year: '2006', match: '99', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/NlJZ-YgAt-c' },
 ];
 
 export const movies = [
-  { id: 'm1', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/TcMBFSGVi1c' },
-  { id: 'm2', title: 'Spider-Man: ATSV', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', year: '2023', match: '98', age: 'PG', trailerUrl: 'https://www.youtube.com/embed/shW9i6k8cB0' },
-  { id: 'm3', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', year: '2008', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/EXeTwQWrcwY' },
-  { id: 'm4', title: 'Interstellar', image: 'https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', year: '2014', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/zSWdZVtXT7E' },
-  { id: 'm5', title: 'Inception', image: 'https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg', year: '2010', match: '96', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/YoHD9XEInc0' },
+  { id: 'm1', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/TcMBFSGVi1c' },
+  { id: 'm2', title: 'Spider-Man: ATSV', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', year: '2023', match: '98', age: 'PG', trailerUrl: 'https://www.youtube-nocookie.com/embed/shwG742_f8s' },
+  { id: 'm3', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', year: '2008', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/EXeTwQWrcwY' },
+  { id: 'm4', title: 'Interstellar', image: 'https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', year: '2014', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/zSWdZVtXT7E' },
+  { id: 'm5', title: 'Inception', image: 'https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg', year: '2010', match: '96', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/YoHD9XEInc0' },
   // Extended
-  { id: 'm6', title: 'Dune: Part Two', image: 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg', year: '2024', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/Way9Dexny3w' },
-  { id: 'm7', title: 'The Batman', image: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg', year: '2022', match: '95', age: 'PG-13', trailerUrl: 'https://www.youtube.com/embed/mqqft2x_Aa4' },
-  { id: 'm8', title: 'Fight Club', image: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', year: '1999', match: '98', age: 'R', trailerUrl: 'https://www.youtube.com/embed/O1ot9f8D4FeE' },
-  { id: 'm9', title: 'The Matrix', image: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', year: '1999', match: '99', age: 'R', trailerUrl: 'https://www.youtube.com/embed/vKQi3bBA1y8' },
-  { id: 'm10', title: 'Pulp Fiction', image: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', year: '1994', match: '98', age: 'R', trailerUrl: 'https://www.youtube.com/embed/s7EdQ4FqbhY' },
+  { id: 'm6', title: 'Dune: Part Two', image: 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg', year: '2024', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/Way9Dexny3w' },
+  { id: 'm7', title: 'The Batman', image: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg', year: '2022', match: '95', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/mqqft2x_Aa4' },
+  { id: 'm8', title: 'Fight Club', image: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', year: '1999', match: '98', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/BdJKm96bHNQ' },
+  { id: 'm9', title: 'The Matrix', image: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', year: '1999', match: '99', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/vKQi3bBA1y8' },
+  { id: 'm10', title: 'Pulp Fiction', image: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', year: '1994', match: '98', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/s7EdQ4FqbhY' },
 ];
 
 export const bollywood = [
-  { id: 'b1', title: '3 Idiots', image: 'https://image.tmdb.org/t/p/w500/66A9MqXOyVFCssoloscw79z8Tew.jpg', year: '2009', match: '99', age: 'PG-13' },
-  { id: 'b2', title: 'RRR', image: 'https://image.tmdb.org/t/p/w500/nEufeZlyAOLqO2brrs0yeF1lgXO.jpg', year: '2022', match: '98', age: 'R' },
-  { id: 'b3', title: 'Dilwale Dulhania...', image: 'https://upload.wikimedia.org/wikipedia/en/8/80/Dilwale_Dulhania_Le_Jayenge_poster.jpg', year: '1995', match: '99', age: 'PG' },
-  { id: 'b4', title: 'Dangal', image: 'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg', year: '2016', match: '98', age: 'PG' },
-  { id: 'b5', title: 'Kantara', image: 'https://upload.wikimedia.org/wikipedia/en/8/84/Kantara_poster.jpeg', year: '2022', match: '96', age: 'TV-14' },
+  { id: 'b1', title: '3 Idiots', image: 'https://image.tmdb.org/t/p/w500/66A9MqXOyVFCssoloscw79z8Tew.jpg', year: '2009', match: '99', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/K0eDlFX9Gmc' },
+  { id: 'b2', title: 'RRR', image: 'https://image.tmdb.org/t/p/w500/nEufeZlyAOLqO2brrs0yeF1lgXO.jpg', year: '2022', match: '98', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/NgBoJJplf2A' },
+  { id: 'b3', title: 'Dilwale Dulhania...', image: 'https://upload.wikimedia.org/wikipedia/en/8/80/Dilwale_Dulhania_Le_Jayenge_poster.jpg', year: '1995', match: '99', age: 'PG', trailerUrl: 'https://www.youtube-nocookie.com/embed/c25GKl5VNeY' },
+  { id: 'b4', title: 'Dangal', image: 'https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg', year: '2016', match: '98', age: 'PG', trailerUrl: 'https://www.youtube-nocookie.com/embed/x_7YlGv9u1g' },
+  { id: 'b5', title: 'Kantara', image: 'https://upload.wikimedia.org/wikipedia/en/8/84/Kantara_poster.jpeg', year: '2022', match: '96', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/8it4_U3m0C0' },
 ];
 
 export const series = [
-  { id: 's1', title: 'Breaking Bad', image: 'https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg', year: '2008', match: '99', age: 'TV-MA' },
-  { id: 's2', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2016', match: '97', age: 'TV-14' },
-  { id: 's3', title: 'Game of Thrones', image: 'https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg', year: '2011', match: '96', age: 'TV-MA' },
-  { id: 's4', title: 'The Boys', image: 'https://image.tmdb.org/t/p/w500/mY7SeH4HFFxW1hiI6cWuwCRKptN.jpg', year: '2019', match: '95', age: 'TV-MA' },
-  { id: 's5', title: 'Squid Game', image: 'https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg', year: '2021', match: '96', age: 'TV-MA' },
+  { id: 's1', title: 'Breaking Bad', image: 'https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg', year: '2008', match: '99', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/HhesaQXLuRY' },
+  { id: 's2', title: 'Stranger Things', image: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg', year: '2016', match: '97', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/b9EkMc79ZSU' },
+  { id: 's3', title: 'Game of Thrones', image: 'https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg', year: '2011', match: '96', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/gcTk9l48HBo' },
+  { id: 's4', title: 'The Boys', image: 'https://image.tmdb.org/t/p/w500/mY7SeH4HFFxW1hiI6cWuwCRKptN.jpg', year: '2019', match: '95', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/06rueu_fh3A' },
+  { id: 's5', title: 'Squid Game', image: 'https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg', year: '2021', match: '96', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/oqxAJKy0ii4' },
   // Extended
-  { id: 's6', title: 'The Last of Us', image: 'https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg', year: '2023', match: '98', age: 'TV-MA' },
-  { id: 's7', title: 'Arcane', image: 'https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg', year: '2021', match: '99', age: 'TV-14' },
-  { id: 's8', title: 'Wednesday', image: 'https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg', year: '2022', match: '96', age: 'TV-14' },
-  { id: 's10', title: 'Loki', image: 'https://image.tmdb.org/t/p/w500/voHUmluYmKyleFkTu3lOXQG702u.jpg', year: '2021', match: '95', age: 'TV-14' },
+  { id: 's6', title: 'The Last of Us', image: 'https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg', year: '2023', match: '98', age: 'TV-MA', trailerUrl: 'https://www.youtube-nocookie.com/embed/uLtkt8BonwM' },
+  { id: 's7', title: 'Arcane', image: 'https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg', year: '2021', match: '99', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/4Ps6nV4wiCE' },
+  { id: 's8', title: 'Wednesday', image: 'https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg', year: '2022', match: '96', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/Di319cFYCPs' },
+  { id: 's10', title: 'Loki', image: 'https://image.tmdb.org/t/p/w500/voHUmluYmKyleFkTu3lOXQG702u.jpg', year: '2021', match: '95', age: 'TV-14', trailerUrl: 'https://www.youtube-nocookie.com/embed/nW948Va-l10' },
 ];

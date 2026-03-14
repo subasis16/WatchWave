@@ -52,6 +52,8 @@ const ContentRow = ({ title, data, ranked = false }) => {
             {data.map((item, index) => (
               <div
                 key={item.id}
+                onMouseEnter={() => handleMouseEnter(item.id)}
+                onMouseLeave={handleMouseLeave}
                 className="relative shrink-0 h-[180px] sm:h-[220px] md:h-[260px] flex items-end pr-4 md:pr-6"
               >
                 {/* Number Overlay Layer */}
@@ -66,12 +68,27 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 </span>
 
                 {/* Portrait Image Container */}
-                <div className="ml-[45px] sm:ml-[60px] md:ml-[85px] h-full aspect-[2/3] z-10 rounded-md overflow-hidden relative shadow-[8px_0_20px_rgba(0,0,0,0.8)] bg-zinc-900">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="ml-[45px] sm:ml-[60px] md:ml-[85px] h-full aspect-[2/3] z-10 rounded-md overflow-hidden relative shadow-[8px_0_20px_rgba(0,0,0,0.8)] bg-zinc-900 group">
+                  {showTrailer && hoveredId === item.id && item.trailerUrl ? (
+                    <div className="relative w-full h-full">
+                      <iframe
+                        src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playlist=${item.trailerUrl.split('/').pop()}`}
+                        className="w-full h-full object-cover pointer-events-none scale-[1.15]"
+                        title={item.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                      {/* Hide YouTube logo watermark */}
+                      <div className="absolute bottom-0 right-0 w-[120px] h-[40px] bg-black z-10 pointer-events-none" />
+                    </div>
+                  ) : (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               </div>
             ))}
@@ -86,29 +103,14 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                onMouseEnter={() => handleMouseEnter(item.id)}
-                onMouseLeave={handleMouseLeave}
                 className="relative w-full aspect-[2/3] rounded-xl overflow-hidden cursor-pointer group/card border border-white/5 bg-rich-gray hover:shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-shadow duration-300"
               >
-                {showTrailer && hoveredId === item.id && item.trailerUrl ? (
-                  <div className="absolute inset-0 z-0">
-                    <iframe
-                      src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.trailerUrl.split('/').pop()}`}
-                      className="w-full h-full object-cover pointer-events-none scale-[1.5]"
-                      title={item.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
-                ) : (
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                )}
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                  loading="lazy"
+                />
 
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 z-10">

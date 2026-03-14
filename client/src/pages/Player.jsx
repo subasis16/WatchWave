@@ -6,7 +6,7 @@ import {
   Share2, Heart, MessageCircle, Maximize, Settings,
   RotateCcw, SkipForward, Check
 } from 'lucide-react';
-import { movies, series, anime } from '../data/content';
+import { trending, anime, movies, bollywood, series } from '../data/content';
 
 const Player = () => {
   const { id } = useParams();
@@ -16,9 +16,10 @@ const Player = () => {
   const [showClipCreator, setShowClipCreator] = useState(false);
   const [volume, setVolume] = useState(80);
 
-  // Find content
-  const allContent = [...movies, ...series, ...anime];
+  // Find content in all arrays
+  const allContent = [...trending, ...anime, ...movies, ...bollywood, ...series];
   const content = allContent.find(c => c.id === id) || movies[0];
+  const trailerUrl = content.trailerUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ";
 
   // Clip Creator State
   const [clipRange, setClipRange] = useState([20, 50]); // % based for UI
@@ -35,7 +36,7 @@ const Player = () => {
 
   return (
     <div
-      className="fixed inset-0 bg-black z-[100] flex items-center justify-center font-sans"
+      className="fixed inset-0 bg-black z-[100] flex items-center justify-center font-sans overflow-hidden"
       onMouseMove={() => setShowControls(true)}
       onClick={() => setShowControls(prev => !prev)}
     >
@@ -68,54 +69,36 @@ const Player = () => {
 
       {/* Ambient Background Effect */}
       <div
-        className="absolute inset-0 z-0 opacity-50 blur-3xl scale-110 pointer-events-none"
+        className="absolute inset-0 z-0 opacity-40 blur-3xl scale-110 pointer-events-none"
         style={{
           backgroundImage: `url(${content.image})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       />
-      <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
 
-      {/* Video Placeholder Area */}
+      {/* Video Player Area */}
       <div className="w-full h-full relative z-10 flex items-center justify-center overflow-hidden">
-        {/* Simulated Buffering/Loading State when not playing */}
-        <AnimatePresence>
-          {!isPlaying && !showClipCreator && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center bg-black/40 z-20 backdrop-blur-sm"
-            >
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => { e.stopPropagation(); setIsPlaying(true); }}
-                className="group relative"
-              >
-                <div className="absolute inset-0 bg-brand-red blur-xl opacity-50 group-hover:opacity-80 transition-opacity" />
-                <div className="bg-brand-red p-6 rounded-full shadow-2xl relative z-10 border border-white/20">
-                  <Play size={48} fill="white" className="text-white ml-2" />
-                </div>
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* The YouTube Iframe */}
+        <div className="w-full h-full pointer-events-none overflow-hidden relative">
+          <iframe
+            className="w-full h-[110%] -mt-[2.5%] border-0 opacity-90 scale-[1.05]"
+            src={`${trailerUrl}?autoplay=1&controls=0&modestbranding=1&rel=0&mute=1&loop=1&showinfo=0&iv_load_policy=3&disablekb=1&playlist=${trailerUrl.split('/').pop()}`}
+            title={content.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+          {/* Hide YouTube logo - bottom right corner overlay */}
+          <div className="absolute bottom-0 right-0 w-[160px] h-[50px] bg-black z-10 pointer-events-none" />
+        </div>
 
-        {/* The "Video" Content */}
-        <motion.img
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 10, ease: "linear" }} // Slow zoom effect while playing
-          src={content.image.replace('w500', 'original')}
-          alt={content.title}
-          className="w-full h-full object-contain shadow-2xl"
-        />
+        {/* Overlay to catch clicks and prevent YouTube interaction directly */}
+        <div className="absolute inset-0 z-10 cursor-default" />
 
-        {/* Cinematic Bars (Letterboxing) */}
-        <div className="absolute top-0 left-0 right-0 h-[10vh] bg-black/90 z-20" />
-        <div className="absolute bottom-0 left-0 right-0 h-[10vh] bg-black/90 z-20" />
+        {/* simulated Cinematic Bars (Letterboxing) */}
+        <div className="absolute top-0 left-0 right-0 h-[8vh] bg-black/95 z-20" />
+        <div className="absolute bottom-0 left-0 right-0 h-[8vh] bg-black/95 z-20" />
       </div>
 
       {/* Clip Creator Overlay */}

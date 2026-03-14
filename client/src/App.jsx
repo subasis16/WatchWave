@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -22,6 +22,7 @@ import Feedback from './pages/Feedback';
 import Auth from './pages/Auth';
 import OpeningAnimation from './components/OpeningAnimation';
 import Downloads from './pages/Downloads';
+import Admin from './pages/Admin';
 
 const App = () => {
   const { pathname } = useLocation();
@@ -32,7 +33,8 @@ const App = () => {
   const isPartyPage = pathname.startsWith('/party');
   const isRoomPage = pathname.startsWith('/room');
   
-  const hideNavbar = isWatchPage || isRoomPage;
+  const isAdminPage = pathname.startsWith('/admin');
+  const hideNavbar = isWatchPage || isRoomPage || isAdminPage;
   const hideFooter = isWatchPage || isPartyPage || isRoomPage;
   const hidePadding = isWatchPage || isPartyPage || isRoomPage;
 
@@ -71,6 +73,7 @@ const App = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/data-privileges" element={<DataPrivileges />} />
         <Route path="/feedback" element={<Feedback />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
 
       {/* Footer */}
@@ -87,32 +90,32 @@ const App = () => {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full md:w-auto">
                 <div className="flex flex-col gap-3">
                   <h4 className="text-white font-bold mb-1">Company</h4>
-                  <a href="/about" className="hover:text-brand-red transition-colors">About Us</a>
-                  <a href="/contact" className="hover:text-brand-red transition-colors">Contact</a>
+                  <Link to="/about" className="hover:text-brand-red transition-colors">About Us</Link>
+                  <Link to="/contact" className="hover:text-brand-red transition-colors">Contact</Link>
                 </div>
                 <div className="flex flex-col gap-3">
                   <h4 className="text-white font-bold mb-1">Support</h4>
-                  <a href="/feedback" className="hover:text-brand-red transition-colors">Submit Feedback</a>
-                  <a href="/plans" className="hover:text-brand-red transition-colors">Billing & Plans</a>
+                  <Link to="/feedback" className="hover:text-brand-red transition-colors">Submit Feedback</Link>
+                  <Link to="/plans" className="hover:text-brand-red transition-colors">Billing & Plans</Link>
                 </div>
                 <div className="flex flex-col gap-3">
                   <h4 className="text-white font-bold mb-1">Legal</h4>
-                  <a href="/terms" className="hover:text-brand-red transition-colors">Terms of Service</a>
-                  <a href="/data-privileges" className="hover:text-brand-red transition-colors">Data Privileges</a>
+                  <Link to="/terms" className="hover:text-brand-red transition-colors">Terms of Service</Link>
+                  <Link to="/data-privileges" className="hover:text-brand-red transition-colors">Data Privileges</Link>
                 </div>
                 <div className="flex flex-col gap-3">
                   <h4 className="text-white font-bold mb-1">Categories</h4>
-                  <a href="/" className="hover:text-brand-red transition-colors">Home</a>
-                  <a href="/movies" className="hover:text-brand-red transition-colors">Movies</a>
-                  <a href="/party" className="hover:text-brand-red transition-colors">Watch Party</a>
+                  <Link to="/" className="hover:text-brand-red transition-colors">Home</Link>
+                  <Link to="/movies" className="hover:text-brand-red transition-colors">Movies</Link>
+                  <Link to="/party" className="hover:text-brand-red transition-colors">Watch Party</Link>
                 </div>
               </div>
             </div>
             <div className="mt-12 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 gap-4">
               <p>&copy; 2026 WatchWave Incorporated. All rights reserved.</p>
               <div className="flex space-x-6">
-                <a href="/data-privileges" className="hover:text-gray-400 transition-colors">Privacy Shield</a>
-                <a href="/terms" className="hover:text-gray-400 transition-colors">Terms of Use</a>
+                <Link to="/data-privileges" className="hover:text-gray-400 transition-colors">Privacy Shield</Link>
+                <Link to="/terms" className="hover:text-gray-400 transition-colors">Terms of Use</Link>
               </div>
             </div>
           </div>
