@@ -18,11 +18,11 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Terms from './pages/Terms';
 import DataPrivileges from './pages/DataPrivileges';
-import Feedback from './pages/Feedback';
 import Auth from './pages/Auth';
 import OpeningAnimation from './components/OpeningAnimation';
 import Downloads from './pages/Downloads';
 import Admin from './pages/Admin';
+import CtaBanner from './components/CtaBanner';
 
 const App = () => {
   const { pathname } = useLocation();
@@ -47,11 +47,11 @@ const App = () => {
   }, []);
 
   return (
-    <div className={`bg-deep-black min-h-screen font-sans text-white selection:bg-brand-red selection:text-white ${!hidePadding ? 'pb-10' : ''}`}>
+    <div className={`selection:bg-white selection:text-black ${!hidePadding ? 'pb-10' : ''}`}>
       <Toaster position="top-right" reverseOrder={false} />
       {showIntro && <OpeningAnimation onComplete={() => setShowIntro(false)} />}
 
-      {!hideNavbar && <Navbar />}
+      {!hideNavbar && !showIntro && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -72,54 +72,67 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/data-privileges" element={<DataPrivileges />} />
-        <Route path="/feedback" element={<Feedback />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
 
       {/* Footer */}
       {!hideFooter && (
-        <footer className="mt-12 py-12 px-4 sm:px-6 lg:px-8 bg-black/50 border-t border-white/5 backdrop-blur-md">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center text-gray-400 text-sm gap-8 md:gap-0">
-              <div className="mb-4 md:mb-0">
-                <span className="text-xl font-black text-brand-red tracking-tighter cursor-pointer">
-                  WATCH WAVE
+        <>
+          <CtaBanner />
+          <footer className="mt-20 py-16 px-4 md:px-10">
+          <div className="glass-card p-10 md:p-16">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-12">
+              <div className="max-w-md">
+                <span className="text-2xl font-black text-white tracking-widest">
+                  WATCHWAVE
                 </span>
-                <p className="mt-2 text-gray-500 max-w-xs leading-relaxed">The ultimate premium spatial streaming experience for world-class entertainment.</p>
+                <p className="mt-4 text-gray-400 font-medium leading-relaxed">
+                  Experience the future of entertainment with our streaming platform. Cinema-grade quality, anywhere you are.
+                </p>
+                <div className="flex gap-4 mt-8">
+                  <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
+                    <span className="font-bold text-xs">FB</span>
+                  </div>
+                  <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
+                    <span className="font-bold text-xs">X</span>
+                  </div>
+                  <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
+                    <span className="font-bold text-xs">IG</span>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 w-full md:w-auto">
-                <div className="flex flex-col gap-3">
-                  <h4 className="text-white font-bold mb-1">Company</h4>
-                  <Link to="/about" className="hover:text-brand-red transition-colors">About Us</Link>
-                  <Link to="/contact" className="hover:text-brand-red transition-colors">Contact</Link>
+
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-20">
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-white font-black text-xs uppercase tracking-widest">Discover</h4>
+                  <Link to="/" className="text-sm text-gray-400 hover:text-white transition-colors">Home</Link>
+                  <Link to="/movies" className="text-sm text-gray-400 hover:text-white transition-colors">Movies</Link>
+                  <Link to="/party" className="text-sm text-gray-400 hover:text-white transition-colors">Parties</Link>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <h4 className="text-white font-bold mb-1">Support</h4>
-                  <Link to="/feedback" className="hover:text-brand-red transition-colors">Submit Feedback</Link>
-                  <Link to="/plans" className="hover:text-brand-red transition-colors">Billing & Plans</Link>
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-white font-black text-xs uppercase tracking-widest">Experience</h4>
+                  <Link to="/plans" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</Link>
+                  <Link to="/downloads" className="text-sm text-gray-400 hover:text-white transition-colors">Off-line</Link>
+                  <Link to="/contact" className="text-sm text-gray-400 hover:text-white transition-colors">Contact</Link>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <h4 className="text-white font-bold mb-1">Legal</h4>
-                  <Link to="/terms" className="hover:text-brand-red transition-colors">Terms of Service</Link>
-                  <Link to="/data-privileges" className="hover:text-brand-red transition-colors">Data Privileges</Link>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <h4 className="text-white font-bold mb-1">Categories</h4>
-                  <Link to="/" className="hover:text-brand-red transition-colors">Home</Link>
-                  <Link to="/movies" className="hover:text-brand-red transition-colors">Movies</Link>
-                  <Link to="/party" className="hover:text-brand-red transition-colors">Watch Party</Link>
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-white font-black text-xs uppercase tracking-widest">Legal</h4>
+                  <Link to="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">Terms</Link>
+                  <Link to="/data-privileges" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy</Link>
                 </div>
               </div>
             </div>
-            <div className="mt-12 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 gap-4">
-              <p>&copy; 2026 WatchWave Incorporated. All rights reserved.</p>
-              <div className="flex space-x-6">
-                <Link to="/data-privileges" className="hover:text-gray-400 transition-colors">Privacy Shield</Link>
-                <Link to="/terms" className="hover:text-gray-400 transition-colors">Terms of Use</Link>
+            
+            <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest gap-4">
+              <p>&copy; 2026 WatchWave. All rights reserved.</p>
+              <div className="flex gap-8">
+                <Link to="/data-privileges" className="hover:text-white transition-colors">Privacy</Link>
+                <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
               </div>
             </div>
           </div>
         </footer>
+        </>
       )}
     </div>
   );

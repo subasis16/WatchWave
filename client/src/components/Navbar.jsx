@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, User, Menu, X, Settings } from 'lucide-react';
+import { Search, Bell, User, Menu, X, Settings, Download } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotification } from '../context/NotificationContext';
+import { toast } from 'react-hot-toast';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,7 +40,10 @@ const Navbar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      alert(`Searching for: ${searchQuery}`);
+      toast.success(`Search initialized for: ${searchQuery}`, {
+        icon: '🔍',
+        style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }
+      });
       setIsSearchOpen(false);
       setSearchQuery('');
     }
@@ -72,178 +76,159 @@ const Navbar = () => {
     { name: 'Movies', path: '/movies' },
     { name: 'Anime', path: '/anime' },
     { name: 'Party', path: '/party' },
-    { name: 'Downloads', path: '/downloads' },
     { name: 'Plans & Prices', path: '/plans' },
   ];
 
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-deep-black/90 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Link to="/" className="text-2xl font-bold text-brand-red tracking-tighter cursor-pointer hover:opacity-80 transition-opacity">
-                  WATCH WAVE
-                </Link>
-              </div>
-              <div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-8">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${location.pathname.startsWith(item.path) ? 'text-white' : 'text-gray-300 hover:text-white'}`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <div className="ml-4 flex items-center md:ml-6 space-x-6">
-                {/* SEARCH BAR (EXPANDING) */}
-                <div className="relative flex items-center" ref={searchRef}>
-                  <form
-                    onSubmit={handleSearchSubmit}
-                    className={`flex items-center transition-all duration-300 ${isSearchOpen ? 'bg-[#1C1D21] border border-white/20 rounded-full px-3 py-1.5 shadow-[0_0_15px_rgba(255,255,255,0.05)]' : ''}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setIsSearchOpen(!isSearchOpen)}
-                      className="text-gray-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
-                    >
-                      <Search size={22} className={isSearchOpen ? 'text-brand-red' : ''} />
-                    </button>
+      <nav className={`fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 transition-all duration-300 ${isScrolled ? 'top-2' : 'top-4'}`}>
+        <div className="glass-card px-4 md:px-8 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Link to="/" className="text-xl font-black text-white tracking-widest hover:opacity-80 transition-opacity">
+              WATCHWAVE
+            </Link>
 
-                    <AnimatePresence>
-                      {isSearchOpen && (
-                        <motion.input
-                          initial={{ width: 0, opacity: 0 }}
-                          animate={{ width: 160, opacity: 1 }}
-                          exit={{ width: 0, opacity: 0 }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                          type="text"
-                          autoFocus
-                          placeholder="Search titles..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none ml-2"
-                        />
-                      )}
-                    </AnimatePresence>
-                  </form>
-                </div>
-
-                {/* NOTIFICATION BELL & DROPDOWN */}
-                <div className="relative flex items-center" ref={notifRef}>
-                  <button
-                    onClick={() => setIsNotifOpen(!isNotifOpen)}
-                    className="text-gray-300 hover:text-white transition-colors relative flex items-center"
-                  >
-                    <Bell size={22} />
-                    {unreadCount > 0 && (
-                      <span className="bg-[#E50914] text-white absolute -top-1.5 -right-1.5 rounded-full text-[10px] w-4 h-4 flex items-center justify-center animate-pulse shadow-[0_0_10px_rgba(229,9,20,0.8)]">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </button>
-
-                  <AnimatePresence>
-                    {isNotifOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute right-0 top-full mt-4 w-[350px] bg-[#141414]/95 backdrop-blur-md border border-white/10 rounded-xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.8)] overflow-hidden"
-                        style={{ zIndex: 100 }}
-                      >
-                        <div className="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-black/20">
-                          <h3 className="text-white font-bold text-sm tracking-wide">Notifications</h3>
-                          {unreadCount > 0 && <span className="text-[10px] bg-[#E50914] text-white px-2 py-0.5 rounded-full font-bold">{unreadCount} Unread</span>}
-                        </div>
-                        <div className="max-h-[350px] overflow-y-auto hide-scrollbar">
-                          {notifications.length === 0 ? (
-                            <div className="px-4 py-8 text-center flex flex-col items-center justify-center text-gray-500">
-                              <Bell size={24} className="mb-2 opacity-20" />
-                              <p className="text-xs">You're all caught up!</p>
-                            </div>
-                          ) : (
-                            notifications.map(notif => (
-                              <div
-                                key={notif.id}
-                                onClick={() => markAsRead(notif.id)}
-                                className={`flex items-start gap-3 px-4 py-3.5 cursor-pointer transition-colors border-b border-white/5 last:border-0 ${notif.read ? 'hover:bg-white/5 opacity-60' : 'bg-white/5 hover:bg-white/10'}`}
-                              >
-                                {notif.avatar && (
-                                  <img src={notif.avatar} className="w-10 h-10 rounded-full border border-white/20 shrink-0 object-cover" alt="Avatar" />
-                                )}
-                                <div className="flex flex-col">
-                                  <p className={`text-[13px] leading-snug ${notif.read ? 'text-gray-400' : 'text-gray-100 font-medium'}`}>{notif.message}</p>
-                                  <span className="text-[10px] text-gray-500 mt-1.5 font-medium">{notif.timestamp}</span>
-                                </div>
-                                {!notif.read && (
-                                  <span className="w-2 h-2 rounded-full bg-[#E50914] shrink-0 mt-1 ml-auto shadow-[0_0_8px_#E50914]"></span>
-                                )}
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <Link to="/settings" className="text-gray-300 hover:text-white transition-colors">
-                  <Settings size={20} />
-                </Link>
-                {user ? (
-                   <Link to="/profile" className="text-gray-300 hover:text-brand-red transition-colors flex items-center gap-2">
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-white/20" />
-                    ) : (
-                      <div className="bg-brand-red/20 p-1.5 rounded-full border border-brand-red/30">
-                        <User size={18} className="text-brand-red" />
-                      </div>
-                    )}
-                  </Link>
-                ) : (
-                  <Link to="/auth" className="bg-brand-red hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(229,9,20,0.3)] hover:shadow-[0_0_25px_rgba(229,9,20,0.5)] text-sm">
-                    Sign In
-                  </Link>
-                )}
-              </div>
-            </div>
-            <div className="-mr-2 flex md:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-300 hover:text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
+            {/* SEARCH PILL */}
+            <div className="hidden lg:flex items-center" ref={searchRef}>
+              <form
+                onSubmit={handleSearchSubmit}
+                className="glass-pill flex items-center px-4 py-1.5 focus-within:bg-white/20 transition-all"
               >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+                <Search size={18} className="text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search movies"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none ml-2 w-40"
+                />
+              </form>
             </div>
+          </div>
+
+          {/* CENTER NAVIGATION */}
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${location.pathname.startsWith(item.path) 
+                  ? 'glass-pill-active' 
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* RIGHT TOOLS */}
+          <div className="flex items-center gap-3">
+            <Link to="/downloads" className="w-10 h-10 glass-pill flex items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Offline Vault">
+                <Download size={18} />
+            </Link>
+
+            <div className="relative flex items-center" ref={notifRef}>
+              <button
+                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                className="w-10 h-10 glass-pill flex items-center justify-center relative hover:scale-110 active:scale-95"
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span className="bg-[#E50914] text-white absolute top-0 right-0 rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold shadow-lg">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {isNotifOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 top-full mt-4 w-[350px] glass-card overflow-hidden z-[100]"
+                  >
+                    <div className="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-white/5">
+                      <h3 className="text-white font-bold text-sm">Notifications</h3>
+                      {unreadCount > 0 && <span className="text-[10px] bg-white text-black px-2 py-0.5 rounded-full font-bold">{unreadCount} New</span>}
+                    </div>
+                    <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-gray-500">
+                          <p className="text-xs">No notifications yet</p>
+                        </div>
+                      ) : (
+                        notifications.map(notif => (
+                          <div
+                            key={notif.id}
+                            onClick={() => markAsRead(notif.id)}
+                            className={`flex items-start gap-3 px-4 py-3.5 cursor-pointer transition-colors border-b border-white/5 last:border-0 ${notif.read ? 'opacity-40' : 'bg-white/5 hover:bg-white/10'}`}
+                          >
+                            <div className="flex flex-col">
+                              <p className={`text-[13px] leading-snug ${notif.read ? 'text-gray-400' : 'text-gray-100 font-medium'}`}>{notif.message}</p>
+                              <span className="text-[10px] text-gray-500 mt-1">{notif.timestamp}</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link to="/settings" className="w-10 h-10 glass-pill flex items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Settings">
+                <Settings size={18} />
+            </Link>
+
+            {user ? (
+              <Link to="/profile" className="flex items-center gap-3 glass-pill pl-1 pr-4 py-1 hover:scale-105 active:scale-95 transition-transform">
+                <img 
+                  src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.displayName || 'U'}`} 
+                  alt="Avatar" 
+                  className="w-8 h-8 rounded-full border border-white/20" 
+                />
+                <span className="text-sm font-bold hidden sm:inline">{user.displayName || 'User'}</span>
+              </Link>
+            ) : (
+              <Link to="/auth" className="glass-pill-active px-6 py-2 rounded-full text-sm font-bold hover:scale-105 active:scale-95 transition-transform">
+                Sign In
+              </Link>
+            )}
+            
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden w-10 h-10 glass-pill flex items-center justify-center"
+            >
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-deep-black/95 backdrop-blur-xl">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden mt-2 glass-card overflow-hidden"
+            >
+              <div className="px-4 py-4 space-y-2">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className="block px-4 py-3 rounded-2xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </>
   );

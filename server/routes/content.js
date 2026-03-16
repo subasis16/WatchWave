@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { db } = require('../firebase');
 const { tmdbFetch, getTrailerKey, imageUrl } = require('../config/tmdb');
 
 /**
@@ -19,17 +20,34 @@ const formatContent = (item, type = 'movie') => ({
     genres: item.genre_ids || [],
     popularity: item.popularity,
     voteCount: item.vote_count,
+    source: 'tmdb'
 });
+
+/**
+ * Transform Firestore custom content into consistent shape
+ */
+const formatCustomContent = (doc) => {
+    const data = doc.data();
+    return {
+        id: doc.id,
+        ...data,
+        source: 'custom'
+    };
+};
 
 // GET /api/content/trending
 router.get('/trending', async (req, res) => {
     try {
-        const [movies, tv] = await Promise.all([
+        const [movies, tv, customSnap] = await Promise.all([
             tmdbFetch('/trending/movie/week'),
             tmdbFetch('/trending/tv/week'),
+            db.collection('content').orderBy('createdAt', 'desc').limit(5).get()
         ]);
 
+        const customResults = customSnap.docs.map(formatCustomContent);
+        
         const combined = [
+            ...customResults,
             ...movies.results.slice(0, 10).map(m => formatContent(m, 'movie')),
             ...tv.results.slice(0, 10).map(t => formatContent(t, 'tv')),
         ];
@@ -54,11 +72,23 @@ router.get('/search', async (req, res) => {
             : type === 'tv' ? '/search/tv'
             : '/search/multi';
 
+        // Fetch custom content first (simple case-insensitive search isn't native, so we do startWith for title)
+        const customSnap = await db.collection('content')
+            .where('title', '>=', q)
+            .where('title', '<=', q + '\uf8ff')
+            .limit(10)
+            .get();
+        
+        const customResults = customSnap.docs.map(formatCustomContent);
+        
         const data = await tmdbFetch(endpoint, { query: q, page });
 
-        const results = data.results
-            .filter(item => item.media_type !== 'person')
-            .map(item => formatContent(item, item.media_type || type));
+        const results = [
+            ...customResults,
+            ...data.results
+                .filter(item => item.media_type !== 'person')
+                .map(item => formatContent(item, item.media_type || type))
+        ];
 
         res.json({ success: true, results, totalPages: data.total_pages, page: data.page });
     } catch (error) {
@@ -94,6 +124,17 @@ router.get('/genre/:genreId', async (req, res) => {
     const { type = 'movie', page = 1 } = req.query;
 
     try {
+        // Fetch matching custom content (genre is an array in Firestore)
+        // Note: genreId from TMDB corresponds to name in some cases or IDs.
+        // We'll try to find by string match if it's a genre name
+        const customSnap = await db.collection('content')
+            .where('type', '==', type)
+            .where('genre', 'array-contains-any', [genreId]) // This works if genreId is a name or matching string
+            .limit(20)
+            .get();
+
+        const customResults = customSnap.docs.map(formatCustomContent);
+
         const endpoint = type === 'tv' ? '/discover/tv' : '/discover/movie';
         const data = await tmdbFetch(endpoint, {
             with_genres: genreId,
@@ -101,7 +142,11 @@ router.get('/genre/:genreId', async (req, res) => {
             page,
         });
 
-        const results = data.results.map(item => formatContent(item, type));
+        const results = [
+            ...customResults,
+            ...data.results.map(item => formatContent(item, type))
+        ];
+
         res.json({ success: true, results, totalPages: data.total_pages, page: data.page });
     } catch (error) {
         console.error('Genre fetch error:', error.message);
@@ -115,11 +160,31 @@ router.get('/:id', async (req, res) => {
     const { type = 'movie' } = req.query;
 
     try {
+        // 1. First, check Firestore for custom content
+        const customDoc = await db.collection('content').doc(id).get();
+        if (customDoc.exists) {
+            const data = customDoc.data();
+            return res.json({
+                success: true,
+                content: {
+                    ...data,
+                    id: customDoc.id,
+                    source: 'custom',
+                    trailerUrl: data.trailerUrl || null,
+                    cast: data.cast || [],
+                    similar: [] // We could implement similar custom content later
+                }
+            });
+        }
+
+        // 2. Fallback to TMDB (if ID looks like a TMDB ID or starts with tmdb_)
+        const cleanId = id.replace(/^tmdb_[mt]/, '');
+        
         const [details, credits, videos, similar] = await Promise.all([
-            tmdbFetch(`/${type}/${id}`, { append_to_response: 'genres' }),
-            tmdbFetch(`/${type}/${id}/credits`),
-            tmdbFetch(`/${type}/${id}/videos`),
-            tmdbFetch(`/${type}/${id}/similar`),
+            tmdbFetch(`/${type}/${cleanId}`, { append_to_response: 'genres' }),
+            tmdbFetch(`/${type}/${cleanId}/credits`),
+            tmdbFetch(`/${type}/${cleanId}/videos`),
+            tmdbFetch(`/${type}/${cleanId}/similar`),
         ]);
 
         // Get YouTube trailer
@@ -167,6 +232,7 @@ router.get('/:id', async (req, res) => {
                 director: credits.crew?.find(c => c.job === 'Director')?.name || null,
                 similar: similar.results?.slice(0, 10).map(s => formatContent(s, type)) || [],
                 seasons,
+                source: 'tmdb'
             }
         };
 

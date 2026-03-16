@@ -26,13 +26,13 @@ const ShareModal = ({ isOpen, onClose }) => {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Room link copied to clipboard!", { style: { background: '#141414', color: '#fff' } });
+    toast.success("Room link copied to clipboard!", { style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
     onClose();
   };
 
   const handleInvite = (name) => {
     console.log(`Invite sent to ${name}`);
-    toast.success(`Invite sent to ${name}`, { icon: '✉️', style: { background: '#141414', color: '#fff' } });
+    toast.success(`Invite sent to ${name}`, { icon: '✉️', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
   };
 
   useEffect(() => {
@@ -42,52 +42,58 @@ const ShareModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xl">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        initial={{ opacity: 0, scale: 0.9, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-sm bg-[#141414]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl relative"
+        exit={{ opacity: 0, scale: 0.9, y: 30 }}
+        transition={{ duration: 0.5, ease: "circOut" }}
+        className="w-full max-w-sm glass-card p-10 relative border-white/10"
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors">
           <X size={20} />
         </button>
 
         {!showInvites ? (
-          <div className="flex flex-col gap-4 mt-2">
-            <h3 className="text-xl font-bold text-white mb-2 text-center">Share this Room</h3>
-            <button
-              onClick={handleCopy}
-              className="flex items-center justify-center gap-3 w-full py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold transition-all"
-            >
-              <Copy size={18} /> Copy Link
-            </button>
-            <button
-              onClick={() => setShowInvites(true)}
-              className="flex items-center justify-center gap-3 w-full py-4 rounded-xl bg-[#E50914] hover:bg-red-700 text-white font-bold transition-all shadow-[0_0_15px_rgba(229,9,20,0.4)]"
-            >
-              <UserPlus size={18} /> Invite Friend
-            </button>
+          <div className="flex flex-col gap-6 mt-4">
+            <div className="text-center space-y-2">
+                <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Share Session</h3>
+                <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Share Screen</h2>
+            </div>
+            <div className="space-y-4">
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl glass-card border-white/5 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white transition-all transition-all duration-500"
+                >
+                  <Copy size={18} /> Copy Invite Key
+                </button>
+                <button
+                  onClick={() => setShowInvites(true)}
+                  className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl glass-pill-active text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-2xl"
+                >
+                  <UserPlus size={18} /> Target Contacts
+                </button>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col mt-2">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="flex flex-col mt-4">
+            <div className="flex items-center gap-4 mb-10">
               <button onClick={() => setShowInvites(false)} className="text-gray-400 hover:text-white transition-colors">
-                ←
+                <ArrowLeft size={20} />
               </button>
-              <h3 className="text-xl font-bold text-white">Invite Friends</h3>
+              <h3 className="text-xl font-black text-white uppercase tracking-tighter">Contacts</h3>
             </div>
             
-            <div className="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
               {mockFriends.map(friend => (
-                <div key={friend.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                  <div className="flex items-center gap-3">
-                    <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full object-cover" />
-                    <span className="font-bold text-gray-200">{friend.name}</span>
+                <div key={friend.id} className="flex items-center justify-between p-4 rounded-2xl glass-card border-white/5">
+                  <div className="flex items-center gap-4">
+                    <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full object-cover border border-white/10 shadow-lg" />
+                    <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">{friend.name}</span>
                   </div>
                   <button
                     onClick={() => handleInvite(friend.name)}
-                    className="px-4 py-1.5 rounded-full bg-[#E50914]/20 text-[#E50914] text-xs font-bold border border-[#E50914]/30 hover:bg-[#E50914] hover:text-white transition-all"
+                    className="px-4 py-2 rounded-full glass-pill border-accent-gold/20 text-accent-gold text-[8px] font-black uppercase tracking-widest hover:bg-accent-gold hover:text-black transition-all"
                   >
                     Invite
                   </button>
@@ -107,7 +113,6 @@ const ShareModal = ({ isOpen, onClose }) => {
 const RoomSettings = ({ isOwner }) => {
   const [banText, setBanText] = useState(false);
   const [banPhoto, setBanPhoto] = useState(false);
-  const [announcement, setAnnouncement] = useState('Welcome, everyone! New emote drops today. Please be respectful!');
   const [roomTitle, setRoomTitle] = useState('COZY GAMING & CHILL - RYU STREAMS');
   
   const [movieVol, setMovieVol] = useState(65);
@@ -116,48 +121,42 @@ const RoomSettings = ({ isOwner }) => {
   const CustomToggle = ({ checked, onChange }) => (
     <button
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-        checked ? 'bg-[#E50914]' : 'bg-gray-600'
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${
+        checked ? 'bg-accent-gold shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-white/10'
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-500 shadow-sm ${
           checked ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
     </button>
   );
 
-  const handleEditTitle = () => {
-    const newTitle = prompt("Enter new room title:", roomTitle);
-    if (newTitle && newTitle.trim() !== '') {
-      setRoomTitle(newTitle);
-      toast.success("Room title updated!", { style: { background: '#141414', color: '#fff' }});
-    }
-  };
-
   const handleReport = () => {
-    toast.success("A moderation report has been filed directly to WatchWave Admin.", { icon: '🚩', style: { background: '#141414', color: '#fff' }});
+    toast.success("A moderation report has been filed directly to WatchWave Admin.", { icon: '🚩', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' }});
   };
 
   if (!isOwner) return null;
 
   return (
-    <div className="bg-[#141414]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shrink-0 flex flex-col shadow-2xl relative overflow-hidden">
-      <div className="flex items-center justify-between mb-5 select-none">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#E50914]/20 flex items-center justify-center text-[#E50914]">
-            <Settings size={18} />
+    <div className="glass-card p-6 pb-8 shrink-0 flex flex-col border-white/10 relative overflow-hidden group">
+      <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="flex items-center justify-between mb-8 select-none relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl glass-card border-white/10 flex items-center justify-center text-white">
+            <Settings size={20} />
           </div>
-          <h3 className="text-sm font-bold text-white tracking-widest uppercase">Room Admin</h3>
+          <h3 className="text-[10px] font-black text-white tracking-[0.3em] uppercase">Core Admin</h3>
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="space-y-3">
-          <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-gray-300">
-            <span>Movie Volume</span>
-            <span className="text-[#E50914]">{movieVol}%</span>
+      <div className="space-y-8 relative z-10">
+        <div className="space-y-4">
+          <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">
+            <span>Media Gain</span>
+            <span className="text-accent-gold">{movieVol}%</span>
           </div>
           <input
             type="range"
@@ -165,14 +164,14 @@ const RoomSettings = ({ isOwner }) => {
             max="100"
             value={movieVol}
             onChange={(e) => setMovieVol(e.target.value)}
-            className="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-[#E50914] custom-slider-red"
+            className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-white"
           />
         </div>
 
-        <div className="space-y-3">
-          <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-gray-300">
-            <span>Voice Chat level</span>
-            <span className="text-gray-500">{voiceVol}%</span>
+        <div className="space-y-4">
+          <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">
+            <span>Voice Chat</span>
+            <span className="text-white">{voiceVol}%</span>
           </div>
           <input
             type="range"
@@ -180,28 +179,19 @@ const RoomSettings = ({ isOwner }) => {
             max="100"
             value={voiceVol}
             onChange={(e) => setVoiceVol(e.target.value)}
-            className="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-white custom-slider-white"
+            className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-white"
           />
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-gray-300 uppercase">Ban Chat</span>
+        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Mute</span>
           <CustomToggle checked={banText} onChange={setBanText} />
         </div>
       </div>
 
-      <button onClick={handleReport} className="mt-6 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-[#E50914]/50 hover:bg-[#E50914]/10 text-white text-sm font-bold tracking-wider transition-all">
-        <Flag size={16} className="text-[#E50914]" /> REPORT ROOM
+      <button onClick={handleReport} className="mt-10 w-full flex items-center justify-center gap-3 py-4 rounded-xl glass-card border-white/5 hover:border-red-500/30 text-gray-400 hover:text-red-500 text-[10px] font-black tracking-[0.2em] transition-all uppercase relative z-10">
+        <Flag size={16} /> Clear Room
       </button>
-
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-slider-red::-webkit-slider-thumb {
-          appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #E50914; box-shadow: 0 0 10px #E50914;
-        }
-        .custom-slider-white::-webkit-slider-thumb {
-          appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff;
-        }
-      `}}/>
     </div>
   );
 };
@@ -294,7 +284,7 @@ const WatchRoom = () => {
       icon: Skull,
       color: 'bg-gradient-to-br from-gray-700 to-black',
       description: 'Suspense',
-      keywords: ['Dark Knight', 'Breaking Bad', 'Death Note', 'Squid Game', 'Batman', 'Oppenheimer', 'Matrix']
+      keywords: ['Dark Knight', 'Breaking Bad', 'Death Note', 'Squid Game', 'Batman', 'Oppenheimer', 'Catalog']
     },
   ];
 
@@ -414,10 +404,15 @@ const WatchRoom = () => {
 
   if (isWaitingInLobby) {
     return (
-      <div className="fixed inset-0 min-h-screen bg-[#050505] flex flex-col items-center justify-center z-[100]">
-        <div className="w-16 h-16 border-4 border-[#E50914]/30 border-t-[#E50914] rounded-full animate-spin mb-8" />
-        <h2 className="text-2xl font-bold text-white tracking-widest uppercase">Waiting for Approval...</h2>
-        <p className="text-gray-500 mt-2 text-sm italic">Knocking securely via Socket.io</p>
+      <div className="fixed inset-0 min-h-screen bg-transparent flex flex-col items-center justify-center z-[100] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/5 via-transparent to-white/5 opacity-50" />
+        <div className="relative group">
+            <div className="absolute inset-0 bg-accent-gold/20 blur-[100px] animate-pulse rounded-full" />
+            <div className="w-24 h-24 border-2 border-accent-gold/30 border-t-accent-gold rounded-full animate-spin mb-10 relative z-10 shadow-[0_0_50px_rgba(255,215,0,0.2)]" />
+        </div>
+        <h2 className="text-[10px] font-black text-white tracking-[0.6em] uppercase mb-4 relative z-10">Encrypted Connection</h2>
+        <h3 className="text-4xl font-black text-white tracking-tighter uppercase relative z-10">Waiting for Server</h3>
+        <p className="text-gray-500 mt-6 text-[10px] font-black uppercase tracking-[0.2em] relative z-10 opacity-60">Handshaking via Global Servers</p>
       </div>
     );
   }
@@ -425,21 +420,24 @@ const WatchRoom = () => {
   const recommendations = currentMood ? getRecommendations(currentMood) : [];
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-20 pb-4 overflow-hidden flex flex-col h-screen font-sans">
+    <div className="min-h-screen text-white pt-24 pb-4 overflow-hidden flex flex-col h-screen font-sans selection:bg-accent-gold selection:text-black">
       
       {/* Dev Toggles */}
-      <div className="absolute top-24 left-6 z-50 flex gap-2">
-        <button onClick={() => setIsOwner(!isOwner)} className="bg-white/5 backdrop-blur-md text-[10px] px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10 transition-all font-bold tracking-widest uppercase">
-          {isOwner ? 'View: Owner' : 'View: Participant'}
+      <div className="fixed top-28 left-8 z-[100] flex gap-3">
+        <button 
+          onClick={() => setIsOwner(!isOwner)} 
+          className="glass-pill px-5 py-2.5 text-[8px] font-black uppercase tracking-[0.2em] border-white/10 hover:bg-white/10 transition-all text-gray-400 hover:text-white"
+        >
+          {isOwner ? 'Role: Host' : 'Role: Viewer'}
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative max-w-[1920px] mx-auto w-full px-4 gap-4 pb-4">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative max-w-[1920px] mx-auto w-full px-6 gap-6 pb-6 mt-4">
 
         {/* =========================================
             LEFT COLUMN: MAIN STAGE 
             ========================================= */}
-        <div className="flex-1 lg:w-[70%] flex flex-col relative overflow-hidden bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl shadow-2xl">
+        <div className="flex-1 lg:w-[70%] flex flex-col relative overflow-hidden glass-card border-white/5 shadow-2xl">
           
           {/* Mood Selector Overlay */}
           <AnimatePresence>
@@ -448,39 +446,46 @@ const WatchRoom = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 bg-[#050505]/95 flex flex-col items-center justify-center p-8 overflow-y-auto custom-scrollbar"
+                className="absolute inset-0 z-50 bg-black/95 backdrop-blur-3xl flex flex-col items-center justify-center p-12 overflow-y-auto custom-scrollbar"
               >
                 {!currentMood ? (
-                  <div className="text-center w-full max-w-4xl">
-                    <motion.h2 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-3xl font-black mb-12 tracking-[0.2em] uppercase">Set the Room Vibe</motion.h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="text-center w-full max-w-5xl">
+                    <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-16">
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-4">Sentiment Engine</h3>
+                        <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Connect Room Vibe</h2>
+                    </motion.div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
                       {moods.map((mood, idx) => (
                         <motion.button
                           key={mood.id}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: idx * 0.05 }}
-                          whileHover={{ scale: 1.05, y: -5 }}
-                          whileTap={{ scale: 0.95 }}
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.05, duration: 0.8, ease: "circOut" }}
+                          whileHover={{ scale: 1.02, y: -5 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => setCurrentMood(mood)}
-                          className={`group relative overflow-hidden rounded-2xl p-8 aspect-video flex flex-col justify-between items-center text-center transition-all ${mood.color} border border-white/10 shadow-lg`}
+                          className="group relative overflow-hidden rounded-[2.5rem] glass-card p-10 aspect-video flex flex-col justify-between items-center text-center transition-all bg-white/[0.02] border-white/5 hover:border-white/20 shadow-2xl"
                         >
-                          <div className="bg-white/20 p-3 rounded-full text-white shadow-inner">
+                          <div className={`p-4 rounded-2xl ${mood.color} text-white shadow-2xl brightness-90 group-hover:brightness-110 transition-all`}>
                             <mood.icon size={32} />
                           </div>
-                          <span className="font-black text-white text-xl tracking-widest uppercase">{mood.name}</span>
+                          <span className="font-black text-white text-sm tracking-[0.3em] uppercase">{mood.name}</span>
                         </motion.button>
                       ))}
                     </div>
-                    <button onClick={() => setShowMoodSelector(false)} className="mt-12 text-gray-500 hover:text-white underline text-xs font-bold tracking-widest uppercase transition-colors">Skip & Just Hangout</button>
+                    <button onClick={() => setShowMoodSelector(false)} className="mt-16 text-gray-500 hover:text-accent-gold text-[10px] font-black tracking-[0.3em] uppercase transition-all">Skip Connection</button>
                   </div>
                 ) : (
-                  <div className="w-full max-w-5xl">
-                    <button onClick={() => setCurrentMood(null)} className="mb-8 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors">&larr; Back to vibes</button>
-                    <h2 className="text-2xl font-black mb-8 flex items-center gap-3 uppercase tracking-wider">
-                      Top picks for <span className="text-[#E50914]">{currentMood.name}</span> mood
-                    </h2>
-                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
+                  <div className="w-full max-w-6xl">
+                    <button onClick={() => setCurrentMood(null)} className="mb-12 text-gray-400 hover:text-white flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] transition-colors">
+                        <ArrowLeft size={16} /> Back to Sentiment Catalog
+                    </button>
+                    <div className="mb-12">
+                        <h3 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.4em] mb-4">Recommended for {currentMood.name} Phase</h3>
+                        <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Content Stream</h2>
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-8">
                       {recommendations.map((item, idx) => (
                         <motion.div
                           key={item.id}
@@ -490,18 +495,18 @@ const WatchRoom = () => {
                           className="group relative cursor-pointer"
                           onClick={() => handleContentSelect(item)}
                         >
-                          <div className="aspect-[2/3] rounded-xl overflow-hidden relative border border-white/5 shadow-2xl">
-                            <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
+                          <div className="aspect-[2/3] rounded-[1.5rem] overflow-hidden relative border border-white/5 shadow-2xl">
+                            <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-1000" />
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <div className="bg-[#E50914] rounded-full p-4 shadow-[0_0_20px_rgba(229,9,20,0.6)] transform scale-0 group-hover:scale-100 transition-transform duration-300">
-                                <Play size={24} fill="white" />
+                              <div className="bg-white rounded-full p-5 shadow-[0_0_40px_rgba(255,255,255,0.3)] transform scale-0 group-hover:scale-100 transition-transform duration-500">
+                                <Play size={24} fill="black" />
                               </div>
                             </div>
-                            <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-md text-[10px] font-black text-[#E50914] px-2 py-1 rounded tracking-tighter border border-[#E50914]/20">
-                              {item.match}% MATCH
+                            <div className="absolute top-4 right-4 glass-pill bg-black/60 border-accent-gold/20 text-[8px] font-black text-accent-gold px-3 py-1.5 uppercase tracking-widest">
+                              {item.match}% SYNC
                             </div>
                           </div>
-                          <h3 className="mt-3 text-xs font-black text-gray-300 uppercase tracking-widest group-hover:text-white truncate transition-colors">{item.title}</h3>
+                          <h3 className="mt-5 text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-white truncate transition-colors">{item.title}</h3>
                         </motion.div>
                       ))}
                     </div>
@@ -512,42 +517,44 @@ const WatchRoom = () => {
           </AnimatePresence>
 
           {/* Header Bar inside Main Stage */}
-          <div className="absolute top-0 w-full p-6 flex justify-between items-center z-10 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
-            <div>
-              <h2 className="text-sm font-black text-gray-400 tracking-[0.2em] uppercase">
-                <span className="text-[#E50914] mr-2">Watching:</span> 
-                <span className="text-white">{selectedContent ? selectedContent.title : 'Nothing Playing'}</span>
-              </h2>
+          <div className="absolute top-0 w-full p-8 flex justify-between items-center z-10 bg-gradient-to-b from-black/60 via-black/20 to-transparent">
+            <div className="flex items-center gap-4">
+                <div className="w-2 h-2 rounded-full bg-accent-gold animate-pulse shadow-[0_0_10px_#FFD700]" />
+                <h2 className="text-[10px] font-black text-gray-300 tracking-[0.4em] uppercase">
+                    <span className="opacity-40">Active Feed:</span> 
+                    <span className="text-white ml-2">{selectedContent ? selectedContent.title : 'Idle'}</span>
+                </h2>
             </div>
           </div>
 
           {/* Video Player Area */}
-          <div className="flex-1 relative flex items-center justify-center bg-[#050505] group">
+          <div className="flex-1 relative flex items-center justify-center bg-transparent group overflow-hidden">
             {selectedContent ? (
               <>
                 <img
                   src={selectedContent.image.replace('w500', 'original')}
                   alt="Video Feed"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${isPlaying ? 'opacity-80' : 'opacity-40 grayscale'}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${isPlaying ? 'opacity-70 scale-100' : 'opacity-30 scale-110 grayscale blur-xl'}`}
                 />
                 <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="z-10 bg-white/5 backdrop-blur-xl p-8 rounded-full cursor-pointer hover:bg-white/10 transition-all border border-white/10 shadow-2xl"
+                  className="z-10 glass-pill-active p-10 rounded-full cursor-pointer transition-all shadow-2xl relative"
                 >
+                    <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full -z-10" />
                   {isPlaying ? <Pause size={48} fill="white" /> : <Play size={48} fill="white" className="ml-2" />}
                 </motion.div>
               </>
             ) : (
-              <div className="text-center z-10">
-                <div className="bg-white/5 p-12 rounded-3xl border border-white/10 backdrop-blur-md shadow-2xl">
-                  <p className="text-gray-400 mb-8 font-bold uppercase tracking-widest text-sm">Room is ready. Choose a movie.</p>
+              <div className="text-center z-10 p-12">
+                <div className="glass-card p-16 rounded-[3rem] border-white/10 shadow-3xl">
+                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em] mb-8">Screen Operational</h3>
                   <button
                     onClick={() => setShowMoodSelector(true)}
-                    className="bg-[#E50914] px-10 py-4 rounded-xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-[0_0_20px_rgba(229,9,20,0.4)] hover:shadow-[0_0_30px_rgba(229,9,20,0.6)]"
+                    className="glass-pill-active px-12 py-5 text-[10px] font-black uppercase tracking-[0.4em] transition-all shadow-2xl"
                   >
-                    Select Content
+                    Select Stream
                   </button>
                 </div>
               </div>
@@ -560,13 +567,13 @@ const WatchRoom = () => {
                   <motion.div
                     key={reaction.id}
                     initial={{ y: 0, opacity: 1, scale: 0.5 }}
-                    animate={{ y: -400, opacity: 0, scale: 1.5 }}
+                    animate={{ y: -500, opacity: 0, scale: 2 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 2.5, ease: "easeOut" }}
+                    transition={{ duration: 3, ease: "easeOut" }}
                     className={`absolute ${reaction.color}`}
                     style={{ left: `${reaction.x}%` }}
                   >
-                    <reaction.icon size={48} fill="currentColor" className="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                    <reaction.icon size={48} fill="currentColor" className="drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]" />
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -574,50 +581,52 @@ const WatchRoom = () => {
           </div>
 
           {/* Controls Bar */}
-          <div className="p-6 bg-gradient-to-t from-black via-black/80 to-transparent z-20 space-y-4">
+          <div className="p-8 bg-black/60 backdrop-blur-3xl z-20 space-y-6">
              {/* Simple Progress Bar */}
-             <div className="w-full h-1 bg-white/10 rounded-full cursor-pointer group relative overflow-hidden">
-                <div className={`h-full bg-[#E50914] shadow-[0_0_10px_#E50914] transition-all duration-300 ${isPlaying ? 'w-[34%]' : 'w-[28%]'}`} />
+             <div className="w-full h-1 bg-white/5 rounded-full cursor-pointer group relative overflow-hidden">
+                <div className={`h-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out ${isPlaying ? 'w-[34%]' : 'w-[28%]'}`} />
              </div>
 
              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-6">
-                   <button onClick={() => setIsPlaying(!isPlaying)} className="hover:text-[#E50914] transition-colors">
+                <div className="flex items-center gap-10">
+                   <button onClick={() => setIsPlaying(!isPlaying)} className="text-gray-400 hover:text-white transition-all transform active:scale-90">
                       {isPlaying ? <Pause size={24} /> : <Play size={24} />}
                    </button>
-                   <div className="flex items-center gap-2">
-                       <Volume2 size={20} className="text-gray-400" />
-                       <div className="w-20 h-1 bg-white/10 rounded-full">
-                          <div className="w-2/3 h-full bg-white rounded-full shadow-[0_0_5px_white]" />
+                   <div className="flex items-center gap-4 group">
+                       <Volume2 size={20} className="text-gray-500 group-hover:text-white transition-colors" />
+                       <div className="w-24 h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div className="w-2/3 h-full bg-accent-gold shadow-[0_0_10px_#FFD700]" />
                        </div>
                    </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-6">
                    {/* Reaction Pool */}
-                   <div className="flex items-center bg-white/5 backdrop-blur-md rounded-full px-4 py-2 gap-3 border border-white/10 shadow-lg">
+                   <div className="flex items-center glass-pill px-6 py-3 gap-6 border-white/5 shadow-2xl">
                       {reactions.map((r) => (
                         <button
                           key={r.id}
                           onClick={() => triggerReaction(r.icon, r.color)}
-                          className="hover:scale-125 transition-transform active:scale-95"
+                          className="hover:scale-125 transition-transform active:scale-95 brightness-90 hover:brightness-110"
                         >
                           <r.icon size={20} className={r.color} />
                         </button>
                       ))}
                     </div>
 
-                    <div className="w-px h-6 bg-white/10 mx-2" />
+                    <div className="w-px h-6 bg-white/5 mx-2" />
 
-                    <button onClick={() => { setShowMoodSelector(true); setCurrentMood(null); }} className="p-2.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all">
-                      <Smile size={22} />
-                    </button>
-                    <button className="p-2.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all">
-                      <Mic size={22} />
-                    </button>
-                    <button onClick={() => navigate('/party')} className="p-2.5 rounded-full bg-[#E50914]/10 text-[#E50914] hover:bg-[#E50914] hover:text-white transition-all">
-                      <PhoneOff size={22} />
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => { setShowMoodSelector(true); setCurrentMood(null); }} className="w-12 h-12 rounded-2xl glass-pill flex items-center justify-center text-gray-400 hover:text-white transition-all border-white/5">
+                          <Smile size={20} />
+                        </button>
+                        <button className="w-12 h-12 rounded-2xl glass-pill flex items-center justify-center text-gray-400 hover:text-white transition-all border-white/5">
+                          <Mic size={20} />
+                        </button>
+                        <button onClick={() => navigate('/party')} className="w-12 h-12 rounded-2xl glass-pill-active bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl">
+                          <PhoneOff size={20} />
+                        </button>
+                    </div>
                 </div>
              </div>
           </div>
@@ -626,49 +635,53 @@ const WatchRoom = () => {
         {/* =========================================
             RIGHT COLUMN: SOCIAL PANEL
             ========================================= */}
-        <div className="w-full lg:w-[30%] lg:min-w-[360px] flex flex-col gap-4 shrink-0 overflow-y-auto custom-scrollbar">
+        <div className="w-full lg:w-[30%] lg:min-w-[400px] flex flex-col gap-6 shrink-0 overflow-y-auto custom-scrollbar">
           
           {/* Header Action Row */}
-          <div className="flex items-center justify-between bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-xl">
-             <div className="flex gap-2">
-                <button onClick={() => navigate('/party')} className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#E50914]/10 border border-[#E50914]/20 text-[#E50914] hover:bg-[#E50914] hover:text-white transition-all">
+          <div className="flex items-center justify-between glass-pill p-4 border-white/5 shadow-2xl">
+             <div className="flex gap-3">
+                <button onClick={() => navigate('/party')} className="w-12 h-12 flex items-center justify-center rounded-2xl glass-pill border-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
                    <LogOut size={20} />
                 </button>
-                <button onClick={() => setIsShareModalOpen(true)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:border-blue-500 hover:text-blue-400 hover:bg-blue-500/10 transition-all">
+                <button onClick={() => setIsShareModalOpen(true)} className="w-12 h-12 flex items-center justify-center rounded-2xl glass-pill border-white/10 text-gray-300 hover:border-accent-gold/50 hover:text-accent-gold transition-all">
                    <Share2 size={20} />
                 </button>
              </div>
 
-             <div className="flex -space-x-3">
+             <div className="flex -space-x-4">
                {participants.map((p) => (
-                 <div key={p.id} className="relative">
-                   <img src={p.avatar} alt={p.name} className={`w-10 h-10 rounded-full border-2 object-cover ${p.isHost ? 'border-[#E50914]' : 'border-black'}`} />
-                   {p.isSpeaking && <div className="absolute inset-0 rounded-full border-2 border-green-500 animate-ping" />}
+                 <div key={p.id} className="relative group">
+                   <img src={p.avatar} alt={p.name} className={`w-12 h-12 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-accent-gold shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'border-[#050505]'}`} />
+                   {p.isSpeaking && <div className="absolute inset-0 rounded-full border-2 border-white/50 animate-ping" />}
                  </div>
                ))}
-               <div className="w-10 h-10 rounded-full bg-rich-gray border-2 border-black flex items-center justify-center text-[10px] font-black">+2</div>
+               <div className="w-12 h-12 rounded-full glass-card border-white/10 flex items-center justify-center text-[10px] font-black z-10">+2</div>
              </div>
           </div>
 
           {/* Social Chat */}
-          <div className="flex-1 min-h-[400px] bg-[#141414]/80 backdrop-blur-xl border border-white/10 rounded-3xl flex flex-col overflow-hidden shadow-2xl">
-             <div className="px-6 py-5 border-b border-white/5 flex items-center gap-3 bg-white/5 uppercase tracking-[0.2em] text-[10px] font-black text-gray-400">
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_red]" /> Live Chat Buffer
+          <div className="flex-1 min-h-[500px] glass-card border-white/5 flex flex-col overflow-hidden shadow-3xl">
+             <div className="px-8 py-6 border-b border-white/5 flex items-center gap-4 bg-white/[0.02] text-[10px] font-black text-gray-500 tracking-[0.3em] uppercase">
+                <div className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-pulse shadow-[0_0_10px_#FFD700]" />
+                Live Chat
              </div>
 
-             <div className="flex-1 overflow-y-auto px-6 py-8 space-y-6 custom-scrollbar scroll-smooth">
+             <div className="flex-1 overflow-y-auto px-8 py-10 space-y-10 custom-scrollbar scroll-smooth">
                 {messages.map((msg) => (
-                  <div key={msg.id} className={`flex gap-4 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
-                    <img src={msg.avatar} className="w-10 h-10 rounded-2xl shadow-lg border border-white/10 object-cover" alt={msg.user} />
+                  <div key={msg.id} className={`flex gap-5 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
+                    <div className="relative shrink-0">
+                        <img src={msg.avatar} className="w-12 h-12 rounded-2xl shadow-2xl border border-white/5 object-cover" alt={msg.user} />
+                        {msg.isMe && <div className="absolute inset-0 rounded-2xl bg-accent-gold/10 pointer-events-none" />}
+                    </div>
                     <div className={`flex flex-col max-w-[80%] ${msg.isMe ? 'items-end' : 'items-start'}`}>
-                       <div className={`flex items-center gap-2 mb-1.5 opacity-60 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
-                          <span className="text-[10px] font-black text-white uppercase tracking-wider">{msg.user} {msg.isMe && '👤'}</span>
-                          <span className="text-[10px] font-mono text-gray-500">{msg.time}</span>
+                       <div className={`flex items-center gap-3 mb-2 opacity-40 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
+                          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{msg.user}</span>
+                          <span className="text-[8px] font-mono text-gray-600">{msg.time}</span>
                        </div>
-                       <div className={`px-5 py-3 rounded-2xl text-[13px] font-medium leading-relaxed shadow-xl ${msg.isMe
-                          ? 'bg-[#E50914] text-white rounded-tr-none shadow-[0_8px_20px_rgba(229,9,20,0.4)]'
-                          : 'bg-white/5 text-gray-300 rounded-tl-none border border-white/10'
-                        }`}>
+                       <div className={`px-5 py-3 rounded-[1.5rem] text-[13px] font-medium leading-loose shadow-2xl transition-all ${msg.isMe
+                           ? 'glass-pill-active border-accent-gold/20 rounded-tr-none'
+                           : 'glass-card border-white/5 rounded-tl-none bg-white/[0.03]'
+                         }`}>
                          {msg.text}
                        </div>
                     </div>
@@ -677,22 +690,22 @@ const WatchRoom = () => {
                 <div ref={chatEndRef} />
              </div>
 
-             <div className="p-5 border-t border-white/10 bg-black/40">
-                <form onSubmit={handleSendMessage} className="relative">
+             <div className="p-8 border-t border-white/5 bg-white/[0.02]">
+                <form onSubmit={handleSendMessage} className="relative group">
+                   <div className="absolute inset-0 bg-white/5 blur-xl group-focus-within:bg-accent-gold/5 transition-all rounded-3xl" />
                    <input
                      type="text"
                      value={input}
                      onChange={(e) => setInput(e.target.value)}
-                     placeholder="Message room..."
-                     className="w-full bg-[#050505] text-sm text-white rounded-2xl py-4 pl-6 pr-14 focus:outline-none border border-white/10 focus:border-[#E50914]/50 transition-all shadow-inner"
+                     placeholder="Send message..."
+                     className="w-full bg-black/50 backdrop-blur-md text-[13px] text-white rounded-[1.5rem] py-5 pl-8 pr-16 focus:outline-none border border-white/5 focus:border-white/20 transition-all shadow-2xl relative z-10 font-medium"
                    />
-                   <button type="submit" disabled={!input.trim()} className={`absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all ${input.trim() ? 'bg-[#E50914] text-white shadow-lg' : 'text-gray-600'}`}>
+                   <button type="submit" disabled={!input.trim()} className={`absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-xl transition-all relative z-20 ${input.trim() ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]' : 'text-gray-600'}`}>
                       <Send size={16} />
                    </button>
                 </form>
              </div>
           </div>
-
           <RoomSettings isOwner={isOwner} />
         </div>
       </div>

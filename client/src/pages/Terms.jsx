@@ -1,48 +1,64 @@
 import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const Terms = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
+    const sections = [
+        { title: 'Playback License', content: 'WatchWave grants you a revocable, non-exclusive, non-transferable, limited license to stream content for personal, non-commercial purposes within our cinematic ecosystem.' },
+        { title: 'User Propagation', content: 'You are responsible for maintaining the security of your personal access keys. Any activity originating from your screen is your legal responsibility.' },
+        { title: 'Cinematic Boundaries', content: 'Our services are geographically restricted based on regional licensing agreements. Attempting to bypass these cinematic boundaries via proxy screens is prohibited.' },
+        { title: 'Content Integrity', content: 'Reproduction or redistribution of the cinematic stream is strictly forbidden. We employ forensic watermarking to protect cinematic integrity.' }
+    ];
+
     return (
-        <div className="pt-24 px-6 max-w-4xl mx-auto min-h-screen text-gray-300">
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-8 border-b border-white/10 pb-4">Terms and Conditions</h1>
+        <div className="min-h-screen pt-40 pb-24 px-8 md:px-16 lg:px-24 bg-transparent text-white selection:bg-accent-gold selection:text-black relative overflow-hidden">
+            
+            {/* Cinematic Background Field */}
+            <div className="fixed inset-0 z-0">
+                <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-white/[0.02] blur-[150px] rounded-full" />
+                <div className="absolute bottom-[20%] left-[-5%] w-[50%] h-[50%] bg-accent-gold/[0.04] blur-[180px] rounded-full" />
+            </div>
 
-            <div className="space-y-10 text-sm leading-relaxed">
-                <section className="bg-white/5 border border-white/5 rounded-2xl p-6 md:p-8">
-                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                        <span className="bg-brand-red/20 text-brand-red w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">1</span>
-                        Acceptance of Terms
-                    </h2>
-                    <p className="text-gray-400">By accessing and utilizing the WatchWave application, you accept and agree to be bound by the terms and provisions of this agreement. In addition, when using these specific services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
-                </section>
+            <div className="relative z-10 max-w-5xl mx-auto">
+                <div className="space-y-6 mb-24">
+                    <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Legal Features / v2.6.0</h3>
+                    <h1 className="text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
+                        Cinematic <br/> Terms
+                    </h1>
+                </div>
 
-                <section className="bg-white/5 border border-white/5 rounded-2xl p-6 md:p-8">
-                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                        <span className="bg-brand-red/20 text-brand-red w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">2</span>
-                        Premium Subscription
-                    </h2>
-                    <p className="text-gray-400">WatchWave is a premium streaming platform. Users agree to provide current, complete, and accurate purchase and account information for all purchases made via our platform. Subscriptions are billed on a recurring basis as dictated by your selected plan.</p>
-                </section>
+                <div className="space-y-12">
+                    {sections.map((section, i) => (
+                        <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="glass-card p-12 border-white/5 hover:border-white/10 transition-all duration-700"
+                        >
+                            <div className="flex flex-col md:flex-row gap-8 md:gap-20">
+                                <div className="md:w-64 shrink-0">
+                                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter leading-none mb-4">{section.title}</h2>
+                                    <div className="h-1 w-12 bg-accent-gold rounded-full" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-[12px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-[2]">
+                                        {section.content}
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
 
-                <section className="bg-white/5 border border-white/5 rounded-2xl p-6 md:p-8">
-                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                        <span className="bg-brand-red/20 text-brand-red w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">3</span>
-                        Watch Parties & Social Conduct
-                    </h2>
-                    <p className="text-gray-400">The "Watch Room" feature is designed for communal viewing. Users are expected to maintain respectful conduct in Voice Chat and Live Text Chat. WatchWave reserves the right to terminate accounts that engage in harassment, hate speech, or the broadcast of unauthorized restricted content.</p>
-                </section>
-
-                <section className="bg-white/5 border border-white/5 rounded-2xl p-6 md:p-8">
-                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                        <span className="bg-brand-red/20 text-brand-red w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">4</span>
-                        Intellectual Property
-                    </h2>
-                    <p className="text-gray-400">All content included on this site, such as text, graphics, logos, images, digital downloads, and data compilations is the property of WatchWave or its content suppliers and protected by international copyright laws.</p>
-                </section>
-
-                <p className="text-gray-500 mt-12 pt-8 border-t border-white/5 font-mono text-xs">LAST UPDATED: MARCH 2026 // REVISION: 4.2.0</p>
+                <div className="mt-24 p-12 glass-card border-dashed border-white/10 text-center">
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.6em]">
+                        Last Propagation: March 14, 2026 &bull; Encryption Active
+                    </p>
+                </div>
             </div>
         </div>
     );

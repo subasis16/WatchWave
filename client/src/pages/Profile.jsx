@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { User, Upload, Sparkles, Hash, Copy, Pencil, Check, Award, ShieldAlert, Lock, Eye, EyeOff, Star, Crown, Zap, Shield, Heart, Gem, LogOut, Globe, Subtitles } from 'lucide-react';
+import { 
+  User, Upload, Sparkles, Hash, Copy, Pencil, Check, Award, ShieldAlert, 
+  Lock, Eye, EyeOff, Star, Crown, Zap, Shield, Heart, Gem, LogOut, 
+  Globe, Subtitles, Play, Users, Scissors, ChevronDown 
+} from 'lucide-react';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -39,7 +44,7 @@ const Profile = () => {
               email: user.email,
               avatar: data.avatar || user.photoURL || null,
               uid: user.uid,
-              bio: data.bio || 'New explorer in the cinematic universe.',
+              bio: data.bio || 'New explorer in the cinematic world.',
               isOnline: data.isOnline ?? true,
               language: data.language || 'English',
               subtitles: data.subtitles || 'English',
@@ -52,7 +57,7 @@ const Profile = () => {
               email: user.email,
               avatar: user.photoURL || null,
               uid: user.uid,
-              bio: 'New explorer in the cinematic universe.',
+              bio: 'New explorer in the cinematic world.',
               isOnline: true,
               language: 'English',
               subtitles: 'English',
@@ -73,13 +78,13 @@ const Profile = () => {
   }, [navigate]);
 
   const badges = [
-    { id: 'b1', title: 'Premium VIP', desc: 'Active Subscription', icon: Crown, unlocked: true, style: 'bg-gradient-to-r from-neutral-900 to-black border border-yellow-500/50 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]', iconColor: 'text-yellow-500' },
-    { id: 'b2', title: 'Shining Shot', desc: 'Hosted 50 Parties', icon: Sparkles, unlocked: true, style: 'bg-gradient-to-r from-cyan-400 to-blue-600 border border-cyan-300 text-white shadow-[0_0_15px_rgba(34,211,238,0.4)]', iconColor: 'text-white' },
-    { id: 'b3', title: 'Popular Idol', desc: '100+ Friends', icon: Star, unlocked: true, style: 'bg-gradient-to-r from-indigo-500 to-purple-600 border border-indigo-400 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]', iconColor: 'text-white' },
-    { id: 'b4', title: 'Richie Rich', desc: 'Gifted 10 times', icon: Gem, unlocked: true, style: 'bg-gradient-to-r from-yellow-400 to-orange-500 border border-yellow-300 text-white shadow-[0_0_15px_rgba(250,204,21,0.4)]', iconColor: 'text-white' },
-    { id: 'b5', title: 'Vast Wealth', desc: 'Top 1% Watcher', icon: Zap, unlocked: true, style: 'bg-gradient-to-r from-fuchsia-500 to-pink-500 border border-fuchsia-400 text-white shadow-[0_0_15px_rgba(217,70,239,0.4)]', iconColor: 'text-yellow-300' },
-    { id: 'b6', title: 'The General', desc: 'Room Moderator', icon: Shield, unlocked: false, style: 'bg-gradient-to-r from-teal-700 to-emerald-900 border border-teal-500 text-yellow-400 shadow-[0_0_15px_rgba(20,184,166,0.4)]', iconColor: 'text-yellow-400' },
-    { id: 'b7', title: 'Love U Forever', desc: 'Watch a romance movie', icon: Heart, unlocked: false, style: 'bg-gradient-to-r from-blue-400 to-purple-400 border border-blue-300 text-white shadow-[0_0_15px_rgba(56,189,248,0.4)]', iconColor: 'text-white' },
+    { id: 'b1', title: 'Premium VIP', desc: 'Active Subscription', icon: Crown, unlocked: true },
+    { id: 'b2', title: 'Shining Shot', desc: 'Hosted 50 Parties', icon: Sparkles, unlocked: true },
+    { id: 'b3', title: 'Popular Idol', desc: '100+ Friends', icon: Star, unlocked: true },
+    { id: 'b4', title: 'Richie Rich', desc: 'Gifted 10 times', icon: Gem, unlocked: true },
+    { id: 'b5', title: 'Vast Wealth', desc: 'Top 1% Watcher', icon: Zap, unlocked: true },
+    { id: 'b6', title: 'The General', desc: 'Room Moderator', icon: Shield, unlocked: false },
+    { id: 'b7', title: 'Love U Forever', desc: 'Watch a romance movie', icon: Heart, unlocked: false },
   ];
 
   const handleAvatarUpload = (e) => {
@@ -109,11 +114,11 @@ const Profile = () => {
           language: profileData.language,
           subtitles: profileData.subtitles
         });
-        alert("Premium Profile successfully updated to Firebase!");
+        toast.success("User Profile Updated", { style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to sync profile changes.");
+      toast.error("Connection Failed");
     }
   };
 
@@ -126,249 +131,284 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading Profile Hub...</div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-transparent text-white">
+        <div className="relative">
+            <div className="w-16 h-16 border-2 border-accent-gold/20 border-t-accent-gold rounded-full animate-spin shadow-2xl" />
+            <div className="absolute inset-0 bg-accent-gold/10 blur-xl animate-pulse rounded-full" />
+        </div>
+    </div>
+  );
 
   return (
-    <div className="pt-24 px-4 sm:px-6 lg:px-8 min-h-screen pb-16 bg-black text-white">
-      <div className="max-w-4xl mx-auto space-y-10">
+    <div className="pt-32 px-8 min-h-screen pb-24 relative overflow-hidden text-white bg-transparent selection:bg-accent-gold selection:text-black">
+      {/* Dynamic Background Field */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[10%] right-[-5%] w-[45%] h-[45%] bg-white/[0.03] blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[5%] left-[-5%] w-[35%] h-[35%] bg-accent-gold/[0.08] blur-[130px] rounded-full" />
+      </div>
 
-        {/* Public Identity Section */}
-        <div className="flex flex-col items-center text-center space-y-6">
-          <div className="relative group cursor-pointer inline-block">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#E50914] to-red-900 flex items-center justify-center overflow-hidden border-4 border-[#1A1A1A] shadow-[0_0_30px_rgba(229,9,20,0.3)] group-hover:shadow-[0_0_40px_rgba(229,9,20,0.5)] transition-all">
-              {profileData.avatar ? (
-                <img src={profileData.avatar} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <User className="w-16 h-16 text-white" />
-              )}
+      <div className="max-w-5xl mx-auto space-y-16 relative z-10">
+        
+        {/* Header Component */}
+        <div className="flex flex-col items-center text-center space-y-10">
+          <div className="relative group">
+            {/* Premium Glow Profile */}
+            <div className="absolute inset-0 bg-accent-gold/20 blur-[60px] opacity-0 group-hover:opacity-100 transition-all duration-1000 -z-10" />
+            <div className="w-48 h-48 rounded-[3rem] glass-card flex items-center justify-center overflow-hidden border border-white/10 shadow-3xl group-hover:-translate-y-2 transition-all duration-700 p-1.5">
+              <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative">
+                {profileData.avatar ? (
+                  <img src={profileData.avatar} alt="Avatar" className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" />
+                ) : (
+                  <div className="w-full h-full bg-white/5 flex items-center justify-center">
+                    <User className="w-20 h-20 text-white/20" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all" />
+              </div>
             </div>
+            
             <label
               htmlFor="avatar-upload"
-              className="absolute bottom-1 right-1 bg-[#1A1A1A] border border-neutral-700 hover:bg-neutral-800 text-white p-2.5 rounded-full cursor-pointer transition-all transform hover:scale-110 shadow-lg"
+              className="absolute bottom-4 right-4 glass-pill-active p-3.5 rounded-2xl cursor-pointer transition-all transform hover:scale-110 shadow-2xl"
             >
-              <Upload className="w-4 h-4" />
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                className="hidden"
-              />
+              <Upload className="w-5 h-5 text-white" />
+              <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
             </label>
           </div>
 
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white mb-3">{profileData.name}</h1>
+          <div className="space-y-6">
+            <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-4">
+                    <h1 className="text-6xl font-black tracking-tighter text-white uppercase">{profileData.name}</h1>
+                    <div className="glass-pill border-accent-gold/20 text-accent-gold px-4 py-1.5 text-[8px] font-black tracking-[0.2em] flex items-center gap-2">
+                        <Crown size={12} /> PRO Screen
+                    </div>
+                </div>
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 text-gray-500 font-black text-[10px] uppercase tracking-widest">
+                        <Hash size={12} className="text-accent-gold" />
+                        screen-0034-alpha
+                    </div>
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
+                </div>
+            </div>
 
-            <div className="flex items-center justify-center gap-2 max-w-md mx-auto">
+            <div className="flex items-center justify-center gap-4 max-w-xl mx-auto">
               {isEditingBio ? (
-                <div className="flex w-full items-center gap-2">
+                <div className="flex w-full items-center gap-3 glass-card p-3 border-white/10 rounded-[1.5rem] shadow-2xl">
                   <input
                     type="text"
                     value={tempBio}
                     onChange={(e) => setTempBio(e.target.value)}
                     maxLength={150}
-                    className="flex-1 bg-[#1A1A1A] border border-neutral-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-[#E50914] transition-colors"
+                    className="flex-1 bg-transparent px-5 py-3 text-[13px] text-white focus:outline-none placeholder:text-gray-700 font-medium"
                     autoFocus
                   />
-                  <button onClick={handleSaveBio} className="p-2 bg-[#E50914] rounded-lg hover:bg-red-700 transition-colors shadow-sm">
-                    <Check className="w-4 h-4 text-white" />
+                  <button onClick={handleSaveBio} className="w-10 h-10 glass-pill-active rounded-xl transition-all shadow-xl flex items-center justify-center">
+                    <Check className="w-5 h-5 text-white" />
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 group">
-                  <p className="text-gray-400 text-sm max-w-[300px] break-words leading-relaxed">{profileData.bio}</p>
-                  <button onClick={() => setIsEditingBio(true)} className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-white transition-all">
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
+                <div 
+                    onClick={() => setIsEditingBio(true)}
+                    className="group glass-pill-active px-10 py-4 border-white/5 cursor-pointer hover:border-white/20 transition-all flex items-center gap-5 shadow-2xl"
+                >
+                  <p className="text-white text-[10px] font-black uppercase tracking-[0.2em]">{profileData.bio}</p>
+                  <Pencil className="w-4 h-4 text-white opacity-40 group-hover:opacity-100 transition-all" />
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Wave Prestige & Titles */}
-        <div className="bg-[#1A1A1A] border border-neutral-800/50 rounded-2xl p-8 backdrop-blur-md shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#E50914]/5 blur-[100px] rounded-full pointer-events-none"></div>
+        {/* Watch Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[ 
+                { label: 'Connected', value: '1,240m', icon: Play },
+                { label: 'Session Screens', value: '48', icon: Users },
+                { label: 'Captured Clips', value: '23', icon: Scissors },
+                { label: 'Transmission', value: 'Live', icon: Globe }
+            ].map((stat, i) => (
+                <div key={i} className="glass-card p-8 border-white/5 group hover:border-white/10 transition-all cursor-default relative overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-white/5 blur-2xl rounded-full" />
+                    <stat.icon className="text-gray-600 mb-6 group-hover:text-white transition-all" size={20} />
+                    <div className="text-white text-3xl font-black tracking-tighter mb-2">{stat.value}</div>
+                    <div className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em]">{stat.label}</div>
+                </div>
+            ))}
+        </div>
 
-          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10">
-            <Award className="w-5 h-5 text-[#E50914]" />
-            Prestige & Titles
-          </h2>
+        {/* Global Achievement Catalog */}
+        <div className="glass-card p-12 relative overflow-hidden border-white/5 shadow-3xl">
+          <div className="absolute top-[-40%] right-[-15%] w-96 h-96 bg-accent-gold/5 blur-[120px] rounded-full pointer-events-none" />
 
-          <div className="flex flex-wrap gap-3 relative z-10">
+          <div className="flex items-center justify-between mb-12">
+            <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] flex items-center gap-4">
+                <div className="w-1.5 h-1.5 bg-accent-gold rounded-full" />
+                Prestige Catalog
+            </h2>
+            <span className="text-[12px] font-black text-accent-gold">5 / 7 UNLOCKED</span>
+          </div>
+
+          <div className="flex flex-wrap gap-6">
             {badges.map((badge) => (
               <div
                 key={badge.id}
-                title={badge.desc}
-                className={`relative flex items-center gap-2 px-4 py-1.5 rounded-full font-bold text-[13px] tracking-wide transition-all duration-300 hover:scale-105 cursor-pointer hover:z-20
+                className={`group relative flex items-center gap-5 px-6 py-4 rounded-[1.5rem] transition-all duration-700 cursor-pointer overflow-hidden
                   ${badge.unlocked
-                    ? badge.style
-                    : 'bg-neutral-900 text-neutral-500 border border-neutral-800 opacity-60 grayscale hover:grayscale-0 hover:opacity-100'
+                    ? 'glass-card border-white/5 text-white hover:border-white/20'
+                    : 'bg-white/[0.01] text-gray-700 border border-white/[0.02]'
                   }`}
               >
-                {!badge.unlocked && (
-                  <div className="absolute -top-1 -right-1 bg-black rounded-full p-0.5 border border-neutral-700 z-10">
-                    <Lock className="w-2.5 h-2.5 text-neutral-400" />
-                  </div>
-                )}
-
-                <badge.icon className={`w-4 h-4 ${badge.unlocked ? badge.iconColor : 'text-neutral-500'}`} fill={badge.unlocked ? 'currentColor' : 'none'} />
-                <span className="drop-shadow-md whitespace-nowrap">{badge.title}</span>
+                {badge.unlocked && <div className="absolute inset-0 bg-accent-gold/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />}
+                <div className={`${badge.unlocked ? 'text-accent-gold' : 'text-gray-800'} transition-all group-hover:scale-110`}>
+                    <badge.icon size={20} />
+                </div>
+                <div>
+                    <div className="text-[10px] font-black uppercase tracking-widest mb-1">{badge.title}</div>
+                    <div className={`text-[8px] font-black uppercase tracking-widest ${badge.unlocked ? 'text-gray-500' : 'text-gray-800'}`}>
+                        {badge.unlocked ? badge.desc : 'RESTRICTED'}
+                    </div>
+                </div>
+                {!badge.unlocked && <Lock size={12} className="absolute top-4 right-4 text-gray-800" />}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Preferences Section */}
-        <div className="bg-[#1A1A1A] border border-neutral-800/50 rounded-2xl p-8 backdrop-blur-md shadow-xl relative overflow-hidden">
-          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10">
-            <Globe className="w-5 h-5 text-[#E50914]" />
-            Preferences
-          </h2>
+        <div className="grid lg:grid-cols-2 gap-10">
+          {/* Cinematic Prefs */}
+          <div className="glass-card p-12 relative overflow-hidden border-white/5 shadow-2xl">
+            <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
+              <Globe className="w-5 h-5 text-white" />
+              Language Core
+            </h2>
 
-          <div className="grid md:grid-cols-2 gap-8 relative z-10">
-            {/* Preferred Language */}
-            <div>
-              <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-[#E50914]" /> Preferred Language
-              </label>
-              <select
-                value={profileData.language}
-                onChange={(e) => setProfileData({ ...profileData, language: e.target.value })}
-                className="w-full bg-black/50 border border-neutral-800/80 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#E50914] transition-all cursor-pointer shadow-inner"
-              >
-                {languages.map((lang) => (
-                  <option key={lang} value={lang} className="bg-[#1A1A1A]">
-                    {lang}
-                  </option>
-                ))}
-              </select>
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <label className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Interpreted Identity</label>
+                <div className="relative">
+                    <select
+                    value={profileData.language}
+                    onChange={(e) => setProfileData({ ...profileData, language: e.target.value })}
+                    className="w-full bg-[#0c0c0c] border border-white/5 rounded-2xl p-5 text-[11px] font-black uppercase tracking-widest text-white appearance-none focus:outline-none focus:border-white/20 transition-all shadow-inner relative z-10"
+                    >
+                    {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 z-10">
+                        <ChevronDown size={14} />
+                    </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Viewing History</label>
+                <div className="relative">
+                    <select
+                    value={profileData.subtitles}
+                    onChange={(e) => setProfileData({ ...profileData, subtitles: e.target.value })}
+                    className="w-full bg-[#0c0c0c] border border-white/5 rounded-2xl p-5 text-[11px] font-black uppercase tracking-widest text-white appearance-none focus:outline-none focus:border-white/20 transition-all shadow-inner relative z-10"
+                    >
+                    {subtitleOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 z-10">
+                        <ChevronDown size={14} />
+                    </div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            {/* Subtitle Preference */}
-            <div>
-              <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Subtitles className="w-3.5 h-3.5 text-[#E50914]" /> Subtitle Preference
-              </label>
-              <select
-                value={profileData.subtitles}
-                onChange={(e) => setProfileData({ ...profileData, subtitles: e.target.value })}
-                className="w-full bg-black/50 border border-neutral-800/80 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#E50914] transition-all cursor-pointer shadow-inner"
-              >
-                {subtitleOptions.map((option) => (
-                  <option key={option} value={option} className="bg-[#1A1A1A]">
-                    {option}
-                  </option>
-                ))}
-              </select>
+          {/* Security Screen */}
+          <div className="glass-card p-12 relative overflow-hidden border-white/5 shadow-2xl">
+            <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
+              <Lock className="w-5 h-5 text-white" />
+              Access Vector
+            </h2>
+
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <label className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Communication Screen</label>
+                <div className="w-full glass-card border-white/5 rounded-2xl p-5 text-[11px] font-black uppercase tracking-widest text-gray-500">
+                  {profileData.email}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Transmission Key</label>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={profileData.uid}
+                    readOnly
+                    className="w-full bg-[#0c0c0c] border border-white/5 rounded-2xl p-5 text-[9px] font-black text-white/30 tracking-[0.3em] uppercase cursor-not-allowed"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(profileData.uid);
+                      toast.success("Key Copied");
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 glass-pill p-2 rounded-xl border-white/10 hover:bg-accent-gold hover:text-black transition-all"
+                  >
+                    <Copy size={16} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Account Details */}
-        <div className="bg-[#1A1A1A] border border-neutral-800/50 rounded-2xl p-8 backdrop-blur-md shadow-xl relative overflow-hidden">
-          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10">
-            <User className="w-5 h-5 text-[#E50914]" />
-            Account Details
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-8 relative z-10">
-            {/* Email (Read Only) */}
-            <div>
-              <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#E50914]" /> Email Address
-              </label>
-              <input
-                type="email"
-                value={profileData.email}
-                readOnly
-                className="w-full bg-black/50 border border-neutral-800/80 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed focus:outline-none shadow-inner"
-              />
+        {/* Visibility Sync */}
+        <div className="glass-card p-12 flex flex-col md:flex-row items-center justify-between gap-10 border-white/5 shadow-3xl group">
+          <div className="flex items-center gap-8">
+            <div className={`p-6 rounded-[2rem] glass-card border-white/10 transition-all duration-1000 ${profileData.isOnline ? 'shadow-[0_0_50px_rgba(34,197,94,0.3)] border-green-500/30' : ''}`}>
+              {profileData.isOnline ? <Eye className="w-8 h-8 text-green-500" /> : <EyeOff className="w-8 h-8 text-gray-600" />}
             </div>
-
-            {/* Unique User ID */}
-            <div>
-              <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Hash className="w-3.5 h-3.5 text-[#E50914]" /> Unique User ID
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={profileData.uid}
-                  readOnly
-                  className="w-full bg-black/50 border border-neutral-700/80 rounded-xl px-4 py-3 text-[#E50914] font-bold font-mono tracking-[0.2em] cursor-not-allowed focus:outline-none shadow-inner"
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(profileData.uid);
-                    alert("UID copied to clipboard!");
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors cursor-pointer bg-neutral-800 p-1.5 rounded-md border border-neutral-700 hover:border-neutral-500 shadow-sm"
-                  title="Copy UID"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Online Status Toggle */}
-            <div className="md:col-span-2 flex items-center justify-between p-5 bg-black/30 border border-neutral-800/50 rounded-xl shadow-inner">
-              <div>
-                <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-                  {profileData.isOnline ? <Eye className="w-4 h-4 text-green-500" /> : <EyeOff className="w-4 h-4 text-neutral-500" />}
-                  Online Status
-                </h3>
-                <p className="text-xs text-gray-500">Show your status in the Wave Lounge globally</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={profileData.isOnline}
-                  onChange={(e) => setProfileData({ ...profileData, isOnline: e.target.checked })}
-                />
-                <div className="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E50914]"></div>
-              </label>
+            <div className="space-y-2">
+              <h3 className="text-sm font-black text-white uppercase tracking-[0.3em]">Profile Visibility</h3>
+              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed">Show my online status to all users</p>
             </div>
           </div>
-
-          <div className="mt-8 flex justify-end">
+          
+          <div className="flex items-center gap-8">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={profileData.isOnline}
+                onChange={(e) => setProfileData({ ...profileData, isOnline: e.target.checked })}
+              />
+              <div className="w-20 h-10 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/20 after:border-white/10 after:border after:rounded-full after:h-8 after:w-8 after:transition-all duration-500 peer-checked:bg-green-500/20"></div>
+            </label>
             <button
               onClick={handleSaveProfile}
-              className="bg-[#E50914] hover:bg-red-700 active:bg-red-800 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(229,9,20,0.3)] hover:shadow-[0_0_25px_rgba(229,9,20,0.5)] flex items-center gap-2"
+              className="glass-pill-active px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all shadow-2xl"
             >
-              Update Profile
+              Force Sync
             </button>
           </div>
         </div>
 
-        {/* Danger Zone */}
-        <div className="bg-[#1A1A1A] border border-red-900/30 rounded-2xl p-8 backdrop-blur-md relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] rounded-full pointer-events-none"></div>
-
-          <h2 className="text-xl font-bold text-red-500 mb-6 flex items-center gap-2 relative z-10">
-            <ShieldAlert className="w-5 h-5" />
-            Danger Zone
-          </h2>
-
-          <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-            <button onClick={handleLogout} className="flex-1 bg-black hover:bg-neutral-900 text-white border border-neutral-800 hover:border-neutral-700 font-semibold px-6 py-3.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
-              <LogOut size={18} /> Sign Out securely
-            </button>
-            <button className="flex-1 bg-black/50 hover:bg-red-950/40 text-red-500 border border-red-500/30 hover:border-red-500 font-semibold px-6 py-3.5 rounded-xl transition-all shadow-sm">
-              Delete Account
-            </button>
-          </div>
+        {/* Destruction Features */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <button onClick={handleLogout} className="glass-card bg-white/[0.01] hover:bg-white/[0.06] p-8 rounded-[2.5rem] transition-all duration-700 flex items-center justify-center gap-5 group border-white/5">
+            <LogOut size={24} className="text-gray-600 group-hover:text-white transition-all transform group-hover:-translate-x-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 group-hover:text-white transition-all">Log Out</span>
+          </button>
+          <button 
+            onClick={() => {
+              if (window.confirm("Are you sure you want to unlink this account? Your data will be wiped.")) {
+                toast.success("Account unlinked successfully.");
+                handleLogout();
+              }
+            }}
+            className="glass-card border-red-500/10 bg-red-500/[0.01] hover:bg-red-500/[0.05] p-8 rounded-[2.5rem] transition-all duration-700 group"
+          >
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-red-500/30 group-hover:text-red-500 transition-all">Unlink Account</span>
+          </button>
         </div>
-
       </div>
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}} />
     </div>
   );
 };

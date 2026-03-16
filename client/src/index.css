@@ -4,31 +4,105 @@
 
 :root {
   color-scheme: dark;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --accent-gold: #f5a623;
 }
 
 body {
-  @apply bg-deep-black text-white font-sans overflow-x-hidden antialiased;
+  @apply bg-[#050505] text-white font-sans overflow-x-hidden antialiased;
+  background-image: 
+    linear-gradient(
+      to bottom,
+      rgba(5, 5, 5, 0.92) 0%,
+      rgba(5, 5, 5, 0.78) 25%,
+      rgba(5, 5, 5, 0.72) 50%,
+      rgba(5, 5, 5, 0.78) 75%,
+      rgba(5, 5, 5, 0.95) 100%
+    ),
+    url('./assets/streaming-bg.png');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   margin: 0;
   padding: 0;
   scroll-behavior: smooth;
+  min-height: 100vh;
+}
+
+/* Cinematic vignette overlay for premium depth */
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(5, 5, 5, 0.6) 75%,
+    rgba(5, 5, 5, 0.9) 100%
+  );
+}
+
+#root > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Subtle ambient glow animation */
+@keyframes ambientGlow {
+  0%, 100% {
+    box-shadow: inset 0 0 120px 30px rgba(245, 166, 35, 0.02),
+                inset 0 0 200px 60px rgba(100, 50, 200, 0.015);
+  }
+  50% {
+    box-shadow: inset 0 0 150px 40px rgba(245, 166, 35, 0.035),
+                inset 0 0 250px 80px rgba(100, 50, 200, 0.025);
+  }
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  animation: ambientGlow 8s ease-in-out infinite;
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl transition-all duration-300;
+  }
+  
+  .glass-pill {
+    @apply bg-white/10 backdrop-blur-md border border-white/10 rounded-full transition-all duration-500 hover:bg-white/20;
+  }
+
+  .glass-pill-active {
+    @apply bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)];
+  }
+
+  .glass-button {
+    @apply px-6 py-2.5 glass-pill flex items-center gap-2 font-semibold text-sm;
+  }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-deep-black;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-rich-gray rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
+  @apply bg-white/20 rounded-full hover:bg-white/30 transition-colors;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -38,4 +112,37 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  filter: contrast(1.1);
+}
+
+.high-contrast .glass-card, 
+.high-contrast .glass-pill {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.high-contrast .text-gray-400,
+.high-contrast .text-gray-500,
+.high-contrast .text-gray-600 {
+  color: #fff !important;
+  font-weight: 800;
+}
+
+/* Motion Reduction */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.motion-reduction * {
+  animation: none !important;
+  transition: none !important;
 }

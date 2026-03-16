@@ -3,6 +3,7 @@ import { MessageCircle, Search, UserPlus, ArrowLeft, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
+import { toast } from 'react-hot-toast';
 
 const socket = io.connect('http://localhost:5000');
 
@@ -11,23 +12,24 @@ const SocialSidebar = () => {
     const [idInput, setIdInput] = useState('');
     const [activeChatUser, setActiveChatUser] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [suggestedFriends, setSuggestedFriends] = useState([
+        { id: 101, name: 'Elena', avatar: 'https://i.pravatar.cc/150?u=10' },
+        { id: 102, name: 'Marcus', avatar: 'https://i.pravatar.cc/150?u=12' },
+        { id: 103, name: 'Sophia', avatar: 'https://i.pravatar.cc/150?u=11' },
+    ]);
     const [currentMessage, setCurrentMessage] = useState('');
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Listen for incoming messages from Socket.io server
         socket.on("receive_message", (data) => {
             setMessages((prevList) => [...prevList, data]);
         });
-
-        // Cleanup listener on unmount
         return () => {
             socket.off("receive_message");
         };
     }, []);
 
-    // Auto-scroll to latest message
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
@@ -35,10 +37,7 @@ const SocialSidebar = () => {
     const joinChatSession = (friend) => {
         setActiveChatUser(friend);
         setActiveTab('chat');
-        // Clear previous messages when opening a new chat for demo purposes
         setMessages([]);
-
-        // Define a unique room string combining IDs (Mocking 'myId_friendId' for now)
         const roomId = `room_100_${friend.id}`;
         socket.emit("join_chat", roomId);
     };
@@ -64,7 +63,6 @@ const SocialSidebar = () => {
         }
     };
 
-    // 4. The 'Friends' View - 5 Mock Friends
     const friends = [
         { id: 1, name: 'Arjun', avatar: 'https://i.pravatar.cc/150?u=1', status: 'Watching Anime', isOnline: true },
         { id: 2, name: 'Sarah', avatar: 'https://i.pravatar.cc/150?u=2', status: 'In Lobby', isOnline: true },
@@ -73,53 +71,52 @@ const SocialSidebar = () => {
         { id: 5, name: 'Rohan', avatar: 'https://i.pravatar.cc/150?u=6', status: 'Offline', isOnline: false },
     ];
 
-    const suggestedFriends = [
-        { id: 101, name: 'Elena', avatar: 'https://i.pravatar.cc/150?u=10' },
-        { id: 102, name: 'Marcus', avatar: 'https://i.pravatar.cc/150?u=12' },
-        { id: 103, name: 'Sophia', avatar: 'https://i.pravatar.cc/150?u=11' },
-    ];
+
 
     return (
-        <div className="h-full w-full bg-[#0B0C10]/80 backdrop-blur-md border-l border-white/5 flex flex-col z-10 overflow-hidden">
+        <div className="h-full w-full bg-black/80 backdrop-blur-xl border-l border-white/5 flex flex-col z-10 overflow-hidden relative shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+            
+            <div className="absolute top-0 right-0 w-64 h-64 bg-accent-gold/[0.04] blur-[120px] rounded-full pointer-events-none" />
 
-            {/* 3. The Tab Navigation (Top Header) - Hide if in Chat mode */}
+            {/* Tab Navigation */}
             {activeTab !== 'chat' && (
-                <div className="flex px-6 pt-6 shrink-0">
+                <div className="flex px-6 pt-8 shrink-0 relative z-10 gap-2">
                     <button
                         onClick={() => setActiveTab('friends')}
-                        className={`flex-1 py-4 text-xs font-bold tracking-widest transition-all text-center ${activeTab === 'friends'
-                            ? 'text-white border-b-2 border-red-600 shadow-[0_4px_15px_-3px_rgba(229,9,20,0.5)]'
-                            : 'text-gray-500 hover:text-gray-300'
+                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.3em] transition-all text-center rounded-xl ${activeTab === 'friends'
+                            ? 'glass-pill-active shadow-xl'
+                            : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
                             }`}
                     >
-                        FRIENDS
+                        Network
                     </button>
 
                     <button
                         onClick={() => setActiveTab('discover')}
-                        className={`flex-1 py-4 text-xs font-bold tracking-widest transition-all text-center ${activeTab === 'discover'
-                            ? 'text-white border-b-2 border-red-600 shadow-[0_4px_15px_-3px_rgba(229,9,20,0.5)]'
-                            : 'text-gray-500 hover:text-gray-300'
+                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.3em] transition-all text-center rounded-xl ${activeTab === 'discover'
+                            ? 'glass-pill-active shadow-xl'
+                            : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
                             }`}
                     >
-                        DISCOVER
+                        Discover
                     </button>
                 </div>
             )}
 
             {/* Dynamic Subheader */}
             {activeTab !== 'chat' && (
-                <div className="px-6 py-4 shrink-0">
-                    <p className="text-gray-400 text-sm font-medium">
-                        {activeTab === 'friends' ? `Online (${friends.filter(f => f.isOnline).length})` : 'Find new friends'}
+                <div className="px-8 py-6 shrink-0 z-10">
+                    <p className="text-gray-600 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                        {activeTab === 'friends' ? (
+                            <><span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" /> Online Connections ({friends.filter(f => f.isOnline).length})</>
+                        ) : 'Find More Friends'}
                     </p>
                 </div>
             )}
 
             {/* Content Area flex container */}
-            <div className="flex-1 overflow-y-auto hide-scrollbar px-4 pb-6">
+            <div className="flex-1 overflow-y-auto hide-scrollbar px-6 pb-6 z-10">
                 <AnimatePresence mode="wait">
-
                     {/* FRIENDS TAB CONTENT */}
                     {activeTab === 'friends' && (
                         <motion.div
@@ -128,11 +125,10 @@ const SocialSidebar = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="space-y-2"
+                            className="space-y-3"
                         >
                             {friends.map(friend => (
-                                <div key={friend.id} className="flex items-center p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group">
-                                    {/* Link to Profile Zone */}
+                                <div key={friend.id} className="flex items-center p-3.5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.04] border border-white/5 cursor-pointer transition-all duration-300 group hover:scale-[1.02] hover:shadow-xl">
                                     <div
                                         className="relative shrink-0 hover:scale-105 transition-transform cursor-pointer"
                                         onClick={(e) => {
@@ -144,32 +140,30 @@ const SocialSidebar = () => {
                                         <img
                                             src={friend.avatar}
                                             alt={friend.name}
-                                            className={`w-10 h-10 rounded-full object-cover border border-white/10 ${!friend.isOnline ? 'grayscale opacity-50' : ''}`}
+                                            className={`w-12 h-12 rounded-xl object-cover border border-white/10 shadow-lg ${!friend.isOnline ? 'grayscale opacity-50' : ''}`}
                                         />
                                         {friend.isOnline && (
-                                            <span className="absolute bottom-0 right-[-2px] w-3 h-3 bg-green-500 border-2 border-[#0B0C10] rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />
+                                            <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border border-[#050505] rounded-lg animate-pulse shadow-[0_0_8px_#22c55e]" />
                                         )}
                                     </div>
 
-                                    {/* Link to Chat Zone (Clicking Name/Status) */}
                                     <div
                                         className="ml-4 flex flex-col flex-1 cursor-pointer"
                                         onClick={() => joinChatSession(friend)}
                                         title={`Message ${friend.name}`}
                                     >
-                                        <h4 className="text-sm font-bold text-white group-hover:text-red-100 transition-colors">{friend.name}</h4>
-                                        <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-400 transition-colors">{friend.status}</p>
+                                        <h4 className="text-[12px] font-black tracking-widest uppercase text-white group-hover:text-accent-gold transition-colors">{friend.name}</h4>
+                                        <p className="text-[9px] font-bold text-gray-500 mt-1 uppercase tracking-widest line-clamp-1">{friend.status}</p>
                                     </div>
 
-                                    {/* Message Action Icon */}
                                     <button
-                                        className="ml-auto text-red-500 hover:text-red-400 p-2 cursor-pointer transition-colors hover:scale-110"
+                                        className="ml-auto text-gray-500 hover:text-white bg-white/5 hover:bg-accent-gold p-2.5 rounded-xl transition-all shadow-md group-hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             joinChatSession(friend);
                                         }}
                                     >
-                                        <MessageCircle size={20} strokeWidth={1.5} />
+                                        <MessageCircle size={16} strokeWidth={2} />
                                     </button>
                                 </div>
                             ))}
@@ -184,41 +178,54 @@ const SocialSidebar = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="space-y-6"
+                            className="space-y-8"
                         >
-                            {/* Search Input Area */}
-                            <div className="px-2">
-                                <div className="relative">
-                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                            <div className="space-y-4">
+                                <div className="relative group">
+                                    <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
                                     <input
                                         type="text"
                                         value={idInput}
                                         onChange={(e) => setIdInput(e.target.value)}
-                                        placeholder="Enter Friend ID#"
-                                        className="w-full bg-white/5 text-white placeholder-gray-500 text-sm pl-10 pr-4 py-3 rounded-md focus:outline-none focus:ring-1 focus:ring-[#E50914] transition-all border border-transparent hover:border-white/10"
+                                        placeholder="Enter Room ID..."
+                                        className="w-full bg-black/40 border border-white/10 rounded-2xl pl-10 pr-4 py-4 text-[11px] font-bold tracking-widest uppercase text-white placeholder-gray-600 focus:outline-none focus:border-accent-gold/40 focus:bg-white/5 transition-all shadow-inner"
                                     />
                                 </div>
-                                <button className="mt-3 w-full bg-[#E50914] hover:bg-red-700 text-white text-sm font-bold py-3 rounded-md transition-colors shadow-[0_0_10px_rgba(229,9,20,0.3)] hover:shadow-[0_0_15px_rgba(229,9,20,0.5)]">
-                                    Send Request
+                                <button 
+                                    onClick={() => {
+                                        if (idInput.trim()) {
+                                            toast.success(`Request sent to Room ID: ${idInput}`);
+                                            setIdInput('');
+                                        } else {
+                                            toast.error("Enter Room ID first");
+                                        }
+                                    }}
+                                    className="w-full glass-pill-active text-white text-[10px] font-black tracking-[0.3em] uppercase py-4 group hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all"
+                                >
+                                    Friend Request
                                 </button>
                             </div>
 
-                            {/* Suggested Friends */}
-                            <div className="pt-4 border-t border-white/5">
-                                <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">
-                                    Suggested to Follow
+                            <div className="pt-8 border-t border-white/5">
+                                <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-6">
+                                    Recommended Targets
                                 </h4>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     {suggestedFriends.map(user => (
-                                        <div key={user.id} className="flex items-center p-3 rounded-xl hover:bg-white/5 transition-colors group">
-                                            <img src={user.avatar} className="w-10 h-10 rounded-full border border-white/10 shrink-0" alt={user.name} />
+                                        <div key={user.id} className="flex items-center p-3.5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 transition-all group hover:scale-[1.02] hover:shadow-xl cursor-pointer">
+                                            <img src={user.avatar} className="w-10 h-10 rounded-xl border border-white/10 shrink-0" alt={user.name} />
                                             <div className="ml-4 flex flex-col">
-                                                <h4 className="text-sm font-bold text-white group-hover:text-red-100 transition-colors">{user.name}</h4>
-                                                <p className="text-[10px] text-gray-500 mt-0.5">Suggested Account</p>
+                                                <h4 className="text-[11px] font-black text-white group-hover:text-white uppercase tracking-widest">{user.name}</h4>
+                                                <p className="text-[8px] font-bold text-gray-600 mt-0.5 uppercase tracking-widest">Match Score</p>
                                             </div>
-                                            {/* Add + Button substituted for the chat bubble */}
-                                            <button className="ml-auto text-xs font-bold text-gray-300 hover:text-white bg-white/10 hover:bg-[#E50914] px-3 py-1.5 rounded-md transition-all flex items-center justify-center gap-1 group-hover:shadow-[0_0_10px_rgba(229,9,20,0.4)]">
-                                                <UserPlus size={14} /> Add
+                                            <button 
+                                                onClick={() => {
+                                                    toast.success(`Request sent to ${user.name}`);
+                                                    setSuggestedFriends(prev => prev.filter(f => f.id !== user.id));
+                                                }}
+                                                className="ml-auto text-[9px] font-black tracking-[0.2em] uppercase text-gray-400 hover:text-gray-900 bg-white/5 hover:bg-white px-4 py-2.5 rounded-xl transition-all shadow-md group-hover:shadow-[0_0_15px_rgba(255,255,255,0.4)]"
+                                            >
+                                                Add
                                             </button>
                                         </div>
                                     ))}
@@ -235,46 +242,45 @@ const SocialSidebar = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.2 }}
-                            className="flex flex-col h-full pt-6"
+                            className="flex flex-col h-full pt-8"
                         >
-                            {/* Chat Header */}
-                            <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5 mb-4 shadow-lg shrink-0">
+                            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-[1.5rem] border border-white/10 mb-6 shadow-2xl shrink-0 backdrop-blur-md">
                                 <button
                                     onClick={() => setActiveTab('friends')}
-                                    className="text-gray-400 hover:text-white transition-colors p-1"
-                                    title="Back to Friends"
+                                    className="text-gray-500 hover:text-white transition-colors glass-card p-2 rounded-xl border-white/5"
+                                    title="Back to Network"
                                 >
-                                    <ArrowLeft size={18} />
+                                    <ArrowLeft size={16} />
                                 </button>
                                 <div className="relative cursor-pointer" onClick={() => navigate('/profile')}>
-                                    <img src={activeChatUser.avatar} className="w-10 h-10 rounded-full object-cover border border-white/20" />
+                                    <img src={activeChatUser.avatar} className="w-12 h-12 rounded-xl object-cover border border-white/20 shadow-md" />
                                     {activeChatUser.isOnline && (
-                                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-[#0B0C10] rounded-full" />
+                                        <span className="absolute -bottom-1 -right-0.5 w-3 h-3 bg-green-500 border border-[#050505] rounded-md shadow-[0_0_10px_#22c55e]" />
                                     )}
                                 </div>
                                 <div className="flex flex-col cursor-pointer" onClick={() => navigate('/profile')}>
-                                    <h4 className="text-sm font-bold text-white leading-tight">{activeChatUser.name}</h4>
-                                    <p className="text-[10px] text-[#E50914] font-medium tracking-wide uppercase">{activeChatUser.status}</p>
+                                    <h4 className="text-[12px] font-black uppercase tracking-widest text-white leading-tight">{activeChatUser.name}</h4>
+                                    <p className="text-[9px] text-accent-gold font-bold tracking-[0.2em] uppercase mt-1">{activeChatUser.status}</p>
                                 </div>
                             </div>
 
-                            {/* Chat Messages Area */}
-                            <div className="flex-1 overflow-y-auto hide-scrollbar space-y-4 py-2 px-2 flex flex-col">
-                                <div className="text-[10px] font-bold tracking-widest text-center text-gray-600 uppercase mb-4 mt-2">Today Chat Started</div>
+                            <div className="flex-1 overflow-y-auto hide-scrollbar space-y-6 py-2 px-2 flex flex-col relative z-10">
+                                <div className="text-[9px] font-black tracking-[0.4em] text-center text-gray-700 uppercase mb-4 mt-2">
+                                    Secure Transmission Line Open
+                                </div>
 
-                                {/* Mapping Real-Time Socket.io messages */}
                                 {messages.map((msg, index) => {
                                     const isMe = msg.author === "Me";
                                     return (
-                                        <div key={index} className={`flex gap-3 max-w-[90%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'}`}>
+                                        <div key={index} className={`flex gap-4 max-w-[90%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'}`}>
                                             {!isMe && (
-                                                <img src={activeChatUser.avatar} className="w-8 h-8 rounded-full shadow-md shrink-0 border border-white/10" />
+                                                <img src={activeChatUser.avatar} className="w-8 h-8 rounded-[0.8rem] shadow-lg shrink-0 border border-white/10 mt-auto" />
                                             )}
                                             <div className="flex flex-col">
-                                                <div className={`${isMe ? 'bg-[#E50914] text-white rounded-2xl rounded-tr-sm' : 'bg-[#1C1D21] text-gray-200 border border-white/5 rounded-2xl rounded-tl-sm'} px-4 py-2.5 text-sm shadow-sm leading-relaxed max-w-[200px] break-words`}>
+                                                <div className={`${isMe ? 'bg-accent-gold/10 text-white border-accent-gold/30 rounded-br-sm' : 'bg-white/5 text-gray-300 border-white/10 rounded-bl-sm'} border backdrop-blur-md rounded-[1.2rem] px-5 py-3 text-[11px] font-bold tracking-wide shadow-2xl leading-relaxed break-words`}>
                                                     {msg.text}
                                                 </div>
-                                                <span className={`text-[9px] text-gray-500 mt-1 ${isMe ? 'text-right' : 'text-left'}`}>
+                                                <span className={`text-[8px] font-black text-gray-600 uppercase tracking-widest mt-2 ${isMe ? 'text-right' : 'text-left'}`}>
                                                     {msg.time}
                                                 </span>
                                             </div>
@@ -285,29 +291,30 @@ const SocialSidebar = () => {
                             </div>
 
                             {/* Chat Input Area */}
-                            <div className="pt-4 border-t border-white/5 mt-2 shrink-0 relative">
-                                <input
-                                    type="text"
-                                    value={currentMessage}
-                                    onChange={(e) => setCurrentMessage(e.target.value)}
-                                    onKeyPress={handleKeyPress}
-                                    placeholder={`Message ${activeChatUser.name}...`}
-                                    className="w-full bg-[#1C1D21] text-white placeholder-gray-500 text-sm pl-4 pr-12 py-3.5 rounded-xl border border-white/5 focus:outline-none focus:border-[#E50914]/50 transition-all shadow-inner"
-                                />
-                                <button
-                                    onClick={sendMessage}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-red hover:text-red-400 p-2 transition-colors cursor-pointer"
-                                >
-                                    <Send size={18} />
-                                </button>
+                            <div className="pt-6 border-t border-white/5 mt-4 shrink-0 relative bg-transparent z-10">
+                                <div className="relative group">
+                                    <input
+                                        type="text"
+                                        value={currentMessage}
+                                        onChange={(e) => setCurrentMessage(e.target.value)}
+                                        onKeyPress={handleKeyPress}
+                                        placeholder={`Log to ${activeChatUser.name}...`}
+                                        className="w-full bg-black/60 border border-white/10 rounded-[1.5rem] pl-6 pr-14 py-4 text-[11px] font-bold uppercase tracking-widest text-white placeholder-gray-600 focus:outline-none focus:border-accent-gold/40 focus:bg-white/5 transition-all shadow-inner backdrop-blur-xl"
+                                    />
+                                    <button
+                                        onClick={sendMessage}
+                                        disabled={!currentMessage.trim()}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white hover:bg-accent-gold transition-all disabled:opacity-30 disabled:hover:text-gray-500 disabled:hover:bg-transparent cursor-pointer shadow-md"
+                                    >
+                                        <Send size={16} className="ml-0.5" />
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     )}
-
                 </AnimatePresence>
             </div>
 
-            {/* Custom Scrollbar CSS hiding */}
             <style dangerouslySetInnerHTML={{
                 __html: `
                     .hide-scrollbar::-webkit-scrollbar { display: none; }

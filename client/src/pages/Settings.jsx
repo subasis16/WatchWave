@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Accessibility, Globe, HandMetal, Eye, Lock,
+  Accessibility, Globe, HandMetal, Eye, Lock, Crown,
   ShieldAlert, Clock, BarChart3, Moon, Volume2,
   Bell, Check, User, CreditCard, PlayCircle, Download, ShieldCheck, HeartPulse
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import { useSettings } from '../context/SettingsContext';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Account');
+  const { 
+    autoplay, updateSetting, toggleSetting,
+    audioDesc, rating, pinEnabled, dailyLimit,
+    highContrast, motionReduction
+  } = useSettings();
+
   const tabs = [
     { id: 'Account', icon: User },
     { id: 'Subscription', icon: CreditCard },
@@ -18,91 +28,105 @@ const Settings = () => {
     { id: 'Downloads', icon: Download }
   ];
 
-  // State for toggles and values from both versions
-  const [autoplay, setAutoplay] = useState(true);
-  const [signLanguage, setSignLanguage] = useState(false);
-  const [audioDesc, setAudioDesc] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [pinEnabled, setPinEnabled] = useState(true);
-  const [rating, setRating] = useState(2); // 0: G, 1: PG, 2: PG-13, 3: R, 4: NC-17
-  const [dailyLimit, setDailyLimit] = useState(120); // minutes
-
   const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
-  const weekData = [45, 120, 90, 60, 200, 150, 80]; // Mock screen time data
+  const weekData = [45, 120, 90, 60, 200, 150, 80];
   const maxTime = Math.max(...weekData);
 
-  // Custom Toggle Switch
   const CustomToggle = ({ checked, onChange }) => (
     <button
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-        checked ? 'bg-[#E50914]' : 'bg-gray-700'
+      onClick={onChange}
+      className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-700 focus:outline-none border border-white/5 ${
+        checked ? 'bg-accent-gold shadow-[0_0_25px_rgba(255,215,0,0.3)]' : 'bg-white/5'
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${
-          checked ? 'translate-x-6' : 'translate-x-1'
+        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-500 shadow-xl ${
+          checked ? 'translate-x-8' : 'translate-x-1'
         }`}
       />
     </button>
   );
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8 bg-[#0B0C10] font-sans text-white selection:bg-[#E50914] selection:text-white">
-      <div className="max-w-6xl mx-auto py-10">
-        <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+    <div className="min-h-screen pt-32 pb-24 px-8 font-sans text-white bg-transparent selection:bg-accent-gold selection:text-black overflow-hidden relative">
+      {/* Dynamic Background Field */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[10%] left-[-5%] w-[40%] h-[40%] bg-white/[0.03] blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] bg-accent-gold/[0.06] blur-[180px] rounded-full" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* Left Column - Sidebar */}
-          <div className="w-full md:w-1/4 shrink-0">
-            <nav className="flex flex-col space-y-1">
+          {/* Sidebar */}
+          <div className="w-full lg:w-[320px] shrink-0">
+            <nav className="flex flex-col space-y-4">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 text-left px-5 py-4 text-sm font-bold tracking-wider transition-all duration-200 border-l-4 uppercase ${
+                  className={`flex items-center gap-5 text-left px-8 py-5 rounded-[1.5rem] transition-all duration-700 group relative overflow-hidden border ${
                     activeTab === tab.id
-                      ? 'border-[#E50914] text-white bg-white/5'
-                      : 'border-transparent text-gray-500 hover:text-white hover:bg-white/5'
+                      ? 'glass-pill-active border-white/20 shadow-3xl'
+                      : 'text-gray-600 border-transparent hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <tab.icon size={18} />
-                  {tab.id}
+                  <tab.icon size={20} className={`${activeTab === tab.id ? 'text-white' : 'text-gray-600 group-hover:text-white'} transition-colors duration-700`} />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">{tab.id}</span>
+                  {activeTab === tab.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-accent-gold rounded-full" />}
                 </button>
               ))}
             </nav>
           </div>
 
-          {/* Right Column - Content Area */}
-          <div className="w-full md:w-3/4">
-            <h1 className="text-4xl font-bold text-white mb-10 tracking-tight uppercase">{activeTab} Settings</h1>
+          {/* Configuration Screen */}
+          <div className="flex-1">
+            <div className="mb-20 space-y-4">
+                <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Account Settings</h3>
+                <h2 className="text-7xl font-black text-white tracking-tighter uppercase leading-none">{activeTab}</h2>
+            </div>
             
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="space-y-8"
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ duration: 0.8, ease: "circOut" }}
+                className="space-y-10"
               >
                 {/* ACCOUNT TAB */}
                 {activeTab === 'Account' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
-                    <h2 className="text-xl font-bold mb-6 border-b border-white/10 pb-4 text-white">Profile Information</h2>
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
-                      <div className="flex items-center gap-6">
-                        <img 
-                          src="https://i.pravatar.cc/150?u=watchwave_user" 
-                          alt="User Avatar" 
-                          className="w-24 h-24 rounded-full object-cover border-2 border-white/10 shadow-lg"
-                        />
-                        <div className="flex flex-col">
-                          <h3 className="text-2xl font-bold text-gray-100">Alex Mercer</h3>
-                          <p className="text-gray-400 mt-1 font-medium">alex.mercer@watchwave.com</p>
+                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-10 opacity-5">
+                       <User size={120} />
+                    </div>
+                    <h2 className="text-[10px] font-black mb-12 text-gray-500 uppercase tracking-[0.4em]">Identity Authentication</h2>
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+                      <div className="flex items-center gap-10">
+                        <div className="relative group">
+                            <div className="w-28 h-28 rounded-[2rem] glass-card p-1 border-white/10 group-hover:scale-105 transition-all duration-700 shadow-3xl">
+                                <img 
+                                  src="https://i.pravatar.cc/200?u=subasis" 
+                                  alt="User Avatar" 
+                                  className="w-full h-full rounded-[1.8rem] object-cover"
+                                />
+                            </div>
+                            <div className="absolute inset-0 rounded-[2.5rem] bg-accent-gold/20 blur-[60px] opacity-0 group-hover:opacity-100 transition-all -z-10" />
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-4">
+                              <h3 className="text-4xl font-black text-white uppercase tracking-tight">Subasis Screen</h3>
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
+                          </div>
+                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em] font-mono">subasis@watchwave.io</p>
                         </div>
                       </div>
-                      <button className="text-white border border-gray-600 rounded-md px-5 py-2.5 hover:border-white transition-colors text-sm font-bold tracking-wide mt-4 sm:mt-0 whitespace-nowrap">
-                        Change Password
+                      <button 
+                        onClick={() => navigate('/profile')}
+                        className="glass-pill-active px-10 py-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all transform hover:scale-105 shadow-3xl"
+                      >
+                        Profile
                       </button>
                     </div>
                   </div>
@@ -110,17 +134,21 @@ const Settings = () => {
 
                 {/* SUBSCRIPTION TAB */}
                 {activeTab === 'Subscription' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
-                    <h2 className="text-xl font-bold mb-6 border-b border-white/10 pb-4 text-white">Watch Plan</h2>
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8">
-                      <div className="flex flex-col items-start">
-                        <div className="inline-block px-3 py-1.5 bg-red-900/30 border border-[#E50914] rounded text-[#E50914] font-black tracking-widest text-xs mb-3 shadow-[0_0_15px_rgba(229,9,20,0.3)]">
-                          WATCHWAVE PREMIUM HD
+                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl overflow-hidden relative">
+                    <div className="absolute -top-10 -right-10 w-48 h-48 bg-accent-gold/5 blur-[100px] rounded-full" />
+                    <h2 className="text-[10px] font-black mb-12 text-gray-500 uppercase tracking-[0.4em]">Resource Allocation</h2>
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-12">
+                      <div className="space-y-6">
+                        <div className="glass-pill border-accent-gold/30 text-accent-gold text-[12px] font-black uppercase tracking-[0.3em] px-8 py-3 shadow-[0_0_30px_rgba(255,215,0,0.1)] inline-flex items-center gap-3">
+                          <Crown size={16} /> Resolution [8K]
                         </div>
-                        <p className="text-gray-400 text-sm font-medium">Active since 2024</p>
+                        <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] max-w-sm leading-relaxed">Admin Privileges Active until Cycle 2027. Multi-screen streaming active.</p>
                       </div>
-                      <button className="bg-[#E50914] hover:bg-red-700 text-white font-bold px-6 py-3.5 rounded-md transition-all shadow-[0_4px_15px_rgba(229,9,20,0.4)] hover:shadow-[0_6px_20px_rgba(229,9,20,0.6)] text-sm tracking-wide w-full sm:w-auto text-center">
-                        MANAGE BILLING (Razorpay)
+                      <button 
+                        onClick={() => navigate('/plans')}
+                        className="glass-pill-active px-12 py-5 text-[11px] font-black uppercase tracking-[0.4em] transition-all hover:border-accent-gold shadow-3xl"
+                      >
+                        Recalibrate Tier
                       </button>
                     </div>
                   </div>
@@ -128,148 +156,122 @@ const Settings = () => {
 
                 {/* PLAYBACK TAB */}
                 {activeTab === 'Playback' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl space-y-8">
+                  <div className="glass-card p-12 md:p-16 border-white/5 space-y-12 shadow-3xl">
                     <div className="flex items-center justify-between">
-                      <div className="pr-6">
-                        <h2 className="text-xl font-bold text-gray-100">Autoplay Next Episode</h2>
-                        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">Seamlessly play the next episode when the current one ends.</p>
+                      <div className="pr-10 space-y-3">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Auto-Play Next Episode</h2>
+                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Automatically play the next episode in a series.</p>
                       </div>
-                      <div className="shrink-0">
-                        <CustomToggle checked={autoplay} onChange={setAutoplay} />
-                      </div>
+                      <CustomToggle checked={autoplay} onChange={() => toggleSetting('autoplay')} />
                     </div>
                     
-                    <div className="flex items-center justify-between border-t border-white/5 pt-8">
-                      <div className="pr-6">
-                        <h2 className="text-xl font-bold text-gray-100">Audio Description</h2>
-                        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">Narrate visual details for the blind and visually impaired.</p>
+                    <div className="flex items-center justify-between border-t border-white/5 pt-12">
+                      <div className="pr-10 space-y-3">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Audio Description</h2>
+                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Audio description for visually impaired viewers.</p>
                       </div>
-                      <div className="shrink-0">
-                        <CustomToggle checked={audioDesc} onChange={setAudioDesc} />
-                      </div>
+                      <CustomToggle checked={audioDesc} onChange={() => toggleSetting('audioDesc')} />
                     </div>
                   </div>
                 )}
 
                 {/* SAFETY TAB */}
                 {activeTab === 'Safety' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl space-y-10">
-                    <div>
-                      <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-white">Maximum Content Rating</h2>
-                        <span className="px-3 py-1 bg-red-900/30 rounded font-bold text-[#E50914] border border-[#E50914]/30">
+                  <div className="glass-card p-12 md:p-16 border-white/5 space-y-16 shadow-3xl">
+                    <div className="space-y-10">
+                      <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Age Filter</h2>
+                        <div className="glass-card px-6 py-2.5 font-black text-accent-gold border-accent-gold/10 text-[12px] shadow-2xl">
                           {ratings[rating]}
-                        </span>
+                        </div>
                       </div>
-                      <div className="relative h-2 bg-gray-800 rounded-full mb-8">
-                        <div className="absolute inset-y-0 left-0 bg-[#E50914] rounded-full shadow-[0_0_10px_rgba(229,9,20,0.5)]" style={{ width: `${(rating / 4) * 100}%` }} />
+                      <div className="relative h-2 bg-white/5 rounded-full">
+                        <div className="absolute inset-y-0 left-0 bg-accent-gold rounded-full shadow-[0_0_25px_rgba(255,215,0,0.5)] transition-all duration-500" style={{ width: `${(rating / 4) * 100}%` }} />
                         <input
                           type="range"
                           min="0"
                           max="4"
                           step="1"
                           value={rating}
-                          onChange={(e) => setRating(parseInt(e.target.value))}
-                          className="absolute inset-x-0 -top-1 w-full h-4 opacity-0 cursor-pointer z-10"
+                          onChange={(e) => updateSetting('rating', parseInt(e.target.value))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
-                        <div className="flex justify-between mt-6 text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">
-                          {ratings.map((r, i) => (
-                            <span key={r} onClick={() => setRating(i)} className={`cursor-pointer transition-colors ${i <= rating ? 'text-gray-300' : 'hover:text-white'}`}>{r}</span>
-                          ))}
-                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-white/5 pt-8">
-                      <div className="pr-6">
-                        <h2 className="text-xl font-bold text-white">Profile PIN</h2>
-                        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">Require a 4-digit PIN to access this profile.</p>
+                    <div className="flex items-center justify-between border-t border-white/5 pt-16">
+                      <div className="pr-10 space-y-3">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Profile Lock</h2>
+                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Require a PIN to access this profile.</p>
                       </div>
-                      <div className="shrink-0">
-                        <CustomToggle checked={pinEnabled} onChange={setPinEnabled} />
-                      </div>
+                      <CustomToggle checked={pinEnabled} onChange={() => toggleSetting('pinEnabled')} />
                     </div>
                   </div>
                 )}
 
                 {/* WELLBEING TAB */}
                 {activeTab === 'Wellbeing' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl space-y-12">
-                    <div>
-                      <h2 className="text-xl font-bold text-white mb-8">Screen Time (Last 7 Days)</h2>
-                      <div className="flex items-end justify-between h-48 gap-3">
+                  <div className="glass-card p-12 md:p-16 border-white/5 space-y-20 shadow-3xl">
+                    <div className="space-y-12">
+                      <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Playback Dynamics</h2>
+                      <div className="flex items-end justify-between h-56 gap-6">
                         {weekData.map((mins, i) => (
-                          <div key={i} className="flex flex-col items-center w-full group relative">
-                            <div className="w-full flex justify-end flex-col h-full rounded-t-lg bg-white/5 overflow-hidden border border-white/5">
+                          <div key={i} className="flex flex-col items-center flex-1 group relative">
+                            <div className="w-full flex justify-end flex-col h-full rounded-[1.2rem] bg-white/[0.03] overflow-hidden border border-white/5">
                               <motion.div
                                 initial={{ height: 0 }}
                                 animate={{ height: `${(mins / maxTime) * 100}%` }}
-                                transition={{ duration: 1, delay: i * 0.1 }}
-                                className={`w-full ${mins > dailyLimit ? 'bg-[#E50914] shadow-[0_0_15px_rgba(229,9,20,0.5)]' : 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]'} opacity-80 group-hover:opacity-100 transition-all`}
+                                transition={{ duration: 1.5, delay: i * 0.1, ease: "circOut" }}
+                                className={`w-full ${mins > dailyLimit ? 'bg-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.2)]' : 'bg-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)]'} transition-all`}
                               />
                             </div>
-                            <span className="text-[10px] text-gray-500 mt-3 font-black tracking-widest">
+                            <span className="text-[10px] text-gray-600 mt-6 font-black tracking-widest">
                               {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][i]}
                             </span>
-                            <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-black border border-white/10 text-[10px] font-bold px-2 py-1 rounded transition-opacity pointer-events-none whitespace-nowrap">
-                              {Math.floor(mins / 60)}H {mins % 60}M
-                            </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="border-t border-white/5 pt-8">
-                      <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-white uppercase tracking-tight">Daily Watch Limit</h2>
-                        <span className="text-[#E50914] font-black tracking-widest">{Math.floor(dailyLimit / 60)}H {dailyLimit % 60}M</span>
+                    <div className="border-t border-white/5 pt-16 space-y-10">
+                      <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Quota Threshold</h2>
+                        <span className="text-accent-gold font-black tracking-[0.2em] text-[14px] font-mono">{Math.floor(dailyLimit / 60)}H {dailyLimit % 60}M</span>
                       </div>
-                      <input
-                        type="range"
-                        min="30"
-                        max="300"
-                        step="15"
-                        value={dailyLimit}
-                        onChange={(e) => setDailyLimit(parseInt(e.target.value))}
-                        className="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-[#E50914]"
-                      />
+                      <div className="relative h-2 bg-white/5 rounded-full">
+                        <div className="absolute inset-y-0 left-0 bg-white rounded-full shadow-[0_0_20px_white] transition-all duration-300" style={{ width: `${(dailyLimit / 300) * 100}%` }} />
+                        <input
+                          type="range"
+                          min="30"
+                          max="300"
+                          step="15"
+                          value={dailyLimit}
+                          onChange={(e) => updateSetting('dailyLimit', parseInt(e.target.value))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* ACCESSIBILITY TAB */}
                 {activeTab === 'Accessibility' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl space-y-8">
-                    <div className="flex items-center justify-between">
-                      <div className="pr-6">
-                        <h2 className="text-xl font-bold text-white">Subtitle Style</h2>
-                        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">Customize how subtitles appear on your screen.</p>
+                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-12">Accessibility Core</h2>
+                    <div className="space-y-12">
+                      <div className="flex items-center justify-between border-b border-white/5 pb-12">
+                        <div className="pr-10 space-y-3">
+                          <h2 className="text-xl font-black text-white uppercase tracking-tighter">High Contrast Screen</h2>
+                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Maximize legibility across cinematic interfaces.</p>
+                        </div>
+                        <CustomToggle checked={highContrast} onChange={() => toggleSetting('highContrast')} />
                       </div>
-                      <select className="bg-black border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:border-[#E50914] focus:outline-none transition-colors">
-                        <option>English (CC)</option>
-                        <option>Spanish</option>
-                        <option>French</option>
-                        <option>Hindi</option>
-                      </select>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-white/5 pt-8">
-                      <div className="pr-6">
-                        <h2 className="text-xl font-bold text-white">Sign Language Overlay</h2>
-                        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">Show sign language interpreter where available.</p>
-                      </div>
-                      <div className="shrink-0">
-                        <CustomToggle checked={signLanguage} onChange={setSignLanguage} />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-white/5 pt-8">
-                      <div className="pr-6">
-                        <h2 className="text-xl font-bold text-white">High Contrast UI</h2>
-                        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">Increase contrast for better readability.</p>
-                      </div>
-                      <div className="shrink-0">
-                        <CustomToggle checked={highContrast} onChange={setHighContrast} />
+                      <div className="flex items-center justify-between">
+                        <div className="pr-10 space-y-3">
+                          <h2 className="text-xl font-black text-white uppercase tracking-tighter">Motion Reduction</h2>
+                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Disable auto-play for easier viewing and less motion.</p>
+                        </div>
+                        <CustomToggle checked={motionReduction} onChange={() => toggleSetting('motionReduction')} />
                       </div>
                     </div>
                   </div>
@@ -277,21 +279,28 @@ const Settings = () => {
 
                 {/* DOWNLOADS TAB */}
                 {activeTab === 'Downloads' && (
-                  <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
-                    <h2 className="text-xl font-bold mb-8 border-b border-white/10 pb-4 text-white">Offline Storage Usage</h2>
-                    <div className="w-full">
-                      <div className="flex justify-between items-end mb-4">
-                        <span className="text-gray-300 text-sm font-bold tracking-wide uppercase">12 GB of 30 GB Used</span>
-                        <button className="text-[#E50914] hover:text-red-400 text-[10px] font-black uppercase tracking-widest transition-colors">
-                          Clear Cache
+                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-12">Storage Screen Cache</h2>
+                    <div className="space-y-8">
+                      <div className="flex justify-between items-end">
+                        <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em]">Offline Storage: 12GB / 30GB</span>
+                        <button 
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to wipe local index? Offline movies will be purged.")) {
+                              toast.success("Cache Purged. 12GB Recovered.");
+                            }
+                          }}
+                          className="text-accent-gold hover:text-white text-[10px] font-black uppercase tracking-[0.4em] transition-all"
+                        >
+                          Wipe Screen Cache
                         </button>
                       </div>
-                      <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden border border-white/5">
+                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: '40%' }}
-                          transition={{ duration: 1, ease: 'easeOut' }}
-                          className="h-full bg-gradient-to-r from-red-800 to-[#E50914] rounded-full shadow-[0_0_10px_rgba(229,9,20,0.8)]"
+                          transition={{ duration: 1.5, ease: 'circOut' }}
+                          className="h-full bg-white rounded-full shadow-[0_0_25px_white]"
                         />
                       </div>
                     </div>
@@ -299,7 +308,6 @@ const Settings = () => {
                 )}
               </motion.div>
             </AnimatePresence>
-            
           </div>
         </div>
       </div>

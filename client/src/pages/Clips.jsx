@@ -1,242 +1,279 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scissors, Play, Heart, Share2, MessageCircle,
-  MoreVertical, X, Check,
-  Clock, Type, Music, Sliders
+  X, Clock, Type, Music, Sliders, Zap, Pause
 } from 'lucide-react';
+import ReactPlayer from 'react-player';
 
 const Clips = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [trimRange, setTrimRange] = useState([10, 40]); // Mock seconds
+  const [trimRange, setTrimRange] = useState([10, 40]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [activeTab, setActiveTab] = useState('trim');
 
   const initialClips = [
     { id: 1, title: "Iron Man Snap", user: "MarvelFan99", views: "1.2M", likes: "45K", image: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg", duration: "0:58" },
-    { id: 2, title: "Luffy Gear 5", user: "PirateKing", views: "850K", likes: "92K", image: "https://image.tmdb.org/t/p/w500/e3NBGiAifW9Xt8xD5tpARskjccO.jpg", duration: "0:30" },
+    { id: 2, title: "Luffy Gear 5", user: "PirateKing", views: "850K", likes: "92K", image: "https://image.tmdb.org/t/p/w500/fcid96gh99oYp9fM9S1A7K92z7t.jpg", duration: "0:30" },
     { id: 3, title: "Wednesday Dance", user: "GothGirl", views: "3.4M", likes: "150K", image: "https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg", duration: "0:45" },
     { id: 4, title: "Walter White Laugh", user: "Heisenberg", views: "500K", likes: "22K", image: "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg", duration: "0:35" },
   ];
 
   const sourceVideos = [
-    { id: 'v1', title: 'Spider-Man: Across the Spider-Verse', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg' },
-    { id: 'v2', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg' },
+    { id: 'v1', title: 'Spider-Man: ATSV', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', url: 'https://www.youtube.com/watch?v=shwG742_f8s' },
+    { id: 'v2', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', url: 'https://www.youtube.com/watch?v=EXeTwQWrcwY' },
   ];
 
   const handleCreateOpen = () => {
     setIsCreating(true);
-    setSelectedVideo(sourceVideos[0]); // Default selection
+    setSelectedVideo(sourceVideos[0]);
   };
 
-  const handleShare = () => {
-    // Logic to add to list or notify
-    setIsCreating(false);
-  }
-
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 bg-deep-black">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen pt-40 pb-24 px-8 md:px-16 lg:px-24 bg-transparent text-white selection:bg-accent-gold selection:text-black relative overflow-hidden">
+      
+      {/* Cinematic Grid Backdrop */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-accent-gold/[0.04] blur-[180px] rounded-full" />
+        <div className="absolute bottom-[10%] left-[-5%] w-[50%] h-[50%] bg-white/[0.02] blur-[150px] rounded-full" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[length:40px_40px]" />
+      </div>
 
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-red to-orange-500">
-              Community Clips
+      <div className="relative z-10 max-w-7xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
+          <div className="space-y-6">
+            <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Movie Highlights / Community Feed</h3>
+            <h1 className="text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
+              Trending <br/> Clips
             </h1>
-            <p className="text-gray-400 mt-1">Capture, edit, and share iconic moments.</p>
           </div>
+
           <button
             onClick={handleCreateOpen}
-            className="flex items-center gap-2 bg-brand-red text-white px-6 py-2.5 rounded-full font-bold hover:bg-red-700 transition shadow-lg shadow-brand-red/20"
+            className="glass-pill-active py-6 px-14 flex items-center gap-4 transition-all duration-700 transform hover:scale-105 shadow-3xl text-[11px] font-black uppercase tracking-[0.4em]"
           >
-            <Scissors size={20} />
-            Create Clip
+            <Scissors size={20} /> Create Clip
           </button>
         </div>
 
-        {/* Create Interface Overlay */}
-        <AnimatePresence>
-          {isCreating && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-            >
-              <div className="bg-rich-gray w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex flex-col md:flex-row h-[80vh] md:h-auto">
-
-                {/* Preview Section */}
-                <div className="flex-1 bg-black relative flex items-center justify-center p-4">
-                  <div className="aspect-video w-full max-w-xl bg-gray-900 rounded-lg overflow-hidden relative group">
-                    <img
-                      src={selectedVideo?.image}
-                      alt="Preview"
-                      className="w-full h-full object-cover opacity-80"
-                    />
-                    {/* Fake Play UI */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-white/20 p-4 rounded-full backdrop-blur-sm">
-                        <Play size={32} fill="white" className="text-white" />
-                      </div>
-                    </div>
-                    {/* Timestamp Overlay */}
-                    <div className="absolute bottom-4 left-4 bg-black/60 px-2 py-1 rounded text-xs font-mono">
-                      00:{trimRange[0]} / 00:{trimRange[1]} (30s)
-                    </div>
-                  </div>
-                </div>
-
-                {/* Editor Tools Section */}
-                <div className="w-full md:w-96 bg-rich-gray p-6 flex flex-col border-l border-white/5">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-white">Clip Editor</h2>
-                    <button onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-white">
-                      <X size={24} />
-                    </button>
-                  </div>
-
-                  <div className="space-y-6 flex-1 overflow-y-auto custom-scrollbar">
-                    {/* Movie Selector */}
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Source Media</label>
-                      <div className="flex gap-2 overflow-x-auto pb-2">
-                        {sourceVideos.map(v => (
-                          <button
-                            key={v.id}
-                            onClick={() => setSelectedVideo(v)}
-                            className={`flex-shrink-0 w-24 rounded-lg overflow-hidden border-2 transition ${selectedVideo?.id === v.id ? 'border-brand-red' : 'border-transparent opacity-60'}`}
-                          >
-                            <img src={v.image} className="w-full h-16 object-cover" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Timeline Slider (Mock) */}
-                    <div>
-                      <div className="flex justify-between text-xs text-gray-400 mb-2">
-                        <span><Clock size={12} className="inline mr-1" /> Timeline</span>
-                        <span>30s selected</span>
-                      </div>
-                      <div className="h-12 bg-gray-800 rounded-lg relative overflow-hidden flex items-center px-4 cursor-ew-resize">
-                        {/* Fake Waveform */}
-                        <div className="flex gap-0.5 items-end justify-center w-full h-full opacity-30">
-                          {[...Array(40)].map((_, i) => (
-                            <div key={i} className="bg-white w-1" style={{ height: `${Math.random() * 80 + 20}%` }} />
-                          ))}
-                        </div>
-                        {/* Selector Box */}
-                        <div className="absolute left-1/4 right-1/4 h-full border-2 border-brand-red bg-brand-red/10 flex justify-between items-center px-1">
-                          <div className="w-1 h-6 bg-white rounded-full"></div>
-                          <div className="w-1 h-6 bg-white rounded-full"></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tools Grid */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <button className="flex items-center justify-center gap-2 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition text-sm font-medium">
-                        <Type size={16} className="text-blue-400" /> Text
-                      </button>
-                      <button className="flex items-center justify-center gap-2 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition text-sm font-medium">
-                        <Music size={16} className="text-green-400" /> Sound
-                      </button>
-                      <button className="flex items-center justify-center gap-2 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition text-sm font-medium">
-                        <Sliders size={16} className="text-orange-400" /> Filter
-                      </button>
-                      <button className="flex items-center justify-center gap-2 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition text-sm font-medium">
-                        <Scissors size={16} className="text-red-400" /> Crop
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-6 border-t border-white/10">
-                    <button
-                      onClick={handleShare}
-                      className="w-full bg-brand-red hover:bg-brand-dark-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition"
-                    >
-                      <Share2 size={18} /> Share Clip
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Clips Feed Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Clips Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {initialClips.map((clip, index) => (
             <motion.div
               key={clip.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-rich-gray rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-red/5 transition-all duration-300 group"
+              transition={{ delay: index * 0.1, duration: 1, ease: "circOut" }}
+              className="group relative aspect-[9/16] rounded-[2.5rem] overflow-hidden glass-card border-white/5 shadow-3xl transition-all duration-1000 hover:border-white/10"
             >
-              <div className="relative aspect-[9/16] overflow-hidden">
-                <img
-                  src={clip.image}
-                  alt={clip.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
+              <img
+                src={clip.image}
+                alt={clip.title}
+                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
 
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="bg-white/20 backdrop-blur-md p-4 rounded-full hover:bg-white/30 transition">
-                    <Play size={32} fill="white" className="text-white ml-1" />
+              {/* Interaction Overlay */}
+              <div className="absolute inset-x-0 bottom-0 p-8 space-y-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-1000">
+                <div className="space-y-2">
+                   <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[8px] font-black">
+                        {clip.user.charAt(0)}
+                    </div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">@{clip.user}</span>
+                  </div>
+                  <h3 className="text-2xl font-black text-white uppercase tracking-tighter line-clamp-2">{clip.title}</h3>
+                </div>
+
+                <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-100">
+                   <div className="flex items-center gap-6">
+                    <button className="text-gray-400 hover:text-red-500 transition-colors flex items-center gap-2">
+                        <Heart size={18} /> <span className="text-[10px] font-black">{clip.likes}</span>
+                    </button>
+                    <button className="text-gray-400 hover:text-accent-gold transition-colors flex items-center gap-2">
+                        <Zap size={18} /> <span className="text-[10px] font-black">{clip.views}</span>
+                    </button>
+                  </div>
+                  <button className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition-all">
+                    <Share2 size={16} />
                   </button>
                 </div>
+              </div>
 
-                {/* Duration Badge */}
-                <div className="absolute top-3 right-3 bg-black/60 px-2 py-1 rounded text-xs font-bold font-mono">
-                  {clip.duration}
-                </div>
-
-                {/* Bottom Info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold">
-                      {clip.user.charAt(0)}
-                    </span>
-                    <span className="text-xs font-medium text-gray-300">@{clip.user}</span>
-                  </div>
-                  <h3 className="font-bold text-white text-lg leading-tight mb-3 line-clamp-2">{clip.title}</h3>
-
-                  {/* Action Bar */}
-                  <div className="flex justify-between items-center text-gray-400">
-                    <button className="flex items-center gap-1 hover:text-red-500 transition">
-                      <Heart size={18} /> <span className="text-xs">{clip.likes}</span>
-                    </button>
-                    <button className="flex items-center gap-1 hover:text-blue-400 transition">
-                      <MessageCircle size={18} /> <span className="text-xs">240</span>
-                    </button>
-                    <button className="hover:text-white transition">
-                      <Share2 size={18} />
-                    </button>
-                  </div>
-                </div>
+              {/* Duration Badge */}
+              <div className="absolute top-6 right-6 glass-pill px-4 py-1.5 text-[9px] font-black text-accent-gold border-accent-gold/20 shadow-2xl">
+                {clip.duration}
               </div>
             </motion.div>
           ))}
 
-          {/* New Clip Mock Placeholder (for aesthetic balance) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+          {/* Create Placeholder */}
+          <motion.button
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
             onClick={handleCreateOpen}
-            className="bg-rich-gray/30 border-2 border-dashed border-gray-700 rounded-xl overflow-hidden hover:bg-rich-gray/50 hover:border-gray-500 transition-all cursor-pointer flex flex-col items-center justify-center p-8 text-center group aspect-[9/16]"
+            className="aspect-[9/16] rounded-[2.5rem] border-2 border-dashed border-white/5 hover:border-accent-gold/20 bg-white/[0.01] hover:bg-accent-gold/[0.02] flex flex-col items-center justify-center p-12 text-center group transition-all duration-700 shadow-3xl"
           >
-            <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Scissors size={24} className="text-gray-400 group-hover:text-white" />
+            <div className="w-20 h-20 rounded-[1.5rem] glass-card flex items-center justify-center mb-8 border-white/5 group-hover:border-accent-gold/40 transition-all duration-700">
+              <Scissors size={28} className="text-gray-600 group-hover:text-white" />
             </div>
-            <h3 className="font-bold text-gray-300 text-lg">Create New</h3>
-            <p className="text-gray-500 text-sm mt-2">Trim & Share your favorite scenes</p>
-          </motion.div>
+            <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-4">New Fragment</h3>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.4em] leading-relaxed">Deconstruct cinema into cinematic moments.</p>
+          </motion.button>
         </div>
       </div>
+
+      {/* Simplified Modal Theme */}
+      <AnimatePresence>
+        {isCreating && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-black/90 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              className="w-full max-w-5xl glass-card relative overflow-hidden border-white/10 shadow-[0_0_100px_rgba(0,0,0,1)] grid lg:grid-cols-5 h-[80vh] lg:h-[600px]"
+            >
+               {/* Preview */}
+               <div className="lg:col-span-3 bg-black relative flex items-center justify-center overflow-hidden group">
+                <ReactPlayer 
+                    url={selectedVideo?.url}
+                    playing={isPlaying}
+                    width="100%"
+                    height="100%"
+                    muted
+                    style={{ opacity: isPlaying ? 1 : 0.6, transform: 'scale(1.05)' }}
+                />
+                
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <button 
+                        onClick={() => setIsPlaying(!isPlaying)}
+                        className="w-20 h-20 rounded-full glass-card flex items-center justify-center border-white/20 hover:scale-110 transition-transform cursor-pointer shadow-3xl bg-black/20"
+                    >
+                        {isPlaying ? <Pause size={32} fill="white" /> : <Play size={32} fill="white" className="ml-1" />}
+                    </button>
+                </div>
+                
+                {/* Trim Info Overlay */}
+                <div className="absolute bottom-8 inset-x-8 flex justify-between items-center bg-black/60 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Selected Segment: {trimRange[1] - trimRange[0]}s</span>
+                    <span className="text-[10px] font-black text-accent-gold uppercase tracking-widest">Entry: 00:{trimRange[0] < 10 ? '0'+trimRange[0] : trimRange[0]}</span>
+                </div>
+               </div>
+
+                {/* Tools */}
+               <div className="lg:col-span-2 p-10 flex flex-col justify-between h-full bg-[#050505]">
+                <div className="space-y-10">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Capture Scene</h2>
+                        <button onClick={() => setIsCreating(false)} className="text-gray-600 hover:text-white transition-colors">
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div className="flex gap-6 border-b border-white/5 pb-4">
+                        {['trim', 'text', 'audio'].map(tab => (
+                            <button 
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'text-accent-gold' : 'text-gray-500 hover:text-white'}`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="space-y-8 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                        {activeTab === 'trim' && (
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center px-1">
+                                        <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Trim Range</span>
+                                        <span className="text-[10px] font-black text-white uppercase tracking-widest">{trimRange[0]}s - {trimRange[1]}s</span>
+                                    </div>
+                                    <div className="relative h-12 bg-white/5 rounded-xl border border-white/10 flex items-center px-2">
+                                        <div 
+                                            className="absolute h-8 bg-accent-gold/20 border-x-2 border-accent-gold rounded-sm transition-all shadow-[0_0_20px_rgba(255,215,0,0.15)]"
+                                            style={{ left: `${trimRange[0]}%`, right: `${100 - trimRange[1]}%` }}
+                                        />
+                                        <input 
+                                            type="range" 
+                                            min="0" max="60" 
+                                            value={trimRange[0]} 
+                                            onChange={(e) => setTrimRange([parseInt(e.target.value), Math.max(parseInt(e.target.value) + 5, trimRange[1])])}
+                                            className="absolute inset-x-0 opacity-0 cursor-pointer h-full z-10" 
+                                        />
+                                        <input 
+                                            type="range" 
+                                            min="0" max="100" 
+                                            value={trimRange[1]} 
+                                            onChange={(e) => setTrimRange([Math.min(parseInt(e.target.value) - 5, trimRange[0]), parseInt(e.target.value)])}
+                                            className="absolute inset-x-0 opacity-0 cursor-pointer h-full z-10" 
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Active Media</span>
+                                    <div className="text-[11px] font-bold text-gray-300 uppercase tracking-widest p-5 glass-card border-white/5 flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-lg bg-white/10 overflow-hidden">
+                                            <img src={selectedVideo?.image} className="w-full h-full object-cover" />
+                                        </div>
+                                        {selectedVideo?.title}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {activeTab === 'text' && (
+                            <div className="space-y-6">
+                                <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Overlay Captions</span>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter caption text..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-white uppercase tracking-widest outline-none focus:border-accent-gold/40 transition-colors"
+                                />
+                                <div className="grid grid-cols-4 gap-3">
+                                    {[...Array(4)].map((_, i) => (
+                                        <div key={i} className="aspect-square glass-card border-white/5 flex items-center justify-center text-[10px] font-black text-gray-500 hover:text-white cursor-pointer transition-colors">
+                                            A{i+1}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <button 
+                    onClick={() => {
+                        setIsProcessing(true);
+                        setTimeout(() => {
+                            setIsProcessing(false);
+                            setIsCreating(false);
+                        }, 2000);
+                    }}
+                    className="w-full glass-pill-active py-5 text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-3xl"
+                >
+                    {isProcessing ? (
+                        <div className="flex items-center justify-center gap-4">
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            <span>Encoding...</span>
+                        </div>
+                    ) : (
+                        <span className="group-hover:scale-110 transition-transform">Post to Community</span>
+                    )}
+                </button>
+               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

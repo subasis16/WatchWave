@@ -5,13 +5,16 @@ import './index.css'
 
 import { BrowserRouter } from 'react-router-dom'
 import { NotificationProvider } from './context/NotificationContext.jsx'
+import { SettingsProvider } from './context/SettingsContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <NotificationProvider>
-        <App />
-      </NotificationProvider>
+      <SettingsProvider>
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
+      </SettingsProvider>
     </BrowserRouter>
   </React.StrictMode>,
 )

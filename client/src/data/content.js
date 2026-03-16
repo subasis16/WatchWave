@@ -32,7 +32,7 @@ export const movies = [
   { id: 'm6', title: 'Dune: Part Two', image: 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg', year: '2024', match: '97', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/Way9Dexny3w' },
   { id: 'm7', title: 'The Batman', image: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg', year: '2022', match: '95', age: 'PG-13', trailerUrl: 'https://www.youtube-nocookie.com/embed/mqqft2x_Aa4' },
   { id: 'm8', title: 'Fight Club', image: 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', year: '1999', match: '98', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/BdJKm96bHNQ' },
-  { id: 'm9', title: 'The Matrix', image: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', year: '1999', match: '99', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/vKQi3bBA1y8' },
+  { id: 'm9', title: 'The Catalog', image: 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', year: '1999', match: '99', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/vKQi3bBA1y8' },
   { id: 'm10', title: 'Pulp Fiction', image: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg', year: '1994', match: '98', age: 'R', trailerUrl: 'https://www.youtube-nocookie.com/embed/s7EdQ4FqbhY' },
 ];
 

@@ -1,49 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import ContentRow from '../components/ContentRow';
 import { series } from '../data/content';
-import { Play, Plus } from 'lucide-react';
 
 const Series = () => {
   return (
-    <div className="pt-24 px-4 sm:px-6 lg:px-8 min-h-screen">
-      <h1 className="text-3xl md:text-4xl font-bold text-white mb-8 flex items-center">
-        <span className="w-1.5 h-10 bg-brand-red mr-4 rounded-full"></span>
-        Series
-      </h1>
+    <div className="min-h-screen bg-transparent selection:bg-accent-gold selection:text-black overflow-hidden">
+      {/* Cinematic Background Field */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-accent-gold/[0.04] blur-[180px] rounded-full" />
+        <div className="absolute bottom-[10%] left-[-5%] w-[50%] h-[50%] bg-white/[0.02] blur-[150px] rounded-full" />
+      </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {series.map((item) => (
-          <div
-            key={item.id}
-            className="relative w-full aspect-[2/3] rounded-xl overflow-hidden transition-all duration-500 hover:scale-105 hover:z-30 hover:shadow-[0_10px_40px_rgba(229,9,20,0.2)] cursor-pointer group/card border border-white/5 bg-rich-gray"
-          >
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
-              loading="lazy"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-              <h3 className="text-white font-bold text-lg mb-1 leading-tight">{item.title}</h3>
-              <div className="flex items-center space-x-2 text-xs text-gray-300 mb-3 font-medium">
-                <span className="text-brand-red">{item.match}% Match</span>
-                <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
-                <span>{item.year}</span>
-                <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
-                <span className="border border-gray-500 px-1 rounded text-gray-400">{item.age}</span>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <Link to={`/player/${item.id}`} className="flex-1 py-2 bg-white rounded-lg text-black hover:bg-brand-red hover:text-white transition flex items-center justify-center font-bold text-sm">
-                  <Play size={16} className="mr-1 fill-current" /> Play
-                </Link>
-                <button className="p-2 border border-gray-500 rounded-full hover:border-white hover:bg-white/10 transition text-white">
-                  <Plus size={18} />
-                </button>
-              </div>
+      <div className="relative z-10 pt-40 pb-24 space-y-20">
+        <div className="px-8 md:px-16 lg:px-24 mb-16">
+          <div className="max-w-4xl space-y-6">
+            <h3 className="text-[10px] font-black tracking-[0.6em] text-gray-600 uppercase">Archive / Episodic Screens</h3>
+            <h1 className="text-7xl md:text-8xl font-black text-white tracking-tighter uppercase leading-[0.8] mb-10">
+              Playback <br/> Series
+            </h1>
+            <div className="flex flex-wrap gap-5">
+              {['Classic Drama', 'Cinematic Thriller', 'Crime Docu', 'Anthology'].map(tag => (
+                <span key={tag} className="glass-pill px-6 py-2.5 text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white hover:border-white/20 transition-all border-white/5 shadow-2xl">
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="space-y-24">
+          <ContentRow title="World-Class Dramas" data={series} />
+          <ContentRow title="Recommended for You" data={series.slice().reverse()} />
+        </div>
       </div>
     </div>
   );
