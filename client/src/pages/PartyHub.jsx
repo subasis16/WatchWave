@@ -4,18 +4,56 @@ import { Settings, Play, Copy, Search, Share2, Video, Smile, Users } from 'lucid
 import { useNavigate } from 'react-router-dom';
 import SocialSidebar from '../components/Party/SocialSidebar';
 import { toast } from 'react-hot-toast';
+import { auth } from '../firebase';
 
 const PartyHub = () => {
     const [isLive, setIsLive] = useState(false);
+    const [roomCode, setRoomCode] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleGoLive = () => {
-        setIsLive(true);
+    const handleGoLive = async () => {
+        try {
+            if (!auth.currentUser) return toast.error("Must be logged in to host.");
+            setIsLoading(true);
+            
+            // Generate a random 6-character transmission code
+            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const token = await auth.currentUser.getIdToken();
+            
+            const res = await fetch('http://localhost:5000/api/party/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ room_code: code, room_password: '' })
+            });
+            
+            const data = await res.json();
+            setIsLoading(false);
+            
+            if (data.success) {
+                setRoomCode(code);
+                setIsLive(true);
+                toast.success(`Encrypted Channel Open: ${code}`, {
+                    icon: '📡',
+                    style: { background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }
+                });
+            } else {
+                toast.error(data.error || "Failed to secure channel.");
+            }
+        } catch (err) {
+            setIsLoading(false);
+            toast.error("Network error. WatchWave API unreachable.");
+        }
     };
 
     const copyLink = () => {
-        navigator.clipboard.writeText("https://watchwave.com/room/your-uid");
-        toast.info("Invite Key Sendted to Clipboard", {
+        if (!roomCode) return toast.error("Start Watching first to generate a key.");
+        const link = `${window.location.origin}/room/${roomCode}`;
+        navigator.clipboard.writeText(link);
+        toast.info("Transmission Key Copied to Clipboard", {
             style: { background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }
         });
     };
@@ -95,10 +133,11 @@ const PartyHub = () => {
                                     {!isLive ? (
                                         <button
                                             onClick={handleGoLive}
-                                            className="glass-pill-active py-6 px-14 flex items-center justify-center gap-4 transition-all duration-700 transform hover:scale-105 shadow-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group/btn"
+                                            disabled={isLoading}
+                                            className="glass-pill-active py-6 px-14 flex items-center justify-center gap-4 transition-all duration-700 transform hover:scale-105 shadow-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group/btn disabled:opacity-50"
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:animate-[sheen_1.5s_infinite]" />
-                                            <Video size={20} /> Start Watching
+                                            <Video size={20} /> {isLoading ? "Initializing..." : "Start Watching"}
                                         </button>
                                     ) : (
                                         <div className="flex flex-wrap gap-6">
@@ -107,7 +146,7 @@ const PartyHub = () => {
                                                 Live Emission
                                             </div>
                                             <button
-                                                onClick={() => navigate('/room')}
+                                                onClick={() => navigate(`/room/${roomCode}`, { state: { roomCode } })}
                                                 className="glass-pill-active py-5 px-12 flex items-center gap-4 transition-all duration-700 transform hover:scale-105 shadow-3xl text-[11px] font-black uppercase tracking-[0.4em]"
                                             >
                                                 <Play size={18} fill="white" /> Join Party

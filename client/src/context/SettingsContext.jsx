@@ -1,25 +1,50 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth, db } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const SettingsContext = createContext();
+
+const defaultSettings = {
+  autoplay: true,
+  audioDesc: false,
+  rating: 2, // 0: G, 1: PG, 2: PG-13, 3: R, 4: NC-17
+  pinEnabled: true,
+  dailyLimit: 120,
+  highContrast: false,
+  motionReduction: false,
+  volume: 80,
+  captions: true
+};
 
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('watchwave_settings');
-    return saved ? JSON.parse(saved) : {
-      autoplay: true,
-      audioDesc: false,
-      rating: 2, // 0: G, 1: PG, 2: PG-13, 3: R, 4: NC-17
-      pinEnabled: true,
-      dailyLimit: 120,
-      highContrast: false,
-      motionReduction: false,
-      volume: 80,
-      captions: true
-    };
+    return saved ? JSON.parse(saved) : defaultSettings;
   });
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists() && userDoc.data().settings) {
+                    setSettings(prev => ({ ...prev, ...userDoc.data().settings }));
+                }
+            } catch (err) {
+                console.error("Failed to load cloud settings", err);
+            }
+        }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('watchwave_settings', JSON.stringify(settings));
+    if (auth.currentUser) {
+        setDoc(doc(db, 'users', auth.currentUser.uid), { settings }, { merge: true })
+            .catch(err => console.error("Cloud settings sync failed:", err));
+    }
   }, [settings]);
 
   const updateSetting = (key, value) => {
@@ -31,17 +56,7 @@ export const SettingsProvider = ({ children }) => {
   };
 
   const resetSettings = () => {
-    setSettings({
-      autoplay: true,
-      audioDesc: false,
-      rating: 2,
-      pinEnabled: true,
-      dailyLimit: 120,
-      highContrast: false,
-      motionReduction: false,
-      volume: 80,
-      captions: true
-    });
+    setSettings(defaultSettings);
   };
 
   return (

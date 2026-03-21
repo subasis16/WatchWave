@@ -21,6 +21,7 @@ import DataPrivileges from './pages/DataPrivileges';
 import Auth from './pages/Auth';
 import OpeningAnimation from './components/OpeningAnimation';
 import Downloads from './pages/Downloads';
+import OfflinePlayer from './pages/OfflinePlayer';
 import Admin from './pages/Admin';
 import CtaBanner from './components/CtaBanner';
 
@@ -61,8 +62,10 @@ const App = () => {
         <Route path="/anime" element={<Anime />} />
         <Route path="/party" element={<PartyHub />} />
         <Route path="/room" element={<WatchRoom />} />
+        <Route path="/room/:id" element={<WatchRoom />} />
         <Route path="/clips" element={<Clips />} />
         <Route path="/downloads" element={<Downloads />} />
+        <Route path="/offline" element={<OfflinePlayer />} />
         <Route path="/player/:id" element={<Player />} />
         <Route path="/watch/:id" element={<VideoPlayer />} />
         <Route path="/settings" element={<Settings />} />

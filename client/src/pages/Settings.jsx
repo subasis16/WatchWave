@@ -8,10 +8,35 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useSettings } from '../context/SettingsContext';
+import { auth, db } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { useEffect } from 'react';
 
 const Settings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Account');
+  const [dbUser, setDbUser] = useState(null);
+  const [authUser, setAuthUser] = useState(null);
+
+  useEffect(() => {
+    let unsubscribeDoc = null;
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setAuthUser(currentUser);
+      if (currentUser) {
+         unsubscribeDoc = onSnapshot(doc(db, 'users', currentUser.uid), (docSnap) => {
+            if (docSnap.exists()) setDbUser(docSnap.data());
+         });
+      } else {
+         setDbUser(null);
+         if (unsubscribeDoc) unsubscribeDoc();
+      }
+    });
+    return () => {
+        unsubscribeAuth();
+        if (unsubscribeDoc) unsubscribeDoc();
+    };
+  }, []);
   const { 
     autoplay, updateSetting, toggleSetting,
     audioDesc, rating, pinEnabled, dailyLimit,
@@ -107,7 +132,7 @@ const Settings = () => {
                         <div className="relative group">
                             <div className="w-28 h-28 rounded-[2rem] glass-card p-1 border-white/10 group-hover:scale-105 transition-all duration-700 shadow-3xl">
                                 <img 
-                                  src="https://i.pravatar.cc/200?u=subasis" 
+                                  src={dbUser?.avatar || authUser?.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${authUser?.displayName || 'User'}`}
                                   alt="User Avatar" 
                                   className="w-full h-full rounded-[1.8rem] object-cover"
                                 />
@@ -116,10 +141,10 @@ const Settings = () => {
                         </div>
                         <div className="space-y-3">
                           <div className="flex items-center gap-4">
-                              <h3 className="text-4xl font-black text-white uppercase tracking-tight">Subasis Screen</h3>
+                              <h3 className="text-4xl font-black text-white uppercase tracking-tight truncate max-w-sm">{dbUser?.name || authUser?.displayName || 'User Screen'}</h3>
                               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
                           </div>
-                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em] font-mono">subasis@watchwave.io</p>
+                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em] font-mono">{authUser?.email || 'user@watchwave.io'}</p>
                         </div>
                       </div>
                       <button 

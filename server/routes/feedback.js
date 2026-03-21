@@ -25,6 +25,27 @@ router.post('/feedback', async (req, res) => {
     }
 });
 
+// POST /api/report — Administrative / Moderation Reporting Endpoint
+router.post('/report', verifyToken, async (req, res) => {
+    try {
+        const { roomCode, reason, reportedUser } = req.body;
+        if (!roomCode || !reason) return res.status(400).json({ error: 'Room and Reason are required.' });
+
+        await db.collection('moderation_reports').add({
+            roomCode,
+            reason,
+            reportedUser: reportedUser || 'Unknown',
+            reporterUid: req.user.uid,
+            timestamp: new Date().toISOString(),
+            status: 'pending_review'
+        });
+
+        res.json({ success: true, message: 'Report safely logged with administration.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // POST /api/contact — Submit contact form
 router.post('/contact', async (req, res) => {
     try {

@@ -3,10 +3,12 @@ import { motion } from 'framer-motion';
 import { Play, Trash2, DownloadCloud } from 'lucide-react';
 import { getOfflineVideos, deleteVideo } from '../utils/offlineStorage';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Downloads = () => {
     const [downloads, setDownloads] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const [storageUsed, setStorageUsed] = useState(15);
     const maxStorage = 50; 
@@ -35,10 +37,12 @@ const Downloads = () => {
 
     const handlePlayOffline = (blob, title) => {
         if (!blob) return toast.error("Storage Error. Local screen unreachable.");
-        toast.info(`Initializing Offline Stream: ${title}`, {
+        toast.success(`Loading Vault Sector: ${title}`, {
             icon: '▶️',
             style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }
         });
+        const objectUrl = URL.createObjectURL(blob);
+        navigate('/offline', { state: { videoUrl: objectUrl, title } });
     };
 
     return (

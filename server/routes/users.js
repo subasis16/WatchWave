@@ -123,6 +123,38 @@ router.delete('/watchHistory/:contentId', verifyToken, async (req, res) => {
     }
 });
 
+// GET /api/users/vault (Cross-Device Global Cinematic Vault Sync)
+router.get('/vault', verifyToken, async (req, res) => {
+    try {
+        const snapshot = await db.collection('users').doc(req.user.uid)
+            .collection('global_vault').orderBy('vaultedAt', 'desc').get();
+        const list = snapshot.docs.map(doc => doc.data());
+        res.json({ success: true, list });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST /api/users/vault 
+router.post('/vault', verifyToken, async (req, res) => {
+    try {
+        const { contentId, title, size } = req.body;
+        if (!contentId) return res.status(400).json({ error: 'contentId is required.' });
+
+        await db.collection('users').doc(req.user.uid)
+            .collection('global_vault').doc(String(contentId)).set({
+                contentId: String(contentId),
+                title: title || '',
+                size: size || 0,
+                vaultedAt: new Date().toISOString(),
+            });
+
+        res.json({ success: true, message: 'Added to Global Vault Tracking.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // GET /api/users/settings
 router.get('/settings', verifyToken, async (req, res) => {
     try {

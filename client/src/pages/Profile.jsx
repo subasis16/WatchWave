@@ -90,9 +90,52 @@ const Profile = () => {
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 20 * 1024 * 1024) {
+          toast.error("Image too large. Please use an image under 20MB.", { style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' }});
+          return;
+      }
+      toast("Syncing Image Engine...", { icon: '⚙️', id: 'img-upload', style: { background: 'rgba(255,255,255,0.1)', color: '#fff' }});
+      
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileData({ ...profileData, avatar: reader.result });
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = async () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const MAX_SIZE = 500; // Perfect, retina crisp compression size
+          
+          // Math calc aspect ratio down-sampler
+          if (width > height && width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          } else if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Drop payload safely to 80% JPEG compression (often <100kb payload!)
+          const compressedData = canvas.toDataURL('image/jpeg', 0.8);
+          
+          setProfileData(prev => ({ ...prev, avatar: compressedData }));
+          
+          if (auth.currentUser) {
+              try {
+                  const userRef = doc(db, 'users', auth.currentUser.uid);
+                  await updateDoc(userRef, { avatar: compressedData });
+                  toast.success("Profile Uploaded & Database Synced!", { id: 'img-upload', icon: '📸', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' }});
+              } catch (err) {
+                  console.error("Error saving optimized avatar:", err);
+                  toast.error("Database Payload Reject limit hit.", { id: 'img-upload' });
+              }
+          }
+        };
       };
       reader.readAsDataURL(file);
     }
