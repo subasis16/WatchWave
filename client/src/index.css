@@ -4,162 +4,145 @@
 
 :root {
   color-scheme: dark;
-  --brand-red: #E50914;
-  --deep-black: #0a0a0a;
-  --rich-gray: #1c1c1c;
-}
-
-/* ============================================================
-   BASE RESET & BODY
-   ============================================================ */
-*, *::before, *::after {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --accent-gold: #f5a623;
 }
 
 body {
-  @apply bg-deep-black text-white font-sans overflow-x-hidden antialiased;
+  @apply bg-[#050505] text-white font-sans overflow-x-hidden antialiased;
+  background-image: 
+    linear-gradient(
+      to bottom,
+      rgba(5, 5, 5, 0.92) 0%,
+      rgba(5, 5, 5, 0.78) 25%,
+      rgba(5, 5, 5, 0.72) 50%,
+      rgba(5, 5, 5, 0.78) 75%,
+      rgba(5, 5, 5, 0.95) 100%
+    ),
+    url('./assets/streaming-bg.png');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   margin: 0;
   padding: 0;
-  /* Safe area for notched phones (iPhone X+) */
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  min-height: 100dvh;
+  scroll-behavior: smooth;
+  min-height: 100vh;
 }
 
-/* ============================================================
-   CUSTOM SCROLLBAR
-   ============================================================ */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { @apply bg-deep-black; }
-::-webkit-scrollbar-thumb { @apply bg-rich-gray rounded-full; }
-::-webkit-scrollbar-thumb:hover { @apply bg-gray-500; }
-
-/* Hide scrollbar utility */
-.no-scrollbar::-webkit-scrollbar,
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar,
-.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* ============================================================
-   RESPONSIVE TYPOGRAPHY
-   ============================================================ */
-.text-responsive-hero {
-  font-size: clamp(2rem, 6vw, 5rem);
-  line-height: 1.1;
-}
-.text-responsive-title {
-  font-size: clamp(1.25rem, 3vw, 2rem);
-}
-.text-responsive-body {
-  font-size: clamp(0.875rem, 2vw, 1.125rem);
+/* Cinematic vignette overlay for premium depth */
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(5, 5, 5, 0.6) 75%,
+    rgba(5, 5, 5, 0.9) 100%
+  );
 }
 
-/* ============================================================
-   TOUCH TARGETS (Mobile accessibility)
-   ============================================================ */
-@media (max-width: 768px) {
-  button, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
+#root > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Subtle ambient glow animation */
+@keyframes ambientGlow {
+  0%, 100% {
+    box-shadow: inset 0 0 120px 30px rgba(245, 166, 35, 0.02),
+                inset 0 0 200px 60px rgba(100, 50, 200, 0.015);
+  }
+  50% {
+    box-shadow: inset 0 0 150px 40px rgba(245, 166, 35, 0.035),
+                inset 0 0 250px 80px rgba(100, 50, 200, 0.025);
   }
 }
 
-/* ============================================================
-   MOBILE SAFE AREA BOTTOM PADDING
-   ============================================================ */
-.pb-safe {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-
-/* ============================================================
-   GLASS MORPHISM UTILITIES
-   ============================================================ */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.glass-dark {
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-/* ============================================================
-   ANIMATION UTILITIES
-   ============================================================ */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(229,9,20,0.3); }
-  50%       { box-shadow: 0 0 25px rgba(229,9,20,0.7); }
-}
-
-.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-
-.shimmer-text {
-  background: linear-gradient(90deg, #fff 25%, #E50914 50%, #fff 75%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmer 3s linear infinite;
-}
-
-/* ============================================================
-   CARD HOVER EFFECTS
-   ============================================================ */
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-}
-
-/* ============================================================
-   RESPONSIVE GRID UTILITIES
-   ============================================================ */
-.content-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
-}
-@media (min-width: 640px) {
-  .content-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
-@media (min-width: 1024px) {
-  .content-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-}
-
-/* ============================================================
-   FORM INPUTS
-   ============================================================ */
-input, select, textarea {
-  font-size: 16px; /* Prevents iOS zoom on focus */
-}
-
-/* ============================================================
-   MOBILE MENU OVERLAY
-   ============================================================ */
-.mobile-menu-overlay {
+body::after {
+  content: '';
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(8px);
-  z-index: 40;
-}
+  pointer-events: none;
+  z-index: 0;
+  animation: ambientGlow 8s ease-in-out infinite;
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl transition-all duration-300;
+  }
+  
+  .glass-pill {
+    @apply bg-white/10 backdrop-blur-md border border-white/10 rounded-full transition-all duration-500 hover:bg-white/20;
+  }
+
+  .glass-pill-active {
+    @apply bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)];
+  }
+
+  .glass-button {
+    @apply px-6 py-2.5 glass-pill flex items-center gap-2 font-semibold text-sm;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/20 rounded-full hover:bg-white/30 transition-colors;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  filter: contrast(1.1);
+}
+
+.high-contrast .glass-card, 
+.high-contrast .glass-pill {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.high-contrast .text-gray-400,
+.high-contrast .text-gray-500,
+.high-contrast .text-gray-600 {
+  color: #fff !important;
+  font-weight: 800;
+}
+
+/* Motion Reduction */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.motion-reduction * {
+  animation: none !important;
+  transition: none !important;
+}
