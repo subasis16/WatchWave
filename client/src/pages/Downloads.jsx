@@ -35,14 +35,20 @@ const Downloads = () => {
         }
     };
 
-    const handlePlayOffline = (blob, title) => {
-        if (!blob) return toast.error("Storage Error. Local screen unreachable.");
-        toast.success(`Loading Vault Sector: ${title}`, {
+    const handlePlayOffline = (item) => {
+        if (!item.blob && !item.id) {
+            toast.error(`No offline data found for "${item.title}". Please re-download it.`, {
+                style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }
+            });
+            return;
+        }
+        toast.success(`Loading: ${item.title}`, {
             icon: '▶️',
             style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }
         });
-        const objectUrl = URL.createObjectURL(blob);
-        navigate('/offline', { state: { videoUrl: objectUrl, title } });
+        // Pass ONLY the id — OfflinePlayer will fetch the blob fresh from IndexedDB
+        // This avoids blob URL invalidation during React Router navigation
+        navigate('/offline', { state: { itemId: item.id, title: item.title } });
     };
 
     return (
@@ -134,7 +140,7 @@ const Downloads = () => {
 
                                 <div className="flex items-center gap-8 shrink-0 lg:pl-12 lg:border-l border-white/5 w-full lg:w-auto justify-center">
                                     <button
-                                        onClick={() => handlePlayOffline(item.blob, item.title)}
+                                        onClick={() => handlePlayOffline(item)}
                                         className="glass-pill-active p-6 rounded-[1.5rem] flex items-center justify-center transition-all shadow-3xl hover:scale-105 active:scale-95 group/play"
                                         title="Watch Offline"
                                     >

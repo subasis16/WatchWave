@@ -6,12 +6,13 @@ import {
   Edit2, Lock, UserX, Clock, Flag, Star, Smile, Heart, ThumbsUp, Laugh, Flame, Frown, Coffee, Zap, Skull, Info, PhoneOff, MessageSquare, ArrowLeft
 } from 'lucide-react';
 import { movies, series, anime } from '../data/content';
+import ReactPlayer from 'react-player';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import io from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 
 const SOCKET_URL = 'http://localhost:5000';
 
@@ -522,14 +523,40 @@ const WatchRoom = () => {
     }
   };
 
-  const handleContentSelect = (item) => {
-    setSelectedContent(item);
+  const handleContentSelect = async (item) => {
+    let enrichedItem = { ...item };
+
+    // If no local videoUrl, try Firestore
+    if (!enrichedItem.videoUrl) {
+      try {
+        const movieDocRef = doc(db, 'movies', item.id);
+        const movieSnap = await getDoc(movieDocRef);
+        if (movieSnap.exists() && movieSnap.data().videoUrl) {
+          enrichedItem.videoUrl = movieSnap.data().videoUrl;
+          console.log(`🎬 WatchRoom: Found Firestore video for ${item.title}`);
+        }
+      } catch (e) {
+        console.warn('WatchRoom Firestore fetch failed:', e.message);
+      }
+    }
+
+    // Fallback: convert youtube-nocookie embed URL to standard YouTube URL for ReactPlayer
+    if (!enrichedItem.videoUrl && enrichedItem.trailerUrl) {
+      let fallbackUrl = enrichedItem.trailerUrl;
+      if (fallbackUrl.includes('youtube-nocookie.com/embed/')) {
+        const videoId = fallbackUrl.split('/embed/')[1]?.split('?')[0];
+        if (videoId) fallbackUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      }
+      enrichedItem.videoUrl = fallbackUrl;
+    }
+
+    setSelectedContent(enrichedItem);
     setShowMoodSelector(false);
     setIsPlaying(true);
 
     if (socket) {
       const currentRoomCode = location.pathname.split('/').pop();
-      socket.emit('sync_content', { roomCode: currentRoomCode, content: item });
+      socket.emit('sync_content', { roomCode: currentRoomCode, content: enrichedItem });
     }
 
     setMessages(prev => [...prev, {
@@ -686,20 +713,48 @@ const WatchRoom = () => {
           <div className="flex-1 relative flex items-center justify-center bg-transparent group overflow-hidden">
             {selectedContent ? (
               <>
-                <img
-                  src={selectedContent.image.replace('w500', 'original')}
-                  alt="Video Feed"
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${isPlaying ? 'opacity-70 scale-100' : 'opacity-30 scale-110 grayscale blur-xl'}`}
-                />
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handlePlayToggle}
-                  className="z-10 glass-pill-active p-10 rounded-full cursor-pointer transition-all shadow-2xl relative"
-                >
-                  <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full -z-10" />
-                  {isPlaying ? <Pause size={48} fill="white" /> : <Play size={48} fill="white" className="ml-2" />}
-                </motion.div>
+                {selectedContent.videoUrl ? (
+                  /* Real Cloudinary Video Player */
+                  <div className="absolute inset-0 w-full h-full">
+                    <ReactPlayer
+                      src={selectedContent.videoUrl}
+                      playing={isPlaying}
+                      controls={true}
+                      volume={localVol / 100}
+                      width="100%"
+                      height="100%"
+                      style={{ position: 'absolute', top: 0, left: 0 }}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      config={{
+                        file: {
+                          attributes: {
+                            crossOrigin: 'anonymous',
+                            style: { objectFit: 'cover' }
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  /* Poster Image Fallback */
+                  <>
+                    <img
+                      src={selectedContent.image.replace('w500', 'original')}
+                      alt="Video Feed"
+                      className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${isPlaying ? 'opacity-70 scale-100' : 'opacity-30 scale-110 grayscale blur-xl'}`}
+                    />
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handlePlayToggle}
+                      className="z-10 glass-pill-active p-10 rounded-full cursor-pointer transition-all shadow-2xl relative"
+                    >
+                      <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full -z-10" />
+                      {isPlaying ? <Pause size={48} fill="white" /> : <Play size={48} fill="white" className="ml-2" />}
+                    </motion.div>
+                  </>
+                )}
               </>
             ) : (
               <div className="text-center z-10 p-12">

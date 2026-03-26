@@ -142,7 +142,7 @@ const Clips = () => {
                {/* Preview */}
                <div className="lg:col-span-3 bg-black relative flex items-center justify-center overflow-hidden group">
                 <ReactPlayer 
-                    url={selectedVideo?.url}
+                    src={selectedVideo?.url}
                     playing={isPlaying}
                     width="100%"
                     height="100%"

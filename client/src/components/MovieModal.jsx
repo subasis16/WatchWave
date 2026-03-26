@@ -1,30 +1,101 @@
-import React, { useEffect } from 'react';
-import { X, Play } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { X, Play, Download, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { saveVideo } from '../utils/offlineStorage';
+import { saveVideo, isVideoDownloaded } from '../utils/offlineStorage';
 import { toast } from 'react-hot-toast';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const MovieModal = ({ movie, isOpen, onClose }) => {
     const navigate = useNavigate();
+    const [downloadProgress, setDownloadProgress] = useState(0);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [downloadComplete, setDownloadComplete] = useState(false);
 
     // Prevent body scrolling when modal is open
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            setDownloadProgress(0);
+            setIsDownloading(false);
+            // Check if already downloaded
+            if (movie) {
+                isVideoDownloaded(movie.id).then(setDownloadComplete);
+            }
         } else {
             document.body.style.overflow = 'unset';
         }
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [isOpen]);
+    }, [isOpen, movie]);
 
     if (!movie) return null;
 
     const handlePlayVideo = () => {
         onClose();
         navigate(`/watch/${movie.id}`);
+    };
+
+    /**
+     * Resolves the best downloadable video URL for this movie.
+     * Priority: local videoUrl → Firestore videoUrl → null (no YouTube, not downloadable)
+     */
+    const resolveVideoUrl = async () => {
+        // 1. Local content has videoUrl
+        if (movie.videoUrl) return movie.videoUrl;
+
+        // 2. Try Firestore
+        try {
+            const movieSnap = await getDoc(doc(db, 'movies', movie.id));
+            if (movieSnap.exists() && movieSnap.data().videoUrl) {
+                return movieSnap.data().videoUrl;
+            }
+        } catch (e) {
+            console.warn('Firestore fetch for download failed:', e.message);
+        }
+
+        return null;
+    };
+
+    const handleDownload = async () => {
+        if (isDownloading || downloadComplete) return;
+
+        const toastId = toast.loading(`Preparing download: ${movie.title}...`, {
+            style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }
+        });
+
+        const videoUrl = await resolveVideoUrl();
+
+        if (!videoUrl) {
+            toast.error(`No downloadable video source for "${movie.title}". Only Cloudinary-hosted content can be downloaded.`, { id: toastId });
+            return;
+        }
+
+        setIsDownloading(true);
+        setDownloadProgress(1);
+
+        // Use the single shared saveVideo from offlineStorage (ensures Downloads page can read it)
+        const success = await saveVideo(movie, videoUrl, (percent) => {
+            setDownloadProgress(percent);
+            toast.loading(`Downloading ${movie.title}... ${percent}%`, { id: toastId });
+        });
+
+        if (success) {
+            setDownloadComplete(true);
+            setIsDownloading(false);
+            setDownloadProgress(100);
+            toast.success(`✅ ${movie.title} ready for offline playback!`, {
+                id: toastId,
+                duration: 4000,
+                style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,215,0,0.3)' }
+            });
+        } else {
+            setIsDownloading(false);
+            setDownloadProgress(0);
+            toast.error(`Download failed for ${movie.title}`, { id: toastId });
+        }
     };
 
     const description = movie.description || "In the early 2000s, an undercover operative infiltrates Karachi's underworld, breaking into its inner circle to dismantle a violent network from within. A gripping tale of espionage and betrayal.";
@@ -108,26 +179,47 @@ const MovieModal = ({ movie, isOpen, onClose }) => {
                                     </p>
 
                                     <div className="flex flex-wrap gap-4 pt-4">
+                                        {/* Watch Now */}
                                         <button
+                                            id={`watch-btn-${movie.id}`}
                                             onClick={handlePlayVideo}
                                             className="glass-pill-active px-10 py-4 font-black text-[10px] uppercase tracking-[0.4em] flex items-center gap-3 shadow-2xl transition-all transform hover:scale-105 active:scale-95"
                                         >
                                             <Play size={16} className="fill-current" />
                                             Watch Now
                                         </button>
-                                        <button 
-                                            onClick={async () => {
-                                                const id = toast.loading(`Encrypting ${movie.title}...`);
-                                                const success = await saveVideo(movie, movie.videoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-                                                if (success) {
-                                                    toast.success("Added to Vault", { id });
-                                                } else {
-                                                    toast.error("Process Failed", { id });
-                                                }
-                                            }}
-                                            className="glass-pill px-10 py-4 font-black text-[10px] uppercase tracking-[0.4em] text-gray-500 hover:text-white transition-all shadow-xl"
+
+                                        {/* Download Button */}
+                                        <button
+                                            id={`download-btn-${movie.id}`}
+                                            onClick={handleDownload}
+                                            disabled={isDownloading}
+                                            className={`relative overflow-hidden glass-pill px-10 py-4 font-black text-[10px] uppercase tracking-[0.4em] flex items-center gap-3 transition-all shadow-xl ${
+                                                downloadComplete
+                                                    ? 'text-emerald-400 border-emerald-400/30'
+                                                    : isDownloading
+                                                        ? 'text-accent-gold border-accent-gold/30 cursor-wait'
+                                                        : 'text-gray-400 hover:text-white hover:border-white/20'
+                                            }`}
                                         >
-                                            Add to Vault
+                                            {/* Animated fill bar */}
+                                            {isDownloading && (
+                                                <motion.div
+                                                    className="absolute inset-y-0 left-0 bg-accent-gold/15 rounded-[inherit]"
+                                                    initial={{ width: '0%' }}
+                                                    animate={{ width: `${downloadProgress}%` }}
+                                                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                                                />
+                                            )}
+                                            <span className="relative z-10 flex items-center gap-3">
+                                                {downloadComplete ? (
+                                                    <><Check size={16} /> Downloaded</>
+                                                ) : isDownloading ? (
+                                                    <><Loader2 size={16} className="animate-spin" /> {downloadProgress}%</>
+                                                ) : (
+                                                    <><Download size={16} /> Download</>
+                                                )}
+                                            </span>
                                         </button>
                                     </div>
                                 </div>

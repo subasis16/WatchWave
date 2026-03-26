@@ -77,7 +77,7 @@ const VideoPlayer = () => {
                 <div className="w-[110%] h-[110%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                     <ReactPlayer 
                         ref={playerRef}
-                        url={trailerUrl}
+                        src={trailerUrl}
                         playing={isPlaying}
                         volume={volume / 100}
                         onProgress={(state) => setProgress(state.played * 100)}

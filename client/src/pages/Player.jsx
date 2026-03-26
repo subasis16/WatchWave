@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Pause, Volume2, ArrowLeft, Scissors,
   Share2, Heart, MessageCircle, Maximize, Settings as SettingsIcon,
-  RotateCcw, SkipForward, Check, Subtitles, X
+  RotateCcw, SkipForward, Check, Subtitles, X, Loader2
 } from 'lucide-react';
 import ReactPlayer from 'react-player';
-import { trending, anime, movies, bollywood, series } from '../data/content';
+import { trending, anime, movies, bollywood, series, allSiteContent } from '../data/content';
 import { useSettings } from '../context/SettingsContext';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const ClipCreator = ({ isOpen, onClose, content }) => {
   const [range, setRange] = useState([20, 50]);
@@ -50,7 +52,7 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
             {/* Real Video Preview for Clip */}
             <div className="aspect-video w-full rounded-2xl overflow-hidden glass-card border-white/10 mt-6 relative group">
                 <ReactPlayer 
-                    url={content.trailerUrl}
+                    src={content.trailerUrl}
                     playing={isPlaying}
                     muted
                     width="100%"
@@ -139,13 +141,121 @@ const Player = () => {
   const [showControls, setShowControls] = useState(true);
   const [showClipCreator, setShowClipCreator] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentSeconds, setCurrentSeconds] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [currentTimeStr, setCurrentTimeStr] = useState("00:00");
+  const [durationStr, setDurationStr] = useState("00:00");
+  const [isLoading, setIsLoading] = useState(true);
+  const [videoUrl, setVideoUrl] = useState(null);
+  
+  // Resolution Management
+  const [resolution, setResolution] = useState('Auto');
+  const [showResolutions, setShowResolutions] = useState(false);
+  const seekTimeRef = React.useRef(null);
+  
   const playerRef = React.useRef(null);
   const containerRef = React.useRef(null);
 
-  // Find content in all arrays
-  const allContent = [...trending, ...anime, ...movies, ...bollywood, ...series];
-  const content = allContent.find(c => c.id === id) || movies[0];
-  const trailerUrl = content.trailerUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+  // Find content in all arrays accurately using allSiteContent (fallback to movies[0] if completely unfound)
+  const content = allSiteContent.find(c => c.id === id) || movies[0];
+
+  // Firebase Firestore: fetch videoUrl, then fallback to local content data
+  useEffect(() => {
+    const fetchVideo = async () => {
+      setIsLoading(true);
+      let resolvedUrl = null;
+
+      try {
+        // Step 1: Try Firestore first (has Cloudinary .mp4 URLs)
+        const movieDocRef = doc(db, 'movies', id);
+        const movieSnap = await getDoc(movieDocRef);
+
+        if (movieSnap.exists() && movieSnap.data().videoUrl) {
+          resolvedUrl = movieSnap.data().videoUrl;
+        }
+      } catch (error) {
+        console.warn('⚠️ Firebase fetch failed, using fallback:', error.message);
+      }
+
+      // Step 2: Fallback to local content arrays (videoUrl or trailerUrl)
+      if (!resolvedUrl) {
+        const localContent = allSiteContent.find(c => c.id === id) || movies[0];
+        if (localContent?.videoUrl) {
+          resolvedUrl = localContent.videoUrl;
+        } else if (localContent?.trailerUrl) {
+          resolvedUrl = localContent.trailerUrl;
+        }
+      }
+
+      // Step 3: Convert youtube-nocookie embed URLs to standard format for ReactPlayer
+      if (resolvedUrl && resolvedUrl.includes('youtube-nocookie.com/embed/')) {
+        const videoId = resolvedUrl.split('/embed/')[1]?.split('?')[0];
+        if (videoId) {
+          resolvedUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        }
+      }
+
+      console.log(`🎬 Player resolved URL for [${id}]:`, resolvedUrl);
+      setVideoUrl(resolvedUrl);
+      setIsLoading(false);
+    };
+
+    fetchVideo();
+  }, [id]);
+
+  const activeUrl = React.useMemo(() => {
+    if (!videoUrl) return null;
+    // Only apply resolution transformations to Cloudinary URLs
+    if (resolution === 'Auto' || !videoUrl.includes('res.cloudinary.com')) return videoUrl;
+    
+    // Convert https://res.cloudinary.com/.../video/upload/v123... 
+    // to -> https://res.cloudinary.com/.../video/upload/q_auto,h_720/v123...
+    const parts = videoUrl.split('/upload/');
+    if (parts.length === 2 && parts[1].startsWith('v')) {
+        return `${parts[0]}/upload/q_auto,h_${resolution}/${parts[1]}`;
+    }
+    return videoUrl;
+  }, [videoUrl, resolution]);
+
+  const handleResolutionChange = (newRes) => {
+    if (newRes === resolution) {
+        setShowResolutions(false);
+        return;
+    }
+    
+    // Save current time to seek back after resolution swap
+    if (playerRef.current) {
+        seekTimeRef.current = playerRef.current.getCurrentTime();
+    }
+    
+    setResolution(newRes);
+    setShowResolutions(false);
+  };
+
+  const resolutionsList = [
+    { label: 'Auto', value: 'Auto' },
+    { label: '1080p', value: '1080' },
+    { label: '720p', value: '720' },
+    { label: '480p', value: '480' }
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
+        <Loader2 size={48} className="text-accent-gold animate-spin mb-6" />
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Loading Stream...</p>
+      </div>
+    );
+  }
+
+  if (!videoUrl) {
+    return (
+      <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
+        <h2 className="text-2xl font-black text-white uppercase tracking-widest mb-6">Video source not found.</h2>
+        <button onClick={() => navigate(-1)} className="glass-pill px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white border-white/20 hover:bg-white/10 transition-all">Go Back</button>
+      </div>
+    );
+  }
 
   const handleCreateClip = () => {
     setShowClipCreator(true);
@@ -200,14 +310,49 @@ const Player = () => {
       />
 
       {/* Video Player Area */}
-      <div className="w-[94%] h-[84%] relative z-10 overflow-hidden shadow-[0_0_150px_rgba(0,0,0,0.9)] rounded-[3rem] border border-white/5 bg-black ring-1 ring-white/10" onClick={() => setIsPlaying(!isPlaying)}>
-        <div className="w-[112%] h-[112%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-          <ReactPlayer 
-            ref={playerRef}
-            url={trailerUrl}
-            playing={isPlaying}
+      <div 
+        className="w-[94%] h-[84%] relative z-10 overflow-hidden shadow-[0_0_150px_rgba(0,0,0,0.9)] rounded-[3rem] border border-white/5 bg-black ring-1 ring-white/10" 
+        onClick={() => setIsPlaying(prev => !prev)}
+      >
+        <div className={`w-full h-full absolute inset-0 flex items-center justify-center`}>
+          {activeUrl && activeUrl.includes('youtube.com') ? (
+            <iframe
+                src={`https://www.youtube.com/embed/${activeUrl.split('v=')[1]}?autoplay=1&mute=${volume === 0 ? 1 : 0}&playsinline=1&controls=1`}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title="YouTube Video Player"
+            />
+          ) : (
+            <ReactPlayer 
+              ref={playerRef}
+              src={activeUrl}
+              playing={isPlaying}
             volume={volume / 100}
-            onProgress={(state) => setProgress(state.played * 100)}
+            muted={volume === 0}
+            playsinline={true}
+            onProgress={(state) => {
+              setProgress(state.played * 100);
+              setCurrentSeconds(state.playedSeconds);
+              setCurrentTimeStr(new Date(state.playedSeconds * 1000).toISOString().substr(14, 5));
+            }}
+            onReady={() => {
+              if (playerRef.current) {
+                const dur = playerRef.current.getDuration();
+                if (dur && !isNaN(dur)) {
+                  setTotalDuration(dur);
+                  setDurationStr(new Date(dur * 1000).toISOString().substr(14, 5));
+                }
+                
+                // Seek back to the saved time after resolution changes
+                if (seekTimeRef.current !== null) {
+                    playerRef.current.seekTo(seekTimeRef.current, 'seconds');
+                    seekTimeRef.current = null;
+                    setIsPlaying(true);
+                }
+              }
+            }}
+            onError={(e) => console.log('Player Error:', e)}
             width="100%"
             height="100%"
             style={{ transform: 'scale(1.03)', transition: 'all 1s', opacity: isPlaying ? 1 : 0.4, filter: isPlaying ? 'none' : 'grayscale(100%) blur(4px)' }}
@@ -215,21 +360,27 @@ const Player = () => {
               youtube: {
                 playerVars: { 
                   autoplay: 1, 
-                  controls: 0, 
+                  controls: activeUrl && activeUrl.includes('youtube.com') ? 1 : 0, 
                   modestbranding: 1, 
                   rel: 0, 
                   showinfo: 0, 
-                  disablekb: 1,
+                  disablekb: 0,
                   cc_load_policy: captions ? 1 : 0 
+                }
+              },
+              file: {
+                attributes: {
+                  controlsList: 'nodownload'
                 }
               }
             }}
           />
+          )}
         </div>
         
         {/* Cinematic Subtitle Overlay */}
         <AnimatePresence>
-            {captions && isPlaying && (
+            {captions && isPlaying && false && (
                 <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -245,7 +396,7 @@ const Player = () => {
             )}
         </AnimatePresence>
         
-        {!isPlaying && !showClipCreator && (
+        {!isPlaying && !showClipCreator && (!activeUrl || !activeUrl.includes('youtube.com')) && (
             <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
                 <motion.button 
                     initial={{ scale: 0.5, opacity: 0 }}
@@ -258,23 +409,24 @@ const Player = () => {
         )}
       </div>
 
-      {/* Controls Area */}
+      {/* Controls Area (Hidden for YouTube embeds since they have native controls) */}
       <AnimatePresence>
-        {showControls && !showClipCreator && (
+        {showControls && !showClipCreator && (!activeUrl || !activeUrl.includes('youtube.com')) && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 50 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 50 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl z-50 px-12 py-10 glass-card border-white/5 shadow-3xl"
+            initial={{ opacity: 0, scale: 0.95, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, scale: 0.95, y: 50, x: "-50%" }}
+            className="absolute bottom-12 left-1/2 w-[90%] max-w-6xl z-50 px-12 py-10 glass-card border-white/5 shadow-3xl"
           >
             {/* Progress Bar */}
             <div 
                 className="w-full h-1 bg-white/5 rounded-full mb-10 relative group cursor-pointer overflow-hidden"
                 onClick={(e) => {
+                    e.stopPropagation();
                     if(playerRef.current) {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const percent = (e.clientX - rect.left) / rect.width;
-                        playerRef.current.seekTo(percent);
+                        playerRef.current.seekTo(percent, 'fraction');
                         setProgress(percent * 100);
                     }
                 }}
@@ -284,15 +436,22 @@ const Player = () => {
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-10">
-                <button onClick={() => setIsPlaying(!isPlaying)} className="w-14 h-14 glass-pill flex items-center justify-center hover:bg-white/10 transition-all border-white/5 transform active:scale-90 shadow-xl">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPlaying(prev => !prev);
+                  }} 
+                  className="w-14 h-14 glass-pill flex items-center justify-center hover:bg-white/10 transition-all border-white/5 transform active:scale-90 shadow-xl"
+                >
                   {isPlaying ? <Pause size={28} className="fill-current" /> : <Play size={28} className="fill-current ml-1" />}
                 </button>
 
                 <div className="flex items-center gap-4">
                   <button 
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       if (playerRef.current) {
-                        playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10);
+                        playerRef.current.seekTo(currentSeconds - 10, 'seconds');
                       }
                     }}
                     className="w-12 h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
@@ -300,9 +459,10 @@ const Player = () => {
                     <RotateCcw size={20} />
                   </button>
                   <button 
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       if (playerRef.current) {
-                        playerRef.current.seekTo(playerRef.current.getCurrentTime() + 10);
+                        playerRef.current.seekTo(currentSeconds + 10, 'seconds');
                       }
                     }}
                     className="w-12 h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
@@ -325,7 +485,7 @@ const Player = () => {
                   </div>
                 </div>
 
-                <span className="text-[10px] font-black text-gray-400 tracking-[0.2em] ml-6 font-mono">12:43 / 45:00</span>
+                <span className="text-[10px] font-black text-gray-400 tracking-[0.2em] ml-6 font-mono w-24">{currentTimeStr} / {durationStr}</span>
               </div>
 
               <div className="flex items-center gap-5">
@@ -337,6 +497,44 @@ const Player = () => {
                   Split Timeline
                 </button>
                 <div className="w-px h-8 bg-white/5 mx-2" />
+                
+                {/* Resolution Picker */}
+                <div className="relative">
+                    <button 
+                      onClick={() => setShowResolutions(!showResolutions)}
+                      className={`glass-pill px-6 py-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all shadow-xl ${
+                          resolution !== 'Auto' ? 'text-accent-gold border-accent-gold/20' : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {resolution === 'Auto' ? 'Auto\u00A0HD' : `${resolution}p`}
+                    </button>
+                    
+                    <AnimatePresence>
+                        {showResolutions && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute bottom-full right-0 mb-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 min-w-[140px] shadow-2xl"
+                            >
+                                {resolutionsList.map(r => (
+                                    <button
+                                        key={r.value}
+                                        onClick={() => handleResolutionChange(r.value)}
+                                        className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+                                            resolution === r.value 
+                                            ? 'bg-accent-gold text-black shadow-[0_0_15px_rgba(255,215,0,0.3)]' 
+                                            : 'text-gray-400 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                    >
+                                        {r.label}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+                
                 <button 
                   onClick={() => toggleSetting('captions')}
                   className={`w-12 h-12 glass-pill flex items-center justify-center transition border-white/5 ${captions ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-gray-400'}`}

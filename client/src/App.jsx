@@ -33,11 +33,12 @@ const App = () => {
   const isWatchPage = pathname.startsWith('/watch');
   const isPartyPage = pathname.startsWith('/party');
   const isRoomPage = pathname.startsWith('/room');
+  const isOfflinePage = pathname.startsWith('/offline');
   
   const isAdminPage = pathname.startsWith('/admin');
-  const hideNavbar = isWatchPage || isRoomPage || isAdminPage;
-  const hideFooter = isWatchPage || isPartyPage || isRoomPage;
-  const hidePadding = isWatchPage || isPartyPage || isRoomPage;
+  const hideNavbar = isWatchPage || isRoomPage || isAdminPage || isOfflinePage;
+  const hideFooter = isWatchPage || isPartyPage || isRoomPage || isOfflinePage;
+  const hidePadding = isWatchPage || isPartyPage || isRoomPage || isOfflinePage;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,8 +67,8 @@ const App = () => {
         <Route path="/clips" element={<Clips />} />
         <Route path="/downloads" element={<Downloads />} />
         <Route path="/offline" element={<OfflinePlayer />} />
-        <Route path="/player/:id" element={<Player />} />
-        <Route path="/watch/:id" element={<VideoPlayer />} />
+        <Route path="/player/:id" element={<VideoPlayer />} />
+        <Route path="/watch/:id" element={<Player />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/plans" element={<Plans />} />
