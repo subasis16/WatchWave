@@ -1,5 +1,5 @@
 import ContentRow from '../components/ContentRow';
-import { anime } from '../data/content';
+import { anime, actionAnime, romanticAnime, sciFiAnime, sportAnime, superPowerAnime, psychologicalAnime, adventureAnime, dramaAnime } from '../data/content';
 
 const Anime = () => {
   return (
@@ -27,9 +27,15 @@ const Anime = () => {
           </div>
         </div>
 
-        <div className="space-y-24">
-          <ContentRow title="Epic Sagas" data={anime} />
-          <ContentRow title="New on WatchWave" data={anime.slice().reverse()} />
+        <div className="space-y-12 pb-12">
+          <ContentRow title="High-Octane Action" data={actionAnime} />
+          <ContentRow title="Psychological Thrillers" data={psychologicalAnime} />
+          <ContentRow title="Sci-Fi Masterpieces" data={sciFiAnime} />
+          <ContentRow title="Epic Adventures" data={adventureAnime} />
+          <ContentRow title="Super Power Sagas" data={superPowerAnime} />
+          <ContentRow title="Intense Sports" data={sportAnime} />
+          <ContentRow title="Heartfelt Romance" data={romanticAnime} />
+          <ContentRow title="Deep Dramas" data={dramaAnime} />
         </div>
       </div>
     </div>

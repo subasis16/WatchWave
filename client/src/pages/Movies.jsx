@@ -1,5 +1,5 @@
 import ContentRow from '../components/ContentRow';
-import { movies, bollywood } from '../data/content';
+import { movies, bollywood, trendingMovies, newReleases, bollywoodHits, hollywoodAction, Romantic, Crime, Comedy, Thriller, Horror } from '../data/content';
 
 const Movies = () => {
   return (
@@ -27,9 +27,16 @@ const Movies = () => {
           </div>
         </div>
 
-        <div className="space-y-24">
-          <ContentRow title="Hollywood Hits" data={movies} />
-          <ContentRow title="Bollywood Blockbusters" data={bollywood} />
+        <div className="space-y-12 pb-12">
+          <ContentRow title="Trending Movies" data={trendingMovies} />
+          <ContentRow title="New Releases" data={newReleases} />
+          <ContentRow title="Hollywood Action" data={hollywoodAction} />
+          <ContentRow title="Bollywood Hits" data={bollywoodHits} />
+          <ContentRow title="Crime Fiction" data={Crime} />
+          <ContentRow title="Romantic Watch" data={Romantic} />
+          <ContentRow title="Comedy Blockbusters" data={Comedy} />
+          <ContentRow title="Dark Thrillers" data={Thriller} />
+          <ContentRow title="Horror Nights" data={Horror} />
         </div>
       </div>
     </div>

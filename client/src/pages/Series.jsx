@@ -1,5 +1,5 @@
 import ContentRow from '../components/ContentRow';
-import { series } from '../data/content';
+import { series, trendingSeries, newReleaseSeries, indianSeries, hollywoodActionSeries, hollywoodCrimeSeries, tvComedy } from '../data/content';
 
 const Series = () => {
   return (
@@ -27,9 +27,13 @@ const Series = () => {
           </div>
         </div>
 
-        <div className="space-y-24">
-          <ContentRow title="World-Class Dramas" data={series} />
-          <ContentRow title="Recommended for You" data={series.slice().reverse()} />
+        <div className="space-y-12 pb-12">
+          <ContentRow title="Trending Series" data={trendingSeries} />
+          <ContentRow title="New Releases" data={newReleaseSeries} />
+          <ContentRow title="Indian Originals" data={indianSeries} />
+          <ContentRow title="Hollywood Action" data={hollywoodActionSeries} />
+          <ContentRow title="Crime & Investigation" data={hollywoodCrimeSeries} />
+          <ContentRow title="Hit Comedies" data={tvComedy} />
         </div>
       </div>
     </div>

@@ -1,0 +1,98 @@
+[
+  {
+    "title": "Godzilla Minus One",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjc5MjllMGUtMDIwMS00ZDVkLWEzODQtM2NlMTMwMTZhNThmXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2023",
+    "genre": "Action, Adventure, Drama"
+  },
+  {
+    "title": "Poor Things",
+    "image": "https://m.media-amazon.com/images/M/MV5BYWU2MjRjZTYtMjVkMS00MTBjLWFiMTAtYmZlYTk1YjkyMWFkXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2023",
+    "genre": "Comedy, Drama, Romance"
+  },
+  {
+    "title": "Mad Max: Fury Road",
+    "image": "https://m.media-amazon.com/images/M/MV5BZDRkODJhOTgtOTc1OC00NTgzLTk4NjItNDgxZDY4YjlmNDY2XkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2015",
+    "genre": "Action, Adventure, Sci-Fi"
+  },
+  {
+    "title": "Mission: Impossible - Dead Reckoning Part One",
+    "image": "https://m.media-amazon.com/images/M/MV5BN2U4OTdmM2QtZTkxYy00ZmQyLTg2N2UtMDdmMGJmNDhlZDU1XkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2023",
+    "genre": "Action, Adventure, Thriller"
+  },
+  {
+    "title": "Se7en",
+    "image": "https://m.media-amazon.com/images/M/MV5BY2IzNzMxZjctZjUxZi00YzAxLTk3ZjMtODFjODdhMDU5NDM1XkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "1995",
+    "genre": "Crime, Drama, Mystery"
+  },
+  {
+    "title": "The Hangover",
+    "image": "https://m.media-amazon.com/images/M/MV5BNDI2MzBhNzgtOWYyOS00NDM2LWE0OGYtOGQ0M2FjMTI2NTllXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2009",
+    "genre": "Comedy"
+  },
+  {
+    "title": "Hereditary",
+    "image": "https://m.media-amazon.com/images/M/MV5BNTEyZGQwODctYWJjZi00NjFmLTg3YmEtMzlhNjljOGZhMWMyXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2018",
+    "genre": "Drama, Horror, Mystery"
+  },
+  {
+    "title": "A Quiet Place",
+    "image": "https://m.media-amazon.com/images/M/MV5BMjI0MDMzNTQ0M15BMl5BanBnXkFtZTgwMTM5NzM3NDM@._V1_SX700.jpg",
+    "year": "2018",
+    "genre": "Drama, Horror, Sci-Fi"
+  },
+  {
+    "title": "It",
+    "image": "https://m.media-amazon.com/images/M/MV5BZGZmOTZjNzUtOTE4OS00OGM3LWJiNGEtZjk4Yzg2M2Q1YzYxXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2017",
+    "genre": "Horror"
+  },
+  {
+    "title": "Animal",
+    "image": "https://m.media-amazon.com/images/M/MV5BZThmNDg1NjUtNWJhMC00YjA3LWJiMjItNmM4ZDQ5ZGZiN2Y2XkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2023",
+    "genre": "Action, Crime, Drama"
+  },
+  {
+    "title": "Pathaan",
+    "image": "https://m.media-amazon.com/images/M/MV5BNDdkNTY1MDQtY2I5MC00OTFlLTg5OWQtZWE2YzE5NWFiMDgzXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2023",
+    "genre": "Action, Adventure, Thriller"
+  },
+  {
+    "title": "K.G.F: Chapter 2",
+    "image": "https://m.media-amazon.com/images/M/MV5BZmQzZjVkZTUtYjI4ZC00ZDJmLWI0ZDUtZTFmMGM1Mzc5ZjIyXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2022",
+    "genre": "Action, Crime, Drama"
+  },
+  {
+    "title": "Baahubali 2: The Conclusion",
+    "image": "https://m.media-amazon.com/images/M/MV5BNTRhYTlhZTgtYmMyYy00NWI4LTk4MzItOWM2YjBmYTg2OTI2XkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2017",
+    "genre": "Action, Drama"
+  },
+  {
+    "title": "Kantara",
+    "image": "https://m.media-amazon.com/images/M/MV5BY2VkZjk5ZjMtM2ExOS00ZDA1LTg1ZDEtYTliNGZiYTc4ZWZiXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2022",
+    "genre": "Action, Adventure, Drama"
+  },
+  {
+    "title": "3 Idiots",
+    "image": "https://m.media-amazon.com/images/M/MV5BNzc4ZWQ3NmYtODE0Ny00YTQ4LTlkZWItNTBkMGQ0MmUwMmJlXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2009",
+    "genre": "Comedy, Drama"
+  },
+  {
+    "title": "RRR",
+    "image": "https://m.media-amazon.com/images/M/MV5BNWMwODYyMjQtMTczMi00NTQ1LWFkYjItMGJhMWRkY2E3NDAyXkEyXkFqcGc@._V1_SX700.jpg",
+    "year": "2022",
+    "genre": "Action, Adventure, Drama"
+  }
+]

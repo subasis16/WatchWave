@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -16,7 +16,6 @@ const paymentRoutes = require('./routes/payments');
 const partyRoutes = require('./routes/party');
 const feedbackRoutes = require('./routes/feedback');
 const adminRoutes = require('./routes/admin');
-const recommendationsRoutes = require('./routes/recommendations');
 
 // ==========================================
 // APP SETUP
@@ -61,7 +60,6 @@ app.use('/api/party', partyRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/contact', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/recommendations', recommendationsRoutes);
 
 // Health check
 app.get('/', (req, res) => {
@@ -81,11 +79,7 @@ app.get('/', (req, res) => {
 });
 
 // 404 handler
-app.use((req, res, next) => {
-    // Check if it's one of our custom endpoints that wasn't modularized
-    if (req.path.startsWith('/api/users/') || req.path.startsWith('/api/notifications/')) {
-        return next();
-    }
+app.use((req, res) => {
     res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
 });
 
@@ -188,70 +182,6 @@ io.on('connection', (socket) => {
 
 // Export io so routes can emit notifications
 module.exports.io = io;
-
-// ==========================================
-// CUSTOM ENDPOINTS (Feature/Watch-Party-UI)
-// ==========================================
-const { db } = require('./firebase');
-
-// GET User Setup (Minimal Profile)
-app.get('/api/users/:uid', async (req, res) => {
-    try {
-        const { uid } = req.params;
-        const userRef = db.collection('users').doc(uid);
-        const doc = await userRef.get();
-        if (!doc.exists) return res.status(404).json({ error: 'User not found' });
-        const data = doc.data();
-        res.status(200).json({
-            uid,
-            name: data.name,
-            avatar: data.avatar,
-            bio: data.bio,
-            isOnline: data.isOnline,
-            badges: data.badges,
-            language: data.language
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Update Online Status & Broadcast
-app.post('/api/users/:uid/status', async (req, res) => {
-    try {
-        const { uid } = req.params;
-        const { isOnline } = req.body;
-        await db.collection('users').doc(uid).update({
-            isOnline: Boolean(isOnline),
-            lastActive: new Date().toISOString()
-        });
-        io.emit('user-status-change', { uid, isOnline: Boolean(isOnline) });
-        res.status(200).json({ message: 'Status updated', isOnline });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Send Custom Socket Notification
-app.post('/api/notifications/send', async (req, res) => {
-    try {
-        const { targetSocketId, message, avatar, type } = req.body;
-        const notification = {
-            message,
-            avatar: avatar || null,
-            type: type || 'info',
-            timestamp: new Date().toLocaleTimeString()
-        };
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('receive-notification', notification);
-        } else {
-            io.emit('receive-notification', notification);
-        }
-        res.status(200).json({ message: 'Notification sent' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // ==========================================
 // START SERVER

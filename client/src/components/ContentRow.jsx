@@ -83,6 +83,11 @@ const ContentRow = ({ title, data, ranked = false }) => {
                       src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover rounded-2xl"
+                      onError={(e) => {
+                        if (e.target.src.includes('SX700')) {
+                          e.target.src = e.target.src.replace('SX700', 'SX300');
+                        }
+                      }}
                     />
                   )}
                 </div>
@@ -111,6 +116,11 @@ const ContentRow = ({ title, data, ranked = false }) => {
                     src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    onError={(e) => {
+                      if (e.target.src.includes('SX700')) {
+                        e.target.src = e.target.src.replace('SX700', 'SX300');
+                      }
+                    }}
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
                 </div>
