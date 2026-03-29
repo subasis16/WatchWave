@@ -25,7 +25,7 @@ const Terms = () => {
             <div className="relative z-10 max-w-5xl mx-auto">
                 <div className="space-y-6 mb-24">
                     <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Legal Features / v2.6.0</h3>
-                    <h1 className="text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
+                    <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
                         Cinematic <br/> Terms
                     </h1>
                 </div>
@@ -37,7 +37,7 @@ const Terms = () => {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: i * 0.1 }}
-                            className="glass-card p-12 border-white/5 hover:border-white/10 transition-all duration-700"
+                            className="glass-card p-8 md:p-12 border-white/5 hover:border-white/10 transition-all duration-700"
                         >
                             <div className="flex flex-col md:flex-row gap-8 md:gap-20">
                                 <div className="md:w-64 shrink-0">
@@ -54,7 +54,7 @@ const Terms = () => {
                     ))}
                 </div>
 
-                <div className="mt-24 p-12 glass-card border-dashed border-white/10 text-center">
+                <div className="mt-24 p-8 md:p-12 glass-card border-dashed border-white/10 text-center">
                     <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.6em]">
                         Last Propagation: March 14, 2026 &bull; Encryption Active
                     </p>

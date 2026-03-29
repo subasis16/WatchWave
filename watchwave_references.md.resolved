@@ -1,0 +1,44 @@
+# References
+
+**Applications & Inspiration:**
+
+* **Netflix** – Major influence on the core cinematic UI/UX design, dark-mode glassmorphism aesthetics, and horizontal scrolling content carousels.
+* **Discord** – Core inspiration for the Party Hub's real-time voice chat, text messaging, and synchronized social room architecture.
+* **TikTok / Instagram Reels** – Shaped the design and functional flow of the vertical 9:16 'Clips' community interface.
+
+**Development Tools:**
+
+* **Visual Studio Code** - Primary Integrated Development Environment (IDE)
+* **Git & GitHub** - Version control and repository collaboration
+* **Postman** - REST API testing, payload verification, and endpoint documentation
+* **Docker** - Containerization of the client and server environments utilizing `docker-compose`
+
+**Libraries & Frameworks:**
+
+* **React.js (v19)** - Primary declarative frontend user interface library
+* **Vite** - High-performance frontend build engine and development bundler
+* **Express.js** - Backend web application framework for Node.js
+* **Socket.IO** - Bidirectional real-time event routing engine for synchronized playback
+* **Firebase Admin SDK** - Client and server-side JWT authentication validation
+* **localforage** - Advanced IndexedDB wrapper enabling asynchronous offline video storage
+* **Framer Motion** - Production-ready fluid UI animation and transition library
+* **Razorpay Node SDK** - Secure payment gateway integration for subscription tiers
+* **@google/genai** - Google Gemini SDK enabling AI-driven mood recommendations
+
+**Documentation:**
+
+* **MDN Web Docs** - Comprehensive web technology reference (specifically utilized for IndexedDB protocols)
+* **Socket.IO Documentation** - Official guides for socket multiplexing and dynamic room broadcasting
+* **Firebase Documentation** - Official references for NoSQL Firestore modeling and Auth routing
+* **Razorpay API Docs** - Integration guides for checkout tunnels and webhook signature verification
+
+**Design Resources:**
+
+* **TailwindCSS** - Primary utility-first CSS framework establishing the visual design system
+* **Lucide React** - Comprehensive vector iconography library utilized throughout the application
+* **TMDB API** - The Movie Database endpoints utilized for fetching high-resolution cinematic posters and metadata
+
+**Hosting & Deployment:**
+
+* **Firebase Firestore** – Primary NoSQL Database Hosting and Authorization
+* **Cloudinary / YouTube** – Core Video Content Delivery Networks (CDN)

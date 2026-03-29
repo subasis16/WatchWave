@@ -167,8 +167,8 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className={`fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 transition-all duration-300 ${isScrolled ? 'top-2' : 'top-4'}`}>
-        <div className="glass-card px-4 md:px-8 py-3 flex items-center justify-between">
+      <nav className={`fixed top-2 md:top-4 left-1/2 -translate-x-1/2 w-[96%] md:w-[95%] max-w-7xl z-50 transition-all duration-300 ${isScrolled ? 'top-1 md:top-2' : ''}`}>
+        <div className="glass-card px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link to="/" className="text-xl font-black text-white tracking-widest hover:opacity-80 transition-opacity">
               WATCHWAVE
@@ -341,12 +341,11 @@ const Navbar = () => {
           </div>
 
           {/* RIGHT TOOLS */}
-          <div className="flex items-center gap-3">
-            <Link to="/downloads" className="w-10 h-10 glass-pill flex items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Offline Vault">
+            <Link to="/downloads" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Offline Vault">
               <Download size={18} />
             </Link>
 
-            <div className="relative flex items-center" ref={notifRef}>
+            <div className="hidden md:flex relative items-center" ref={notifRef}>
               <button
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
                 className="w-10 h-10 glass-pill flex items-center justify-center relative hover:scale-110 active:scale-95"
@@ -358,50 +357,14 @@ const Navbar = () => {
                   </span>
                 )}
               </button>
-
-              <AnimatePresence>
-                {isNotifOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-4 w-[350px] glass-card overflow-hidden z-[100]"
-                  >
-                    <div className="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-white/5">
-                      <h3 className="text-white font-bold text-sm">Notifications</h3>
-                      {unreadCount > 0 && <span className="text-[10px] bg-white text-black px-2 py-0.5 rounded-full font-bold">{unreadCount} New</span>}
-                    </div>
-                    <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-                      {notifications.length === 0 ? (
-                        <div className="px-4 py-8 text-center text-gray-500">
-                          <p className="text-xs">No notifications yet</p>
-                        </div>
-                      ) : (
-                        notifications.map(notif => (
-                          <div
-                            key={notif.id}
-                            onClick={() => markAsRead(notif.id)}
-                            className={`flex items-start gap-3 px-4 py-3.5 cursor-pointer transition-colors border-b border-white/5 last:border-0 ${notif.read ? 'opacity-40' : 'bg-white/5 hover:bg-white/10'}`}
-                          >
-                            <div className="flex flex-col">
-                              <p className={`text-[13px] leading-snug ${notif.read ? 'text-gray-400' : 'text-gray-100 font-medium'}`}>{notif.message}</p>
-                              <span className="text-[10px] text-gray-500 mt-1">{notif.timestamp}</span>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
 
-            <Link to="/settings" className="w-10 h-10 glass-pill flex items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Settings">
+            <Link to="/settings" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Settings">
               <Settings size={18} />
             </Link>
 
             {user ? (
-              <Link to="/profile" className="flex items-center gap-3 glass-pill pl-1 pr-4 py-1 hover:scale-105 active:scale-95 transition-transform">
+              <Link to="/profile" className="hidden md:flex items-center gap-3 glass-pill pl-1 pr-4 py-1 hover:scale-105 active:scale-95 transition-transform">
                 <img
                   src={dbUser?.avatar || user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.displayName || 'U'}`}
                   alt="Avatar"
@@ -410,18 +373,17 @@ const Navbar = () => {
                 <span className="text-sm font-bold hidden sm:inline">{user.displayName || 'User'}</span>
               </Link>
             ) : (
-              <Link to="/auth" className="glass-pill-active px-6 py-2 rounded-full text-sm font-bold hover:scale-105 active:scale-95 transition-transform">
+              <Link to="/auth" className="hidden md:flex glass-pill-active px-6 py-2 rounded-full text-sm font-bold hover:scale-105 active:scale-95 transition-transform">
                 Sign In
               </Link>
             )}
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden w-10 h-10 glass-pill flex items-center justify-center"
+              className="md:hidden w-10 h-10 glass-pill flex items-center justify-center ml-auto"
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -455,7 +417,67 @@ const Navbar = () => {
                     {item.name}
                   </Link>
                 ))}
-              </div>
+
+                <div className="pt-4 mt-4 border-t border-white/5 space-y-1">
+                    {user ? (
+                        <>
+                            <Link
+                                to="/profile"
+                                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-white hover:bg-white/5 transition-colors"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                <img
+                                    src={dbUser?.avatar || user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.displayName || 'U'}`}
+                                    alt="Avatar"
+                                    className="w-10 h-10 rounded-full border border-white/20 object-cover"
+                                />
+                                <div>
+                                    <p className="text-sm font-bold">{user.displayName || 'User'}</p>
+                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">View Profile</p>
+                                </div>
+                            </Link>
+                            <Link
+                                to="/downloads"
+                                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                <Download size={20} />
+                                <span>Offline Vault</span>
+                            </Link>
+                            <div 
+                                className="flex items-center justify-between px-4 py-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                                onClick={() => {
+                                    setIsNotifOpen(!isNotifOpen);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <Bell size={20} />
+                                    <span>Notifications</span>
+                                </div>
+                                {unreadCount > 0 && <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{unreadCount}</span>}
+                            </div>
+                        </>
+                    ) : (
+                        <Link
+                            to="/auth"
+                            className="flex items-center gap-4 px-4 py-4 rounded-2xl text-accent-gold hover:bg-white/5 transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <User size={20} />
+                            <span>Sign In / Create Account</span>
+                        </Link>
+                    )}
+                    <Link
+                        to="/settings"
+                        className="flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <Settings size={20} />
+                        <span>Settings</span>
+                    </Link>
+                </div>
+                </div>
             </motion.div>
           )}
         </AnimatePresence>

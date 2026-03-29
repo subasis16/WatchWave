@@ -14,7 +14,7 @@ const Movies = () => {
         <div className="px-8 md:px-16 lg:px-24 mb-16">
           <div className="max-w-4xl space-y-6">
             <h3 className="text-[10px] font-black tracking-[0.6em] text-gray-600 uppercase">Classic Movies</h3>
-            <h1 className="text-7xl md:text-8xl font-black text-white tracking-tighter uppercase leading-[0.8] mb-10">
+            <h1 className="text-4xl md:text-8xl font-black text-white tracking-tighter uppercase leading-[0.8] mb-10">
               Motion <br/> Pictures
             </h1>
             <div className="flex flex-wrap gap-5">
@@ -28,15 +28,11 @@ const Movies = () => {
         </div>
 
         <div className="space-y-12 pb-12">
-          <ContentRow title="Trending Movies" data={trendingMovies} />
           <ContentRow title="New Releases" data={newReleases} />
           <ContentRow title="Hollywood Action" data={hollywoodAction} />
           <ContentRow title="Bollywood Hits" data={bollywoodHits} />
           <ContentRow title="Crime Fiction" data={Crime} />
-          <ContentRow title="Romantic Watch" data={Romantic} />
-          <ContentRow title="Comedy Blockbusters" data={Comedy} />
           <ContentRow title="Dark Thrillers" data={Thriller} />
-          <ContentRow title="Horror Nights" data={Horror} />
         </div>
       </div>
     </div>

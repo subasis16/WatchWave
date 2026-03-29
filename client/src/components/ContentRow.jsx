@@ -93,14 +93,14 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 </div>
 
                 {/* Number Overlay - Bottom Right Solid White Style */}
-                <span className="absolute -bottom-8 -right-4 text-7xl md:text-9xl font-black italic text-white z-20 select-none pointer-events-none drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]">
+                <span className="absolute -bottom-6 md:-bottom-8 -right-2 md:-right-4 text-6xl md:text-9xl font-black italic text-white z-20 select-none pointer-events-none drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]">
                   {index + 1}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-4 md:gap-6 no-scrollbar pb-6 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0 scroll-smooth">
             {data.map((item, index) => (
               <motion.div
                 key={item.id}
@@ -109,7 +109,7 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="glass-card p-2 group cursor-pointer hover:scale-105 active:scale-95 transition-all duration-500"
+                className="shrink-0 w-[180px] lg:w-full glass-card p-2 group cursor-pointer hover:scale-105 active:scale-95 transition-all duration-500"
               >
                 <div className="relative aspect-[2/3] rounded-2xl overflow-hidden mb-3">
                   <img

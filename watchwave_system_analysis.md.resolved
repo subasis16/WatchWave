@@ -1,0 +1,62 @@
+# 3. System Analysis
+
+## 3.1 Existing System
+
+Current digital entertainment consumption relies heavily on massive, passive OTT platforms (e.g., Netflix, Amazon Prime) working in isolation from external communication tools (e.g., Discord, Zoom). Users attempting to watch content synchronously across long distances must manually coordinate playback by counting down over audio calls, resulting in frequent desynchronization and spoilers. Furthermore, offline capabilities across existing giants are strictly localized to proprietary, enclosed native mobile applications, leaving desktop, laptop, and browser-first users entirely without reliable playback options during network drops. These legacy platforms also treat viewing as a solitary activity, lacking natively integrated interactive features such as real-time emoji reactions, dynamic voice chat, or the ability to generate clips directly from the player.
+
+## 3.2 Proposed System (WatchWave)
+
+WatchWave is a unified, fully integrated cinematic streaming ecosystem designed specifically to bridge the vast gap between solitary video consumption and social interaction. By introducing the intelligent **Party Hub**, users can dynamically generate secure, password-protected watch rooms where core video states (play, pause, seek, content switches) are perfectly synchronized across all globally connected endpoints via Socket.IO. The proposed system pioneers browser-based offline capabilities by securely storing video buffers as binary blobs natively within IndexedDB, granting desktop users unprecedented offline portability. Furthermore, the integration of generative AI (Google Gemini) enables intelligent, mood-based content curation, while an integrated, community-driven Clips generation tool transforms passive viewers into active content creators.
+
+## 3.3 Feasibility Study
+
+* **Technical Feasibility:** The project utilizes vastly documented, modern open-source technologies (React 19, Express 5, Socket.IO). The complex requirement of browser-based offline storage is technically highly feasible by utilizing the `localforage` wrapper over IndexedDB APIs, effectively bypassing standard `localStorage` size limits to achieve multi-gigabyte browser caching.
+* **Economic Feasibility:** By intelligently leveraging cost-effective cloud services (Firebase Authentication, free-tier TMDB architectural APIs, and decentralized client-side processing), the platform requires exceptionally minimal initial server capital. The Razorpay subscription integration provides a direct, highly scalable monetization vector to offset all subsequent socket hosting and metadata bandwidth costs.
+* **Operational Feasibility:** The platform's intuitive, aesthetically rich glassmorphism UX is specifically designed to minimize friction and the user learning curve. Features like one-click room generation, single-tap offline caching, and seamless Razorpay checkouts ensure the system is deeply operationally viable across diverse, fast-moving user demographics.
+
+---
+
+# 4. System Specification
+
+## 4.1 Hardware Requirements
+
+**Client-Side (Minimum Node Operation):**
+* **Processor:** Intel Core i3 (5th Gen) / AMD Ryzen 3 or equivalent mobile architecture.
+* **RAM:** 4GB minimum (8GB firmly recommended to handle concurrent HD streaming, React component trees, and background socket listeners).
+* **Storage:** Minimum 5GB free local disk space (Required for IndexedDB offline video vault storage).
+* **Display:** 720p minimum resolution (1080p highly recommended for optimal TailwindCSS UI scaling).
+* **Network:** 5 Mbps stable broadband (Required for synchronous 1080p playback and multi-party Voice Chat).
+
+**Server-Side (Development / MVP Production Basis):**
+* **Environment:** Virtual Private Server (VPS) or cloud Platform-as-a-Service (e.g., Render, Heroku).
+* **Processor:** 2 vCPUs minimum.
+* **RAM:** 2GB minimum (To gracefully maintain Node.js processes and persistent Socket.IO event routing tables).
+
+## 4.2 Software Requirements
+
+**Client-Side Ecosystem:**
+* **Operating System:** Windows 10+, macOS 11+, Android 10+, iOS 14+.
+* **Browser:** Any modern WebKit or Chromium-based browser (Chrome, Edge, Safari, Firefox) with WebRTC, LocalStorage, and IndexedDB DOM permissions enabled.
+
+**Development & Hosting Stack:**
+* **Frontend Architecture:** React.js (v19), Vite Build Engine, TailwindCSS, Framer Motion (for fluid DOM mount/unmount animations).
+* **Backend Architecture:** Node.js Runtime, Express.js (v5 Framework), Helmet.js Security Header Middleware.
+* **Real-Time Protocol:** Socket.IO Client/Server (v4).
+* **Database & Authentication:** Firebase Admin API (Firestore NoSQL, JWT Bearer Token validation), ES6 In-Memory Map structures (for localized fallback).
+* **External Integrations:** Razorpay Node SDK, TMDB REST API, Google GenAI SDK.
+
+## 4.3 Functional Requirements
+
+1. The system must authenticate end-users securely utilizing Firebase (Email/Password or Google OAuth flow) and successfully parse resulting JWTs upon API access.
+2. The system must dynamically generate fully unique, 6-character alphanumeric room codes alongside timestamp metadata for every new Watch Party instantiation.
+3. The system must actively broadcast master play/pause/seek events exclusively from the defined Host client to all connected Guest clients with a target latency of <500ms.
+4. The system must permit clients to request, fetch, and download active video streams directly into the browser's IndexedDB storage cluster for remote, offline retrieval via the isolated Offline Player.
+5. The system must automatically enforce daily accumulated viewing quotas utilizing persistent settings tracked via the Wellbeing configuration panel.
+6. The system must intercept Razorpay webhook events to accurately process subscription upgrades and issue corresponding `updateDoc` commands to the user's Firestore authorization profile.
+
+## 4.4 Non-Functional Requirements
+
+* **Performance / UI Render:** The platform's Document Object Model (DOM) must aggressively maintain a stable 60 FPS rendering target during highly complex Framer Motion transitions and floating Emoji overlay renders to guarantee a premium cinematic feel.
+* **Scalability:** The Express socket routing implementation must successfully multiplex and broadcast message events to discrete arrays of up to 12 parallel clients per room without significant degradation to CPU I/O.
+* **Reliability / Fault Tolerance:** In the explicit event of backend Firestore API exhaustion or severe credential omission, the Express instance must gracefully failover to in-memory `Map()` arrays to explicitly ensure fundamental Watch Party generation remains functional.
+* **Security Context:** Pure video URLs and master administrative states must not be permanently exposed unprotected to the client; all privileged routes fundamentally demand JWT Bearer token validation matching active session keys.

@@ -76,7 +76,7 @@ const Auth = () => {
     };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-20 px-8 relative overflow-hidden bg-transparent selection:bg-accent-gold selection:text-black">
+    <div className="min-h-screen flex items-start justify-center pt-24 md:pt-32 pb-20 px-4 md:px-8 relative overflow-hidden bg-transparent selection:bg-accent-gold selection:text-black">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0 opacity-40">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-white/[0.04] blur-[180px] rounded-full animate-pulse" />
@@ -102,14 +102,14 @@ const Auth = () => {
         initial={{ y: 50, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: "circOut" }}
-        className="relative z-10 w-full max-w-[500px] glass-card p-12 md:p-16 border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.5)]"
+        className="relative z-10 w-full max-w-[500px] glass-card p-8 md:p-16 border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.5)]"
       >
-        <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center p-5 rounded-3xl glass-card mb-8 border-white/10 shadow-3xl bg-white/5">
-                <Fingerprint size={40} className={`transition-colors duration-500 ${isLogin ? 'text-white' : 'text-accent-gold'}`} />
+        <div className="text-center mb-10 md:mb-12">
+            <div className="inline-flex items-center justify-center p-4 md:p-5 rounded-3xl glass-card mb-6 md:mb-8 border-white/10 shadow-3xl bg-white/5">
+                <Fingerprint size={32} className={`transition-colors duration-500 ${isLogin ? 'text-white' : 'text-accent-gold'}`} />
             </div>
           <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.6em] mb-4">WatchWave / {isLogin ? 'Sign In' : 'Sign Up'}</h3>
-          <h2 className="text-5xl font-black text-white tracking-tighter uppercase">
+          <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase">
             {isLogin ? 'Welcome Back' : 'Join Now'}
           </h2>
         </div>

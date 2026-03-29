@@ -44,12 +44,10 @@ router.post('/vibe', async (req, res) => {
         const prompt = `Act as an expert film and television curator. Recommend exactly 5 highly-rated ${vibe} movies/shows. Return ONLY a valid JSON array of objects. Each object must contain 'title', 'release_year', 'genre', 'description', and 'tmdb_search_query'. Do not use markdown blocks or any other formatting, just pure JSON array output.`;
 
         // Direct async call onto flash models
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-
-        const textResponse = response.text;
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const textResponse = response.text();
 
         // 5. PARSE RESPONSE
         let parsedData;

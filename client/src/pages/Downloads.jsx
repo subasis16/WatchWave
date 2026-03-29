@@ -65,10 +65,10 @@ const Downloads = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
                     <div className="space-y-6">
                         <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Storage Layer / Local Screen</h3>
-                        <h2 className="text-8xl font-black tracking-tighter uppercase text-white leading-none">Cinematic <br/> Vault</h2>
+                        <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-none">Cinematic <br/> Vault</h2>
                     </div>
 
-                    <div className="w-full lg:w-[450px] glass-card p-10 border-white/5 shadow-3xl relative overflow-hidden group">
+                    <div className="w-full lg:w-[450px] glass-card p-8 md:p-10 border-white/5 shadow-3xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <DownloadCloud size={40} />
                         </div>
@@ -116,7 +116,7 @@ const Downloads = () => {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1, duration: 1, ease: "circOut" }}
-                                className="group flex flex-col lg:flex-row items-center justify-between p-10 glass-card border-white/5 hover:border-white/10 transition-all duration-1000 shadow-3xl gap-12 relative overflow-hidden"
+                                className="group flex flex-col lg:flex-row items-center justify-between p-6 md:p-10 glass-card border-white/5 hover:border-white/10 transition-all duration-1000 shadow-3xl gap-8 md:gap-12 relative overflow-hidden"
                             >
                                 <div className="absolute top-0 left-0 w-1 h-full bg-accent-gold/40 opacity-0 group-hover:opacity-100 transition-all" />
                                 
@@ -125,8 +125,8 @@ const Downloads = () => {
                                         <div className="absolute inset-0 bg-accent-gold/10 opacity-0 group-hover/img:opacity-100 transition-opacity z-10" />
                                         <img src={item.poster} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 border border-white/5" />
                                     </div>
-                                    <div className="flex flex-col truncate w-full text-center lg:text-left space-y-4">
-                                        <h3 className="text-4xl font-black text-white uppercase tracking-tighter truncate">{item.title}</h3>
+                                    <div className="flex flex-col truncate w-full text-center lg:text-left space-y-2 md:space-y-4">
+                                        <h3 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter truncate">{item.title}</h3>
                                         <div className="flex flex-wrap justify-center lg:justify-start gap-6 items-center">
                                             <div className="glass-pill px-5 py-2 text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold border-accent-gold/20 shadow-xl">
                                                 {item.size}
@@ -138,21 +138,21 @@ const Downloads = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-8 shrink-0 lg:pl-12 lg:border-l border-white/5 w-full lg:w-auto justify-center">
+                                <div className="flex items-center gap-6 md:gap-8 shrink-0 lg:pl-12 lg:border-l border-white/5 w-full lg:w-auto justify-center">
                                     <button
                                         onClick={() => handlePlayOffline(item)}
-                                        className="glass-pill-active p-6 rounded-[1.5rem] flex items-center justify-center transition-all shadow-3xl hover:scale-105 active:scale-95 group/play"
+                                        className="glass-pill-active p-4 md:p-6 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center transition-all shadow-3xl hover:scale-105 active:scale-95 group/play"
                                         title="Watch Offline"
                                     >
-                                        <Play size={24} fill="white" className="ml-1" />
+                                        <Play className="w-5 h-5 md:w-6 md:h-6 ml-1" fill="white" />
                                     </button>
 
                                     <button
                                         onClick={() => handleDelete(item.id, item.title)}
-                                        className="text-gray-600 hover:text-red-400 p-6 glass-card border-white/5 hover:border-red-500/10 rounded-[1.5rem] transition-all group/trash shadow-xl"
+                                        className="text-gray-600 hover:text-red-400 p-4 md:p-6 glass-card border-white/5 hover:border-red-500/10 rounded-2xl md:rounded-[1.5rem] transition-all group/trash shadow-xl"
                                         title="Delete Movie"
                                     >
-                                        <Trash2 size={24} />
+                                        <Trash2 className="w-5 h-5 md:w-6 md:h-6" />
                                     </button>
                                 </div>
                             </motion.div>

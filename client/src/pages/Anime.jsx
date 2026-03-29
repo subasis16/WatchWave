@@ -30,12 +30,9 @@ const Anime = () => {
         <div className="space-y-12 pb-12">
           <ContentRow title="High-Octane Action" data={actionAnime} />
           <ContentRow title="Psychological Thrillers" data={psychologicalAnime} />
-          <ContentRow title="Sci-Fi Masterpieces" data={sciFiAnime} />
-          <ContentRow title="Epic Adventures" data={adventureAnime} />
           <ContentRow title="Super Power Sagas" data={superPowerAnime} />
           <ContentRow title="Intense Sports" data={sportAnime} />
           <ContentRow title="Heartfelt Romance" data={romanticAnime} />
-          <ContentRow title="Deep Dramas" data={dramaAnime} />
         </div>
       </div>
     </div>

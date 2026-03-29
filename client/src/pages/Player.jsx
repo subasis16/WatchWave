@@ -9,8 +9,10 @@ import {
 import ReactPlayer from 'react-player';
 import { trending, anime, movies, bollywood, series, allSiteContent } from '../data/content';
 import { useSettings } from '../context/SettingsContext';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import LoginOverlay from '../components/LoginOverlay';
 
 const ClipCreator = ({ isOpen, onClose, content }) => {
   const [range, setRange] = useState([20, 50]);
@@ -138,7 +140,8 @@ const Player = () => {
   const navigate = useNavigate();
   const { volume, updateSetting, captions, toggleSetting, autoplay } = useSettings();
   const [isPlaying, setIsPlaying] = useState(true);
-  const [showControls, setShowControls] = useState(true);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [showClipCreator, setShowClipCreator] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentSeconds, setCurrentSeconds] = useState(0);
@@ -147,17 +150,63 @@ const Player = () => {
   const [durationStr, setDurationStr] = useState("00:00");
   const [isLoading, setIsLoading] = useState(true);
   const [videoUrl, setVideoUrl] = useState(null);
-  
-  // Resolution Management
   const [resolution, setResolution] = useState('Auto');
   const [showResolutions, setShowResolutions] = useState(false);
   const seekTimeRef = React.useRef(null);
-  
   const playerRef = React.useRef(null);
   const containerRef = React.useRef(null);
 
-  // Find content in all arrays accurately using allSiteContent (fallback to movies[0] if completely unfound)
-  const content = allSiteContent.find(c => c.id === id) || movies[0];
+  const activeUrl = React.useMemo(() => {
+    if (!videoUrl) return null;
+    // Only apply resolution transformations to Cloudinary URLs
+    if (resolution === 'Auto' || !videoUrl.includes('res.cloudinary.com')) return videoUrl;
+    
+    // Convert https://res.cloudinary.com/.../video/upload/v123... 
+    // to -> https://res.cloudinary.com/.../video/upload/q_auto,h_720/v123...
+    const parts = videoUrl.split('/upload/');
+    if (parts.length === 2 && parts[1].startsWith('v')) {
+        return `${parts[0]}/upload/q_auto,h_${resolution}/${parts[1]}`;
+    }
+    return videoUrl;
+  }, [videoUrl, resolution]);
+
+  const [isIdle, setIsIdle] = useState(false);
+  const idleTimerRef = React.useRef(null);
+
+  const resetIdle = React.useCallback(() => {
+    setIsIdle(false);
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    if (isPlaying) {
+      idleTimerRef.current = setTimeout(() => setIsIdle(true), 2000);
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      setIsIdle(false);
+    } else {
+        resetIdle();
+    }
+  }, [isPlaying, resetIdle]);
+
+  useEffect(() => {
+    const handleMouseMove = () => resetIdle();
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [resetIdle]);
+
+  const shouldShowUI = !isIdle || !isPlaying;
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+        setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Firebase Firestore: fetch videoUrl, then fallback to local content data
   useEffect(() => {
@@ -166,7 +215,6 @@ const Player = () => {
       let resolvedUrl = null;
 
       try {
-        // Step 1: Try Firestore first (has Cloudinary .mp4 URLs)
         const movieDocRef = doc(db, 'movies', id);
         const movieSnap = await getDoc(movieDocRef);
 
@@ -177,7 +225,6 @@ const Player = () => {
         console.warn('⚠️ Firebase fetch failed, using fallback:', error.message);
       }
 
-      // Step 2: Fallback to local content arrays (videoUrl or trailerUrl)
       if (!resolvedUrl) {
         const localContent = allSiteContent.find(c => c.id === id) || movies[0];
         if (localContent?.videoUrl) {
@@ -187,7 +234,6 @@ const Player = () => {
         }
       }
 
-      // Step 3: Convert youtube-nocookie embed URLs to standard format for ReactPlayer
       if (resolvedUrl && resolvedUrl.includes('youtube-nocookie.com/embed/')) {
         const videoId = resolvedUrl.split('/embed/')[1]?.split('?')[0];
         if (videoId) {
@@ -203,19 +249,17 @@ const Player = () => {
     fetchVideo();
   }, [id]);
 
-  const activeUrl = React.useMemo(() => {
-    if (!videoUrl) return null;
-    // Only apply resolution transformations to Cloudinary URLs
-    if (resolution === 'Auto' || !videoUrl.includes('res.cloudinary.com')) return videoUrl;
-    
-    // Convert https://res.cloudinary.com/.../video/upload/v123... 
-    // to -> https://res.cloudinary.com/.../video/upload/q_auto,h_720/v123...
-    const parts = videoUrl.split('/upload/');
-    if (parts.length === 2 && parts[1].startsWith('v')) {
-        return `${parts[0]}/upload/q_auto,h_${resolution}/${parts[1]}`;
-    }
-    return videoUrl;
-  }, [videoUrl, resolution]);
+  if (authLoading) return (
+    <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
+      <Loader2 size={48} className="text-accent-gold animate-spin mb-6" />
+      <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Authenticating Transmission...</p>
+    </div>
+  );
+
+  if (!user) return <LoginOverlay />;
+
+  // Find content accurately using allSiteContent (fallback to movies[0] if completely unfound)
+  const content = allSiteContent.find(c => c.id === id) || movies[0];
 
   const handleResolutionChange = (newRes) => {
     if (newRes === resolution) {
@@ -271,15 +315,14 @@ const Player = () => {
     <div
       ref={containerRef}
       className="fixed inset-0 bg-transparent z-[100] flex items-center justify-center font-sans overflow-hidden selection:bg-accent-gold selection:text-black"
-      onMouseMove={() => setShowControls(true)}
     >
       <AnimatePresence>
-        {showControls && (
+        {shouldShowUI && (
           <motion.div
-            initial={{ opacity: 0, y: -50 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="absolute top-0 left-0 right-0 p-12 z-50 flex items-center justify-between pointer-events-none"
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-0 left-0 right-0 p-8 z-50 flex items-center justify-between pointer-events-none bg-gradient-to-b from-black/80 to-transparent pb-20"
           >
             <button
               onClick={() => navigate(-1)}
@@ -287,12 +330,11 @@ const Player = () => {
             >
               <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform text-white" />
             </button>
-            <div className="text-right pointer-events-auto glass-card px-8 py-5 border-white/5 space-y-1 shadow-2xl">
-              <h2 className="text-2xl font-black text-white tracking-tighter uppercase whitespace-nowrap">{content.title}</h2>
-              <div className="flex items-center justify-end gap-3 opacity-40">
-                <span className="text-[10px] font-black uppercase tracking-widest">S1 : E01</span>
-                <div className="w-1 h-1 bg-white rounded-full" />
-                <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap text-accent-gold">Transmission Alpha</span>
+            <div className="text-right pointer-events-auto flex flex-col items-end gap-1">
+              <h2 className="text-xl md:text-2xl font-black text-white tracking-widest uppercase mb-1 drop-shadow-2xl">{content.title}</h2>
+              <div className="flex items-center gap-4 opacity-60">
+                <span className="text-[9px] font-black uppercase tracking-[0.3em]">Season 1 : Episode 01</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold">4K ALPHA STREAM</span>
               </div>
             </div>
           </motion.div>
@@ -309,10 +351,13 @@ const Player = () => {
         }}
       />
 
-      {/* Video Player Area */}
       <div 
-        className="w-[94%] h-[84%] relative z-10 overflow-hidden shadow-[0_0_150px_rgba(0,0,0,0.9)] rounded-[3rem] border border-white/5 bg-black ring-1 ring-white/10" 
-        onClick={() => setIsPlaying(prev => !prev)}
+        className="w-full h-full relative z-10 overflow-hidden bg-black" 
+        onClick={() => {
+            const nextPlaying = !isPlaying;
+            setIsPlaying(nextPlaying);
+            if (nextPlaying) setIsIdle(true);
+        }}
       >
         <div className={`w-full h-full absolute inset-0 flex items-center justify-center`}>
           {activeUrl && activeUrl.includes('youtube.com') ? (
@@ -411,16 +456,15 @@ const Player = () => {
 
       {/* Controls Area (Hidden for YouTube embeds since they have native controls) */}
       <AnimatePresence>
-        {showControls && !showClipCreator && (!activeUrl || !activeUrl.includes('youtube.com')) && (
+        {shouldShowUI && !showClipCreator && (!activeUrl || !activeUrl.includes('youtube.com')) && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 50, x: "-50%" }}
+            initial={{ opacity: 0, scale: 0.98, y: 20, x: "-50%" }}
             animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, scale: 0.95, y: 50, x: "-50%" }}
-            className="absolute bottom-12 left-1/2 w-[90%] max-w-6xl z-50 px-12 py-10 glass-card border-white/5 shadow-3xl"
+            exit={{ opacity: 0, scale: 0.98, y: 20, x: "-50%" }}
+            className="absolute bottom-6 md:bottom-10 left-1/2 w-[95%] md:w-[98%] max-w-6xl z-50 px-4 md:px-8 py-4 md:py-6 glass-card border-white/5 shadow-3xl bg-black/60 backdrop-blur-3xl rounded-3xl md:rounded-[2.5rem]"
           >
-            {/* Progress Bar */}
             <div 
-                className="w-full h-1 bg-white/5 rounded-full mb-10 relative group cursor-pointer overflow-hidden"
+                className="w-full h-1 bg-white/5 rounded-full mb-6 md:mb-10 relative group cursor-pointer overflow-hidden"
                 onClick={(e) => {
                     e.stopPropagation();
                     if(playerRef.current) {
@@ -434,19 +478,21 @@ const Player = () => {
                 <div className="h-full bg-white shadow-[0_0_20px_white] transition-all duration-300 pointer-events-none" style={{ width: `${progress}%` }} />
             </div>
 
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-10">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-0">
+              <div className="flex items-center gap-4 md:gap-10">
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    setIsPlaying(prev => !prev);
+                    const nextPlaying = !isPlaying;
+                    setIsPlaying(nextPlaying);
+                    if (nextPlaying) setIsIdle(true);
                   }} 
-                  className="w-14 h-14 glass-pill flex items-center justify-center hover:bg-white/10 transition-all border-white/5 transform active:scale-90 shadow-xl"
+                  className="w-10 h-10 md:w-14 md:h-14 glass-pill flex items-center justify-center hover:bg-white/10 transition-all border-white/5 transform active:scale-90 shadow-xl"
                 >
-                  {isPlaying ? <Pause size={28} className="fill-current" /> : <Play size={28} className="fill-current ml-1" />}
+                  {isPlaying ? <Pause size={20} className="fill-current md:w-7 md:h-7" /> : <Play size={20} className="fill-current ml-1 md:w-7 md:h-7" />}
                 </button>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
@@ -454,9 +500,9 @@ const Player = () => {
                         playerRef.current.seekTo(currentSeconds - 10, 'seconds');
                       }
                     }}
-                    className="w-12 h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
+                    className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
                   >
-                    <RotateCcw size={20} />
+                    <RotateCcw size={16} />
                   </button>
                   <button 
                     onClick={(e) => {
@@ -465,16 +511,16 @@ const Player = () => {
                         playerRef.current.seekTo(currentSeconds + 10, 'seconds');
                       }
                     }}
-                    className="w-12 h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
+                    className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
                   >
-                    <SkipForward size={20} />
+                    <SkipForward size={16} />
                   </button>
                 </div>
 
-                <div className="flex items-center gap-5 group">
-                  <Volume2 size={22} className="text-gray-500 group-hover:text-white transition-colors" />
+                <div className="hidden sm:flex items-center gap-5 group">
+                  <Volume2 size={20} className="text-gray-500 group-hover:text-white transition-colors" />
                   <div 
-                    className="w-32 h-1 bg-white/5 rounded-full overflow-hidden cursor-pointer"
+                    className="w-24 md:w-32 h-1 bg-white/5 rounded-full overflow-hidden cursor-pointer"
                     onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const newVol = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
@@ -485,28 +531,27 @@ const Player = () => {
                   </div>
                 </div>
 
-                <span className="text-[10px] font-black text-gray-400 tracking-[0.2em] ml-6 font-mono w-24">{currentTimeStr} / {durationStr}</span>
+                <span className="text-[9px] md:text-[10px] font-black text-gray-400 tracking-[0.2em] font-mono whitespace-nowrap">{currentTimeStr} / {durationStr}</span>
               </div>
 
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-2 md:gap-3">
                 <button
                   onClick={handleCreateClip}
-                  className="glass-pill px-8 py-4 flex items-center gap-3 text-[10px] font-black tracking-widest uppercase hover:bg-accent-gold hover:text-black hover:border-accent-gold transition-all duration-500 text-accent-gold shadow-2xl border-accent-gold/20"
+                  className="hidden md:flex glass-pill px-6 py-3.5 items-center gap-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-white/10 hover:text-white transition-all duration-500 text-gray-400 shadow-2xl border-white/5"
                 >
-                  <Scissors size={18} />
-                  Split Timeline
+                  <Scissors size={16} />
+                  Clip Fragment
                 </button>
-                <div className="w-px h-8 bg-white/5 mx-2" />
                 
                 {/* Resolution Picker */}
                 <div className="relative">
                     <button 
                       onClick={() => setShowResolutions(!showResolutions)}
-                      className={`glass-pill px-6 py-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all shadow-xl ${
+                      className={`glass-pill px-4 md:px-6 py-3 md:py-4 flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all shadow-xl ${
                           resolution !== 'Auto' ? 'text-accent-gold border-accent-gold/20' : 'text-gray-400 hover:text-white'
                       }`}
                     >
-                      {resolution === 'Auto' ? 'Auto\u00A0HD' : `${resolution}p`}
+                      {resolution === 'Auto' ? 'Auto' : `${resolution}p`}
                     </button>
                     
                     <AnimatePresence>
@@ -515,13 +560,13 @@ const Player = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
-                                className="absolute bottom-full right-0 mb-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 min-w-[140px] shadow-2xl"
+                                className="absolute bottom-full right-0 mb-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 min-w-[120px] shadow-2xl"
                             >
                                 {resolutionsList.map(r => (
                                     <button
                                         key={r.value}
                                         onClick={() => handleResolutionChange(r.value)}
-                                        className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+                                        className={`w-full text-left px-4 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${
                                             resolution === r.value 
                                             ? 'bg-accent-gold text-black shadow-[0_0_15px_rgba(255,215,0,0.3)]' 
                                             : 'text-gray-400 hover:bg-white/10 hover:text-white'
@@ -537,16 +582,9 @@ const Player = () => {
                 
                 <button 
                   onClick={() => toggleSetting('captions')}
-                  className={`w-12 h-12 glass-pill flex items-center justify-center transition border-white/5 ${captions ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-gray-400'}`}
-                  title="Toggle Captions"
+                  className={`w-10 h-10 md:w-12 md:h-12 glass-pill flex items-center justify-center transition border-white/5 ${captions ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-gray-400'}`}
                 >
-                  <Subtitles size={20} />
-                </button>
-                <button 
-                  onClick={() => navigate('/settings')}
-                  className="w-12 h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
-                >
-                  <SettingsIcon size={20} />
+                  <Subtitles size={18} />
                 </button>
                 <button 
                   onClick={() => {
@@ -558,9 +596,9 @@ const Player = () => {
                       }
                     }
                   }}
-                  className="w-12 h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
+                  className="w-10 h-10 md:w-12 md:h-12 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
                 >
-                  <Maximize size={20} />
+                  <Maximize size={18} />
                 </button>
               </div>
             </div>

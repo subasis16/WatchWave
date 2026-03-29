@@ -1,0 +1,48 @@
+# Detailed Scope of the Project
+
+The scope of the WatchWave project defines the precise system boundaries, outlining exactly what features are included within the development lifecycle of the Minimum Viable Product (MVP) and explicitly stating limitations or functionalities reserved for future iterations.
+
+## 1. In-Scope Functionality
+
+The following modules and features are fully implemented and define the core operational scope of WatchWave:
+
+### A. Advanced User Management & Authentication
+* **Secure Authentication:** Implementation of Firebase Authentication supporting Email/Password and Google OAuth integrations.
+* **Profile Configuration:** Users can upload custom avatars, configure profile PIN locks, and update biographical metadata stored in NoSQL Firestore documents.
+* **Digital Wellbeing & Accessibility:** A dedicated configuration dashboard tracking weekly watch time, enforcing daily viewing quotas, and providing aesthetic toggles (High Contrast, Motion Reduction) securely tied to the user's session.
+
+### B. Content Delivery & Discovery
+* **Responsive Cinematic Interface:** A highly optimized frontend utilizing TailwindCSS and Framer Motion to deliver a 60-FPS, glassmorphism-styled environment for browsing Movies, Series, and Anime.
+* **AI-Powered Discovery Engine:** Integration of the Google Gemini LLM API to analyze user moods and dynamically recommend relevant media, heavily diverging from traditional static genre tags.
+* **High-Fidelity Playback:** A robust video player component (`ReactPlayer`) successfully wrapping external CDNs and YouTube endpoints to serve high-definition media.
+
+### C. Real-Time Social Ecosystem (Party Hub)
+* **Synchronized Watch Rooms:** Generating dynamic, password-protected virtual rooms where the Host's playback state (Play, Pause, Seek) is forcefully propagated to all connected Guests via a highly scaled WebSocket (`Socket.IO`) architecture.
+* **Interactive Communication:** Natively embedded live text chat, deeply animated floating emoji reactions, and integrated microphone-based voice chat within the viewing party.
+* **Community Clips Engine:** An interactive video manipulation tool allowing users to define start/end timestamps, append custom caption overlays, and theoretically "publish" short-form highlight sequences to a central social feed.
+
+### D. Offline-First Infrastructure
+* **Browser-Native Video Caching:** Bypassing strict `localStorage` limits by heavily utilizing `localforage` (IndexedDB API) to securely download, store, and stream multi-gigabyte video binary blobs directly from the local machine context.
+* **Isolated Offline Player:** A dedicated routing component capable of retrieving and playing cached media absolutely independent of global network connectivity.
+
+### E. Subscription Gating & Monetization
+* **Tiered Authorization:** Dual-tier feature gating (Solo Screen vs. Party Hub access).
+* **Payment Gateway Integration:** Real-time financial transaction routing utilizing the Razorpay Node.js SDK, seamlessly updating Firestore authentication permissions upon verified webhook interception.
+
+---
+
+## 2. Out-of-Scope Functionality
+
+To ensure the project remains technically viable and strictly focused on its core USP of browser-based social streaming, the following functionalities are explicitly excluded from the current development scope:
+
+* **Native Mobile Compilation:** The project is strictly designed as a highly responsive Web Application. Native compilation into Android APK files (via Kotlin/Java) or iOS ipa files (via Swift) is out of scope.
+* **Server-Side Video Transcoding:** WatchWave acts as an advanced content distributor and synchronizer; it does not currently ingest raw user uploads, nor does it perform server-side FFMpeg rendering to dynamically transcode files into HLS/DASH adaptive bitrates.
+* **WebRTC Video Mesh Routing:** While voice chat is fully integrated, the system does not utilize peer-to-peer WebRTC data channels for transmitting active webcam video feeds within Watch Parties, mitigating severe client bandwidth throttling.
+* **Automated DRM Integration:** The MVP assumes authorized administrative media inputs. Complex Digital Rights Management (DRM) wrappers and automated, algorithmic DMCA copyright infringement scanners are beyond the current technical scope.
+
+---
+
+## 3. Domain and Audience Scope
+
+* **Domain Classification:** The project operates simultaneously within the **Digital Entertainment (OTT - Over The Top)** and **Real-Time Social Networking** technology domains.
+* **Target Audience Scope:** The primary defined audience includes digitally-native entertainment enthusiasts (aged 16–35), long-distance couples, international university students, and niche online subcultures (e.g., Anime communities) who prioritize aesthetic immersion and shared communication over solitary media consumption.

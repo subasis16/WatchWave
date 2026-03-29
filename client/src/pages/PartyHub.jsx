@@ -124,21 +124,38 @@ const PartyHub = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-8 flex-1">
-                                    <div className="space-y-3">
-                                        <h2 className="text-[10px] font-black tracking-[0.6em] uppercase text-gray-600">Cinematic Experience / Alpha</h2>
-                                        <h3 className="text-6xl font-black tracking-tighter text-white uppercase leading-none">Personal Theater</h3>
+                                <div className="space-y-6 flex-1">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-[1px] w-8 bg-accent-gold/40" />
+                                            <h2 className="text-[11px] font-black tracking-[0.5em] uppercase text-accent-gold/60">Cinematic Experience / Alpha</h2>
+                                        </div>
+                                        <h3 className="text-6xl md:text-8xl font-black tracking-tighter text-white uppercase leading-[0.9] drop-shadow-2xl">
+                                            Personal<br />Theater
+                                        </h3>
+                                        <div className="flex items-center gap-6 pt-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">12 Active Visitors</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Smile className="w-3 h-3 text-accent-gold/50" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Good Vibes Only</span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {!isLive ? (
-                                        <button
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
                                             onClick={handleGoLive}
                                             disabled={isLoading}
-                                            className="glass-pill-active py-6 px-14 flex items-center justify-center gap-4 transition-all duration-700 transform hover:scale-105 shadow-3xl text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group/btn disabled:opacity-50"
+                                            className="glass-pill-active py-6 px-16 flex items-center justify-center gap-5 transition-all duration-700 shadow-[0_20px_50px_rgba(255,255,255,0.1)] text-[12px] font-black uppercase tracking-[0.4em] relative overflow-hidden group/btn disabled:opacity-50 mt-4"
                                         >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:animate-[sheen_1.5s_infinite]" />
-                                            <Video size={20} /> {isLoading ? "Initializing..." : "Start Watching"}
-                                        </button>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[sheen_1.5s_infinite]" />
+                                            <Video size={22} /> {isLoading ? "Initializing..." : "Start Watching"}
+                                        </motion.button>
                                     ) : (
                                         <div className="flex flex-wrap gap-6">
                                             <div className="glass-pill border-green-500/20 text-white font-black py-5 px-10 flex items-center gap-4 shadow-2xl uppercase tracking-widest text-[10px]">
@@ -157,45 +174,12 @@ const PartyHub = () => {
                             </div>
                         </motion.section>
 
-                        {/* 2. Party Info */}
-                        <div className="grid md:grid-cols-2 gap-10">
-                            <motion.div
-                                initial={{ opacity: 0, x: -30 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.4 }}
-                                className="glass-card p-12 relative overflow-hidden group border-white/5"
-                            >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] blur-3xl rounded-full" />
-                                <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center mb-8 border-white/10 group-hover:border-accent-gold/40 transition-all">
-                                    <Users className="text-white" size={28} />
-                                </div>
-                                <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Secure Connection</h3>
-                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-[1.8] max-w-sm">
-                                    Broadcast your presence to verified screens only. Peer-to-peer encryption is active by default.
-                                </p>
-                            </motion.div>
 
-                            <motion.div
-                                initial={{ opacity: 0, x: 30 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="glass-card p-12 relative overflow-hidden group border-white/5"
-                            >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/[0.02] blur-3xl rounded-full" />
-                                <div className="w-16 h-16 rounded-2xl glass-card flex items-center justify-center mb-8 border-white/10 group-hover:border-accent-gold/40 transition-all">
-                                    <Settings className="text-white" size={28} />
-                                </div>
-                                <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Core Features</h3>
-                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-[1.8] max-w-sm">
-                                    Customize your cinematic domain. Manage audience permissions and watch party session.
-                                </p>
-                            </motion.div>
-                        </div>
                     </div>
                 </div>
 
                 {/* Right Column (Social Sidebar) */}
-                <div className="w-full lg:w-[420px] h-full hidden lg:flex flex-col bg-transparent shrink-0 border-l border-white/5">
+                <div className="w-full lg:w-[340px] h-full hidden lg:flex flex-col bg-transparent shrink-0 border-l border-white/5 overflow-hidden">
                     <SocialSidebar />
                 </div>
             </div>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { saveVideo, isVideoDownloaded } from '../utils/offlineStorage';
 import { toast } from 'react-hot-toast';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 const MovieModal = ({ movie, isOpen, onClose }) => {
@@ -34,6 +34,14 @@ const MovieModal = ({ movie, isOpen, onClose }) => {
     if (!movie) return null;
 
     const handlePlayVideo = () => {
+        if (!auth.currentUser) {
+            toast.error("Cinema locked! Sign in to join the WatchWave experience.", {
+                style: { background: 'rgba(0,0,0,0.8)', color: '#fff', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,215,0,0.3)' }
+            });
+            onClose();
+            navigate('/auth');
+            return;
+        }
         onClose();
         navigate(`/watch/${movie.id}`);
     };
@@ -151,8 +159,8 @@ const MovieModal = ({ movie, isOpen, onClose }) => {
                             {/* Info Section */}
                             <div className="flex-1 p-8 md:p-12 space-y-10">
                                 <div className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Movie Details</h3>
-                                    <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
+                                    <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] md:tracking-[0.6em]">Movie Details</h3>
+                                    <h2 className="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
                                         {movie.title}
                                     </h2>
                                 </div>

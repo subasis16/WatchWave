@@ -21,7 +21,7 @@ const About = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
                     <div className="space-y-6">
                         <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">About / WatchWave</h3>
-                        <h1 className="text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
+                        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
                             Beyond <br/> Streaming
                         </h1>
                     </div>
@@ -66,7 +66,7 @@ const About = () => {
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-32 glass-card p-12 md:p-24 border-white/5 relative overflow-hidden group"
+                    className="mt-32 glass-card p-10 md:p-24 border-white/5 relative overflow-hidden group"
                 >
                     <div className="absolute top-0 right-0 w-96 h-96 bg-accent-gold/[0.04] blur-[100px] rounded-full group-hover:scale-110 transition-transform duration-1000" />
                     <div className="relative z-10 max-w-2xl">

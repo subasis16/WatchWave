@@ -179,7 +179,7 @@ const Plans = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center space-y-8 mb-24">
           <h3 className="text-[10px] font-black tracking-[0.8em] text-gray-600 uppercase">System Tiers / Entitlements</h3>
-          <h1 className="text-8xl font-black text-white tracking-tighter uppercase leading-none">
+          <h1 className="text-4xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">
             Subscription <br/> Access
           </h1>
           <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">
@@ -198,8 +198,8 @@ const Plans = () => {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1 }}
-                className={`relative glass-card p-12 md:p-16 transition-all duration-1000 transform cursor-pointer border-white/5 shadow-3xl overflow-hidden group
-                  ${isSelected ? 'bg-white/[0.05] border-white/20 scale-[1.02]' : 'hover:bg-white/[0.02] hover:border-white/10'}`}
+                className={`relative glass-card p-8 md:p-16 transition-all duration-1000 transform cursor-pointer border-white/5 shadow-3xl overflow-hidden group
+                  ${isSelected ? 'bg-white/[0.05] border-white/20 md:scale-[1.02]' : 'hover:bg-white/[0.02] hover:border-white/10'}`}
                 onClick={() => handlePlanSelect(plan.id)}
               >
                 {/* Visual Accent */}
@@ -217,18 +217,18 @@ const Plans = () => {
                   <div className={`glass-card p-5 rounded-[2rem] border-white/10 shadow-3xl transition-all duration-700 ${isSelected ? 'scale-110 border-accent-gold/40' : ''}`}>
                     <IconComponent className={`w-10 h-10 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter">{plan.name}</h3>
-                    <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">{plan.description}</p>
+                  <div className="space-y-1 md:space-y-2">
+                    <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">{plan.name}</h3>
+                    <p className="text-[8px] md:text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">{plan.description}</p>
                   </div>
                 </div>
 
                 {/* Pricing Screen */}
-                <div className="mb-16 p-10 glass-card border-white/5 bg-white/[0.01] shadow-inner relative z-10 overflow-hidden">
-                  <div className="flex items-baseline gap-4">
-                    <span className="text-gray-600 text-2xl font-bold font-mono">₹</span>
-                    <span className="text-7xl font-black text-white tracking-widest leading-none">{plan.price}</span>
-                    <span className="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em]"> / {plan.period}</span>
+                <div className="mb-10 md:mb-16 p-6 md:p-10 glass-card border-white/5 bg-white/[0.01] shadow-inner relative z-10 overflow-hidden">
+                  <div className="flex items-baseline gap-2 md:gap-4">
+                    <span className="text-gray-600 text-lg md:text-2xl font-bold font-mono">₹</span>
+                    <span className="text-5xl md:text-7xl font-black text-white tracking-widest leading-none">{plan.price}</span>
+                    <span className="text-gray-600 text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em]"> / {plan.period}</span>
                   </div>
                   {plan.id === 'group' && (
                     <div className="mt-12 pt-12 border-t border-white/5 space-y-6">
@@ -256,17 +256,17 @@ const Plans = () => {
                 {/* Directives */}
                 <div className="space-y-6 mb-16 relative z-10">
                   <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4">Core Directives</h4>
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-6 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
-                      <div className={`w-1.5 h-1.5 rounded-full transition-all duration-700 ${isSelected ? 'bg-accent-gold shadow-[0_0_10px_#FFD700]' : 'bg-white/10'}`} />
+                   {plan.features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-4 md:gap-6 text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
+                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-700 ${isSelected ? 'bg-accent-gold shadow-[0_0_10px_#FFD700]' : 'bg-white/10'}`} />
                       {feature}
                     </div>
                   ))}
                 </div>
 
                 {/* CTA Hub */}
-                <button
-                  className={`w-full py-6 rounded-[2.5rem] font-black text-[10px] uppercase tracking-[0.5em] transition-all duration-700 shadow-3xl relative overflow-hidden group/btn
+                 <button
+                  className={`w-full py-5 md:py-6 rounded-[2rem] md:rounded-[2.5rem] font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-700 shadow-3xl relative overflow-hidden group/btn
                   ${isSelected ? 'glass-pill-active border-white/20' : 'glass-card border-white/5 hover:border-white/10 text-gray-500 hover:text-white'}`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -290,7 +290,7 @@ const Plans = () => {
             <button
               onClick={handlePayment}
               disabled={isProcessing}
-              className="glass-pill-active px-24 py-8 font-black text-[12px] uppercase tracking-[0.6em] transition-all transform hover:scale-105 shadow-[0_40px_100px_rgba(255,255,255,0.08)] flex items-center justify-center mx-auto disabled:opacity-50 group/final"
+              className="glass-pill-active w-full md:w-auto px-10 md:px-24 py-6 md:py-8 font-black text-[10px] md:text-[12px] uppercase tracking-[0.4em] md:tracking-[0.6em] transition-all transform md:hover:scale-105 shadow-[0_40px_100px_rgba(255,255,255,0.08)] flex items-center justify-center mx-auto disabled:opacity-50 group/final"
             >
               {isProcessing ? (
                 <><Loader2 className="w-6 h-6 mr-4 animate-spin" /> Tunnel Initialization...</>

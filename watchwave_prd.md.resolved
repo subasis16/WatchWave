@@ -1,0 +1,567 @@
+# WatchWave — Product Requirements Document (PRD)
+
+> **Version:** 1.0  
+> **Date:** March 29, 2026  
+> **Author:** Auto-generated from codebase analysis  
+> **Repository:** [github.com/subasis16/WatchWave](https://github.com/subasis16/WatchWave)
+
+---
+
+## 1. Executive Summary
+
+**WatchWave** is a premium, cinematic streaming web application that delivers movies, series, and anime content through a visually rich, dark-themed interface. The platform combines real-time collaborative watch parties, offline downloads, social features, clip creation tools, and AI-powered recommendations into a single immersive experience. It targets entertainment enthusiasts who demand a high-end, Netflix-inspired streaming UI with modern social-first features.
+
+---
+
+## 2. Product Vision & Goals
+
+| Dimension | Description |
+|-----------|-------------|
+| **Vision** | To be the most visually immersive and socially connected streaming platform for cinematic content. |
+| **Target Audience** | Movie & anime enthusiasts, social watchers, content curators aged 16–35. |
+| **Core Value Prop** | Cinema-grade streaming + real-time watch parties + offline vault + community clips—all wrapped in a premium glassmorphism UI. |
+
+### Key Business Goals
+1. Deliver a production-ready streaming MVP with monetization via subscription tiers
+2. Enable social engagement through real-time watch parties and friend systems
+3. Provide offline-first capabilities for mobile/unreliable network scenarios
+4. Build community engagement via user-generated clips and reactions
+
+---
+
+## 3. Technical Architecture
+
+### 3.1 System Overview
+
+```mermaid
+graph TB
+    subgraph Client["Frontend (Vite + React 19)"]
+        UI["UI Layer<br/>React + Framer Motion"]
+        Router["React Router v7"]
+        State["Context API + Local State"]
+        FB_Client["Firebase Client SDK"]
+        Socket_Client["Socket.IO Client"]
+        IDB["IndexedDB (localforage)"]
+    end
+
+    subgraph Server["Backend (Express 5 + Node.js)"]
+        API["REST API Layer"]
+        Auth_MW["Auth Middleware (JWT)"]
+        Socket_Server["Socket.IO Server"]
+        Rate["Rate Limiter"]
+        Helmet["Helmet Security"]
+    end
+
+    subgraph External["External Services"]
+        Firebase["Firebase (Auth + Firestore)"]
+        TMDB["TMDB API"]
+        Razorpay["Razorpay Payments"]
+        Gemini["Google Gemini AI"]
+    end
+
+    UI --> Router
+    UI --> State
+    UI --> FB_Client
+    UI --> Socket_Client
+    UI --> IDB
+    FB_Client --> Firebase
+    Socket_Client --> Socket_Server
+    API --> Auth_MW
+    API --> Firebase
+    API --> TMDB
+    API --> Razorpay
+    API --> Gemini
+    Auth_MW --> Firebase
+```
+
+### 3.2 Technology Stack
+
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| **Frontend Framework** | React | 19.2.3 |
+| **Build Tool** | Vite | 7.3.1 |
+| **Styling** | TailwindCSS | 3.4.17 |
+| **Animations** | Framer Motion | 12.29.2 |
+| **Icons** | Lucide React | 0.563.0 |
+| **Routing** | React Router DOM | 7.13.0 |
+| **Video Player** | React Player | 3.4.0 |
+| **Notifications** | React Hot Toast | 2.6.0 |
+| **Realtime** | Socket.IO Client | 4.8.3 |
+| **Auth & DB (Client)** | Firebase | 12.10.0 |
+| **Offline Storage** | localforage (IndexedDB) | 1.10.0 |
+| **Backend** | Express | 5.2.1 |
+| **Auth (Server)** | Firebase Admin | 13.7.0 |
+| **Payments** | Razorpay SDK | 2.9.6 |
+| **AI Recommendations** | Google GenAI (@google/genai) | 1.46.0 |
+| **Security** | Helmet | 8.1.0 |
+| **Rate Limiting** | express-rate-limit | 8.3.1 |
+| **Realtime (Server)** | Socket.IO | 4.8.3 |
+| **Containerization** | Docker Compose | 3.8 |
+
+---
+
+## 4. Feature Specifications
+
+### 4.1 Authentication & User Management
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Firebase Auth | Email/password and Google OAuth sign-in | ✅ Implemented |
+| User Profile | Avatar upload (compressed JPEG), editable bio, online status | ✅ Implemented |
+| Profile Lock | Optional PIN-based profile protection | ✅ Implemented |
+| Session Management | `onAuthStateChanged` listener + automatic redirect for unauthenticated users | ✅ Implemented |
+
+**User Data Model (Firestore `users` collection):**
+```
+{
+  name: string,
+  email: string,
+  avatar: string (base64 JPEG, max ~100KB),
+  bio: string (max 150 chars),
+  isOnline: boolean,
+  language: "English" | "Hindi" | "Spanish" | ...,
+  subtitles: "Off" | "English" | "Hindi" | ...,
+  lastActive: ISO timestamp,
+  badges: array
+}
+```
+
+---
+
+### 4.2 Content Browsing & Discovery
+
+#### 4.2.1 Home Page
+- **Hero Carousel:** Auto-rotating (8s interval) cinematic banner featuring 4 spotlight titles with backdrop images from TMDB
+- **Content Rows:** Horizontally scrollable carousels for "Now Trending," "Absolute Classics," "Anime World," "Bingeworthy Series," and "Bollywood Hits"
+- **CTA Banner:** Promotional call-to-action section in footer area
+
+#### 4.2.2 Category Pages
+
+| Page | Content Rows |
+|------|-------------|
+| **Movies** (`/movies`) | New Releases, Hollywood Action, Bollywood Hits, Crime Fiction, Dark Thrillers |
+| **Series** (`/series`) | New Releases, Indian Originals, Hollywood Action, Crime & Investigation, Hit Comedies |
+| **Anime** (`/anime`) | High-Octane Action, Psychological Thrillers, Super Power Sagas, Intense Sports, Heartfelt Romance |
+
+#### 4.2.3 Movie Modal
+- Triggered on content card click from any `ContentRow`
+- Displays: poster image (TMDB original), title, match %, year, genres, description
+- Actions: **Watch Now** (navigates to `/watch/:id`), **Download** (saves to IndexedDB with progress bar)
+- Download resolves video URL from: local data → Firestore `movies` collection → fallback
+
+#### 4.2.4 Content Data
+- Static content arrays defined in `client/src/data/content.js`
+- Includes metadata: `id`, `title`, `image` (TMDB poster URL), `trailerUrl`, `videoUrl`, `match`, `year`, `genre`
+- TMDB API integration on the backend for dynamic content enrichment
+
+---
+
+### 4.3 Video Playback
+
+#### 4.3.1 Player Page (`/watch/:id`)
+- Full-featured video player using **ReactPlayer**
+- Supports: Cloudinary-hosted MP4 files, YouTube URLs, YouTube-nocookie embed URLs
+- Fallback: trailer URL → poster image with play/pause overlay
+- Video URL resolution: local `videoUrl` → Firestore lookup → `trailerUrl` conversion
+
+#### 4.3.2 Video Player Page (`/player/:id`)
+- Alternative lightweight player entry point
+- Used by Hero carousel's "Watch" button
+
+---
+
+### 4.4 Watch Party System
+
+> **The flagship social feature of WatchWave.**
+
+#### 4.4.1 Party Hub (`/party`)
+- Room creation with auto-generated 6-character alphanumeric room code
+- Backend stores room data (in-memory for local dev, Firestore for production)
+- Room features: password protection, participant tracking, host designation
+- Once live: share transmission key (room link), navigate to room
+
+#### 4.4.2 Watch Room (`/room/:id`)
+- **Real-time synchronized playback** via Socket.IO:
+  - `sync_play` / `sync_pause` / `sync_seek` — Playback state sync
+  - `sync_content` — Content change broadcast
+- **Mood-Based Content Selection:** 6 mood categories (Happy, Sad, Relaxed, Excited, Romantic, Thriller) that filter content recommendations based on keyword matching
+- **Live Chat:** Real-time messaging between room participants
+- **Floating Reactions:** Heart, ThumbsUp, Laugh, Fire — animated overlay reactions
+- **Role System:** Host vs. Viewer roles with toggleable controls
+- **Room Settings (Host Only):**
+  - Media gain control (volume sync)
+  - Voice chat volume
+  - Global mute toggle
+  - Room moderation/report functionality
+- **Share Modal:** Copy room link or invite friends directly
+- **Knock-to-Enter:** Entry request system — host can accept/decline join requests
+- **Voice Chat:** Microphone toggle with `getUserMedia` API
+
+#### 4.4.3 Social Sidebar
+- Visible in Party Hub alongside the main stage
+- Friend list, social interactions
+
+#### 4.4.4 Socket.IO Events
+
+| Event | Direction | Purpose |
+|-------|-----------|---------|
+| `join_watch_room` | Client → Server | Join a room with userId and username |
+| `leave_watch_room` | Client → Server | Leave a room |
+| `sync_play` / `sync_pause` / `sync_seek` | Bidirectional | Playback synchronization |
+| `sync_content` | Bidirectional | Content change broadcast |
+| `room_message` | Bidirectional | Chat messages |
+| `send_reaction` / `receive_reaction` | Bidirectional | Floating emoji reactions |
+| `entry-request` / `entry-accepted` / `entry-declined` | Bidirectional | Knock-to-enter system |
+| `join_chat` / `send_message` / `receive_message` | Bidirectional | Private 1-on-1 chat |
+| `join_user_room` | Client → Server | Join personal notification room |
+| `broadcast_notification` | Server → All | Admin broadcast notifications |
+| `user-status-change` | Server → All | Online/offline status changes |
+
+---
+
+### 4.5 Clips System (`/clips`)
+
+- **Community Clips Feed:** Grid of 9:16 aspect ratio clip cards (TikTok/Reel-style)
+- Each clip shows: title, creator, views, likes, duration, poster image
+- **Clip Creator Tool:**
+  - Source video selection
+  - Trim range slider (start/end seconds)
+  - Tab system: Trim, Text (captions), Audio
+  - Live preview with ReactPlayer
+  - "Post to Community" action with encoding simulation
+
+---
+
+### 4.6 Offline Downloads System
+
+#### 4.6.1 Download Flow
+1. User clicks **Download** on Movie Modal or Hero
+2. `resolveVideoUrl()` fetches best available video URL
+3. `saveVideo()` in `offlineStorage.js` fetches the video blob
+4. Video blob + metadata stored in **IndexedDB** via `localforage`
+5. Progress callback updates UI in real-time
+
+#### 4.6.2 Downloads Page (`/downloads`)
+- Lists all offline-saved content with poster, title, size, download date
+- Storage allocation tracker (used/total GB)
+- Per-item actions: **Play Offline**, **Delete**
+
+#### 4.6.3 Offline Player (`/offline`)
+- Dedicated player that reads video blob from IndexedDB by item ID
+- Completely functional without network connectivity
+
+---
+
+### 4.7 Subscription & Payments
+
+#### 4.7.1 Plans Page (`/plans`)
+
+| Plan | Price | Features |
+|------|-------|----------|
+| **Solo Screen** | ₹499/cycle | 8K resolution, single stream, cinematic sound, offline storage, zero-ad |
+| **Party Hub** | ₹1,499/cycle | 8K multi-stream, up to 12 screens, sharing, priority bandwidth, admin controls, cross-platform, elite support |
+
+- Group plan includes per-screen cost calculator with slider (5–12 screens)
+- Razorpay integration for payment processing
+- Mock payment tunnel fallback when backend is unavailable
+
+#### 4.7.2 Payment API (`/api/payments`)
+- `POST /create-order` — Creates Razorpay order
+- `POST /webhook` — Handles Razorpay webhook (raw body for signature verification)
+
+---
+
+### 4.8 Settings (`/settings`)
+
+8-tab settings panel with sidebar navigation:
+
+| Tab | Controls |
+|-----|----------|
+| **Account** | Profile preview, link to profile page |
+| **Subscription** | Current tier display, upgrade CTA |
+| **Playback** | Auto-play next episode toggle, audio description toggle |
+| **Safety** | Age filter slider (G → NC-17), profile lock PIN toggle |
+| **Wellbeing** | Weekly watch time bar chart, daily quota threshold slider (30min–5hr) |
+| **Accessibility** | High contrast mode, motion reduction |
+| **Language** | Interface language (7 languages), subtitle/caption language (8 options) — synced to Firestore |
+| **Downloads** | Storage usage bar, cache wipe action |
+
+Settings are managed via a React Context (`SettingsContext`) with `useSettings()` hook.
+
+---
+
+### 4.9 Social & Friends System
+
+**Backend Routes (`/api/friends`):**
+- Friend request, accept, decline, unfriend workflows
+- Friend list retrieval
+- Real-time status updates via Socket.IO
+
+---
+
+### 4.10 AI-Powered Recommendations
+
+**Backend Route (`/api/recommendations`):**
+- Powered by **Google Gemini AI** (`@google/genai`)
+- Generates personalized content suggestions
+- Used in Watch Room mood-based content matching
+
+---
+
+### 4.11 Admin Dashboard (`/admin`)
+
+- Admin verification via Firestore `admins` collection
+- Protected by `verifyToken` + `verifyAdmin` middleware chain
+- Content management, user management, moderation tools
+- Socket-based admin notifications
+
+---
+
+### 4.12 Feedback & Contact
+
+- **Contact Page** (`/contact`): User feedback form
+- **Backend** (`/api/feedback`): Stores feedback, handles room moderation reports
+- Shared route handles both `/api/feedback` and `/api/contact`
+
+---
+
+### 4.13 Static/Legal Pages
+
+| Page | Route | Purpose |
+|------|-------|---------|
+| About | `/about` | Platform information |
+| Terms | `/terms` | Terms of service |
+| Data Privileges | `/data-privileges` | Privacy policy |
+
+---
+
+## 5. API Architecture
+
+### 5.1 REST API Routes
+
+| Route Prefix | Module | Auth Required |
+|-------------|--------|---------------|
+| `/api/content` | Content CRUD & TMDB integration | Varies |
+| `/api/users` | User profiles, status updates | Yes |
+| `/api/friends` | Friend system | Yes |
+| `/api/payments` | Razorpay orders & webhooks | Varies |
+| `/api/party` | Watch room CRUD | Yes |
+| `/api/feedback` | Feedback & reports | Yes |
+| `/api/admin` | Admin operations | Yes (Admin) |
+| `/api/recommendations` | AI suggestions | Yes |
+
+### 5.2 Security
+
+- **Helmet.js** for HTTP headers
+- **CORS** whitelist: `localhost:5173`, `localhost:3000`, configurable `CLIENT_URL`
+- **Rate Limiting** via `express-rate-limit`
+- **Firebase Admin token verification** with JWT fallback for local development
+- **Request validation** via `express-validator`
+
+---
+
+## 6. UI/UX Design System
+
+### 6.1 Design Language
+
+| Property | Value |
+|----------|-------|
+| **Theme** | Ultra-dark, cinematic (pure black backgrounds with glassmorphism) |
+| **Primary Color** | Accent Gold (`accent-gold` — golden amber) |
+| **Typography** | System font stack, all-caps with extreme letter-spacing for labels |
+| **Border Radius** | Large rounded corners (`rounded-[2rem]` to `rounded-[3rem]`) |
+| **Effects** | Glassmorphism (`backdrop-blur`), ambient glow blurs, pulse animations |
+| **Transitions** | 500ms–1000ms ease-out transitions on all interactive elements |
+
+### 6.2 Design Tokens (CSS Classes)
+
+| Class | Purpose |
+|-------|---------|
+| `glass-card` | Primary container — frosted glass card with border and blur |
+| `glass-pill` | Tag/badge — small rounded pill with glass effect |
+| `glass-pill-active` | Active/primary CTA — bright glass pill |
+| `shadow-2xl` / `shadow-3xl` | Deep, dramatic drop shadows |
+| `accent-gold` | Primary brand color for highlights and CTAs |
+
+### 6.3 Motion Design
+- **Page transitions**: `framer-motion` with opacity + y-axis slide
+- **Content cards**: Staggered entrance animations with `delay: index * 0.05`
+- **Hover effects**: Scale (1.02–1.1), grayscale removal, border glow
+- **Loading states**: Spinning border + pulsing blur backdrop
+- **Opening animation**: Full-screen branded intro sequence
+
+### 6.4 Responsive Design
+- Mobile-first with `md:` and `lg:` Tailwind breakpoints
+- Collapsible sidebar in Settings (mobile shows menu → tab → back button flow)
+- Stacked layouts on mobile, side-by-side on desktop
+- Typography scaling: `text-4xl → md:text-8xl` for headlines
+
+---
+
+## 7. Infrastructure & Deployment
+
+### 7.1 Docker Compose Setup
+
+```yaml
+services:
+  backend:  → port 5000, auto-restart
+  client:   → port 5173, depends on backend
+```
+
+### 7.2 Environment Variables
+
+**Server (.env):**
+| Variable | Purpose |
+|----------|---------|
+| `PORT` | Server port (default: 5000) |
+| `TMDB_API_KEY` | Movie metadata API |
+| `GEMINI_API_KEY` | AI recommendations |
+| `RAZORPAY_KEY_ID` | Payment gateway |
+| `RAZORPAY_KEY_SECRET` | Payment gateway |
+| `RAZORPAY_WEBHOOK_SECRET` | Webhook verification |
+| `CLIENT_URL` | CORS origin |
+
+**Client (.env):**
+| Variable | Purpose |
+|----------|---------|
+| `VITE_FIREBASE_API_KEY` | Firebase client auth |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase config |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase config |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase config |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase config |
+| `VITE_FIREBASE_APP_ID` | Firebase config |
+| `VITE_RAZORPAY_KEY_ID` | Razorpay client key |
+
+---
+
+## 8. Page & Route Map
+
+```mermaid
+graph LR
+    subgraph Public
+        A["/"] --> Home
+        B["/auth"] --> Auth
+        C["/about"] --> About
+        D["/contact"] --> Contact
+        E["/terms"] --> Terms
+        F["/data-privileges"] --> DataPrivileges
+    end
+
+    subgraph Authenticated
+        G["/movies"] --> Movies
+        H["/series"] --> Series
+        I["/anime"] --> Anime
+        J["/profile"] --> Profile
+        K["/settings"] --> Settings
+        L["/plans"] --> Plans
+        M["/clips"] --> Clips
+        N["/downloads"] --> Downloads
+        O["/offline"] --> OfflinePlayer
+    end
+
+    subgraph Streaming
+        P["/player/:id"] --> VideoPlayer
+        Q["/watch/:id"] --> Player
+    end
+
+    subgraph Social
+        R["/party"] --> PartyHub
+        S["/room/:id"] --> WatchRoom
+    end
+
+    subgraph Admin
+        T["/admin"] --> AdminDashboard
+    end
+```
+
+---
+
+## 9. Data Flow Diagrams
+
+### 9.1 Watch Party Flow
+
+```mermaid
+sequenceDiagram
+    participant Host
+    participant Server
+    participant Guest
+
+    Host->>Server: POST /api/party/create (room_code, token)
+    Server-->>Host: { success: true, room_code }
+    Host->>Server: Socket: join_watch_room
+    Host->>Host: Share room link
+
+    Guest->>Server: POST /api/party/join (room_code, token)
+    Server-->>Guest: { success: true }
+    Guest->>Server: Socket: entry-request
+    Server->>Host: Socket: receive-entry-request
+    Host->>Server: Socket: entry-accepted
+    Server->>Guest: Socket: entry-accepted
+
+    Guest->>Server: Socket: join_watch_room
+    Host->>Server: Socket: sync_content (movie)
+    Server->>Guest: Socket: sync_content (movie)
+    Host->>Server: Socket: sync_play
+    Server->>Guest: Socket: sync_play
+```
+
+### 9.2 Offline Download Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Modal as Movie Modal
+    participant Storage as offlineStorage.js
+    participant IDB as IndexedDB
+
+    User->>Modal: Click Download
+    Modal->>Modal: resolveVideoUrl()
+    Modal->>Storage: saveVideo(movie, url, onProgress)
+    Storage->>Storage: fetch(url) as blob
+    Storage-->>Modal: onProgress(percent)
+    Storage->>IDB: localforage.setItem(id, {blob, metadata})
+    Storage-->>Modal: success = true
+    Modal->>User: "Ready for offline playback!"
+```
+
+---
+
+## 10. Non-Functional Requirements
+
+| Category | Requirement |
+|----------|-------------|
+| **Performance** | Hero images preloaded, lazy content rows, optimized avatar compression (500px max, 80% JPEG) |
+| **Security** | Firebase token auth, rate limiting, Helmet headers, CORS whitelist, admin role verification |
+| **Accessibility** | High contrast mode, motion reduction toggle, audio descriptions, subtitle support (7 languages) |
+| **Wellbeing** | Daily watch time tracker, configurable quota threshold, weekly usage visualization |
+| **Offline** | Full video download & playback via IndexedDB, service worker capable |
+| **Responsiveness** | Mobile-first design, fluid typography, collapsible navigation |
+| **Real-time** | Sub-second latency for playback sync, chat, reactions via WebSockets |
+
+---
+
+## 11. Known Limitations & Future Considerations
+
+### Current Limitations
+- Content data is primarily static (hardcoded arrays in `data/content.js`)
+- Watch party room data uses in-memory storage in local dev (no persistence across server restarts)
+- Firebase Admin requires `serviceAccountKey.json` for full functionality; local dev uses JWT fallback
+- Clip creation is UI-only (no server-side video processing pipeline)
+- Voice chat in watch rooms is microphone-access only (no WebRTC peer-to-peer audio streaming)
+- Download functionality requires Cloudinary-hosted videos (YouTube URLs are not downloadable)
+
+### Future Roadmap Candidates
+- Server-side video transcoding and adaptive bitrate streaming (HLS/DASH)
+- Real WebRTC voice/video chat in watch parties
+- Machine learning-based personalized recommendations (beyond Gemini prompts)
+- Content management system (CMS) for admin content upload
+- Push notifications via Firebase Cloud Messaging
+- Progressive Web App (PWA) with service worker caching
+- Multi-profile support per account
+- Watch history and "Continue Watching" row
+- Social features: user reviews, ratings, watchlists
+- CDN distribution for global low-latency streaming
+
+---
+
+> **© 2026 WatchWave. All rights reserved.**

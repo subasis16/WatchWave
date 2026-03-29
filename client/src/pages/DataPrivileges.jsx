@@ -21,7 +21,7 @@ const DataPrivileges = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
                     <div className="space-y-6">
                         <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Security Layers / Features</h3>
-                        <h1 className="text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
+                        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
                             Privacy <br/> Shield
                         </h1>
                     </div>
@@ -31,7 +31,7 @@ const DataPrivileges = () => {
                     <motion.div 
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="glass-card p-12 md:p-20 border-white/5 relative overflow-hidden group"
+                        className="glass-card p-8 md:p-20 border-white/5 relative overflow-hidden group"
                     >
                          <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-1000">
                              <Shield size={100} strokeWidth={1} />
@@ -73,7 +73,7 @@ const DataPrivileges = () => {
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card p-12 md:p-20 border-white/5 text-center space-y-12"
+                    className="glass-card p-10 md:p-20 border-white/5 text-center space-y-8 md:space-y-12"
                 >
                     <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Propagation Rights</h3>
                     <div className="grid md:grid-cols-3 gap-12 text-left">

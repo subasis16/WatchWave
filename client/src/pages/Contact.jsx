@@ -21,7 +21,7 @@ const Contact = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
                     <div className="space-y-6">
                         <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Get in Touch</h3>
-                        <h1 className="text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
+                        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
                             Contact <br/> Us
                         </h1>
                     </div>
@@ -65,7 +65,7 @@ const Contact = () => {
                     <motion.div 
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="glass-card p-12 md:p-16 border-white/5 shadow-3xl relative overflow-hidden"
+                        className="glass-card p-8 md:p-16 border-white/5 shadow-3xl relative overflow-hidden"
                     >
                          <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                             <Fingerprint size={120} strokeWidth={1} />

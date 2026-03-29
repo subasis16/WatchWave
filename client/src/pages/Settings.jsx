@@ -3,19 +3,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Accessibility, Globe, HandMetal, Eye, Lock, Crown,
   ShieldAlert, Clock, BarChart3, Moon, Volume2,
-  Bell, Check, User, CreditCard, PlayCircle, Download, ShieldCheck, HeartPulse
+  Bell, Check, User, CreditCard, PlayCircle, Download, ShieldCheck, HeartPulse, ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useSettings } from '../context/SettingsContext';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useEffect } from 'react';
 
 const Settings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Account');
+  const [showMenu, setShowMenu] = useState(true); // Mobile menu toggle
   const [dbUser, setDbUser] = useState(null);
   const [authUser, setAuthUser] = useState(null);
 
@@ -50,6 +51,7 @@ const Settings = () => {
     { id: 'Safety', icon: ShieldCheck },
     { id: 'Wellbeing', icon: HeartPulse },
     { id: 'Accessibility', icon: Accessibility },
+    { id: 'Language', icon: Globe },
     { id: 'Downloads', icon: Download }
   ];
 
@@ -84,13 +86,16 @@ const Settings = () => {
         <div className="flex flex-col lg:flex-row gap-16">
           
           {/* Sidebar */}
-          <div className="w-full lg:w-[320px] shrink-0">
+          <div className={`w-full lg:w-[320px] shrink-0 ${!showMenu ? 'hidden lg:block' : 'block'}`}>
             <nav className="flex flex-col space-y-4">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-5 text-left px-8 py-5 rounded-[1.5rem] transition-all duration-700 group relative overflow-hidden border ${
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setShowMenu(false);
+                  }}
+                  className={`flex items-center gap-5 text-left px-8 py-5 rounded-[2.5rem] transition-all duration-700 group relative overflow-hidden border ${
                     activeTab === tab.id
                       ? 'glass-pill-active border-white/20 shadow-3xl'
                       : 'text-gray-600 border-transparent hover:text-white hover:bg-white/5'
@@ -105,10 +110,23 @@ const Settings = () => {
           </div>
 
           {/* Configuration Screen */}
-          <div className="flex-1">
-            <div className="mb-20 space-y-4">
-                <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Account Settings</h3>
-                <h2 className="text-7xl font-black text-white tracking-tighter uppercase leading-none">{activeTab}</h2>
+          <div className={`flex-1 ${showMenu ? 'hidden lg:block' : 'block'}`}>
+            <div className="mb-20 space-y-8">
+                {/* Mobile Back Button */}
+                <button 
+                  onClick={() => setShowMenu(true)}
+                  className="lg:hidden flex items-center gap-4 text-gray-500 hover:text-white transition-all group mb-8"
+                >
+                  <div className="w-10 h-10 rounded-xl glass-card flex items-center justify-center border-white/5 group-hover:border-white/20">
+                    <ArrowLeft size={16} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">Back to Menu</span>
+                </button>
+
+                <div className="mb-12 lg:mb-20 space-y-4">
+                <h3 className="text-[9px] md:text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Account Settings</h3>
+                <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase leading-none">{activeTab}</h2>
+            </div>
             </div>
             
             <AnimatePresence mode="wait">
@@ -122,11 +140,11 @@ const Settings = () => {
               >
                 {/* ACCOUNT TAB */}
                 {activeTab === 'Account' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-10 opacity-5">
+                  <div className="glass-card p-8 md:p-16 border-white/5 shadow-3xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-10 opacity-5 hidden md:block">
                        <User size={120} />
                     </div>
-                    <h2 className="text-[10px] font-black mb-12 text-gray-500 uppercase tracking-[0.4em]">Identity Authentication</h2>
+                    <h2 className="text-[9px] md:text-[10px] font-black mb-8 md:mb-12 text-gray-500 uppercase tracking-[0.4em]">Identity Authentication</h2>
                     <div className="flex flex-col md:flex-row items-center justify-between gap-12">
                       <div className="flex items-center gap-10">
                         <div className="relative group">
@@ -139,12 +157,12 @@ const Settings = () => {
                             </div>
                             <div className="absolute inset-0 rounded-[2.5rem] bg-accent-gold/20 blur-[60px] opacity-0 group-hover:opacity-100 transition-all -z-10" />
                         </div>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-4">
-                              <h3 className="text-4xl font-black text-white uppercase tracking-tight truncate max-w-sm">{dbUser?.name || authUser?.displayName || 'User Screen'}</h3>
-                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
+                        <div className="space-y-2 md:space-y-3">
+                          <div className="flex items-center gap-3 md:gap-4">
+                              <h3 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tight truncate max-w-[200px] md:max-w-sm">{dbUser?.name || authUser?.displayName || 'User Screen'}</h3>
+                              <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
                           </div>
-                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em] font-mono">{authUser?.email || 'user@watchwave.io'}</p>
+                          <p className="text-[8px] md:text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] font-mono">{authUser?.email || 'user@watchwave.io'}</p>
                         </div>
                       </div>
                       <button 
@@ -159,9 +177,9 @@ const Settings = () => {
 
                 {/* SUBSCRIPTION TAB */}
                 {activeTab === 'Subscription' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl overflow-hidden relative">
+                  <div className="glass-card p-8 md:p-16 border-white/5 shadow-3xl overflow-hidden relative">
                     <div className="absolute -top-10 -right-10 w-48 h-48 bg-accent-gold/5 blur-[100px] rounded-full" />
-                    <h2 className="text-[10px] font-black mb-12 text-gray-500 uppercase tracking-[0.4em]">Resource Allocation</h2>
+                    <h2 className="text-[9px] md:text-[10px] font-black mb-8 md:mb-12 text-gray-500 uppercase tracking-[0.4em]">Resource Allocation</h2>
                     <div className="flex flex-col md:flex-row justify-between items-center gap-12">
                       <div className="space-y-6">
                         <div className="glass-pill border-accent-gold/30 text-accent-gold text-[12px] font-black uppercase tracking-[0.3em] px-8 py-3 shadow-[0_0_30px_rgba(255,215,0,0.1)] inline-flex items-center gap-3">
@@ -181,11 +199,11 @@ const Settings = () => {
 
                 {/* PLAYBACK TAB */}
                 {activeTab === 'Playback' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 space-y-12 shadow-3xl">
+                  <div className="glass-card p-8 md:p-16 border-white/5 space-y-10 md:space-y-12 shadow-3xl">
                     <div className="flex items-center justify-between">
-                      <div className="pr-10 space-y-3">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Auto-Play Next Episode</h2>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Automatically play the next episode in a series.</p>
+                      <div className="pr-4 md:pr-10 space-y-2 md:space-y-3">
+                        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Auto-Play Next Episode</h2>
+                        <p className="text-[8px] md:text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Automatically play the next episode in a series.</p>
                       </div>
                       <CustomToggle checked={autoplay} onChange={() => toggleSetting('autoplay')} />
                     </div>
@@ -202,7 +220,7 @@ const Settings = () => {
 
                 {/* SAFETY TAB */}
                 {activeTab === 'Safety' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 space-y-16 shadow-3xl">
+                  <div className="glass-card p-8 md:p-16 border-white/5 space-y-12 md:space-y-16 shadow-3xl">
                     <div className="space-y-10">
                       <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Age Filter</h2>
@@ -236,13 +254,13 @@ const Settings = () => {
 
                 {/* WELLBEING TAB */}
                 {activeTab === 'Wellbeing' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 space-y-20 shadow-3xl">
-                    <div className="space-y-12">
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Playback Dynamics</h2>
-                      <div className="flex items-end justify-between h-56 gap-6">
+                  <div className="glass-card p-6 md:p-16 border-white/5 space-y-12 md:space-y-20 shadow-3xl">
+                    <div className="space-y-8 md:space-y-12">
+                      <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Playback Dynamics</h2>
+                      <div className="flex items-end justify-between h-48 md:h-56 gap-2 md:gap-6">
                         {weekData.map((mins, i) => (
                           <div key={i} className="flex flex-col items-center flex-1 group relative">
-                            <div className="w-full flex justify-end flex-col h-full rounded-[1.2rem] bg-white/[0.03] overflow-hidden border border-white/5">
+                            <div className="w-full flex justify-end flex-col h-full rounded-lg md:rounded-[1.2rem] bg-white/[0.03] overflow-hidden border border-white/5">
                               <motion.div
                                 initial={{ height: 0 }}
                                 animate={{ height: `${(mins / maxTime) * 100}%` }}
@@ -250,7 +268,7 @@ const Settings = () => {
                                 className={`w-full ${mins > dailyLimit ? 'bg-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.2)]' : 'bg-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)]'} transition-all`}
                               />
                             </div>
-                            <span className="text-[10px] text-gray-600 mt-6 font-black tracking-widest">
+                            <span className="text-[7px] md:text-[10px] text-gray-600 mt-4 md:mt-6 font-black tracking-widest">
                               {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][i]}
                             </span>
                           </div>
@@ -258,10 +276,10 @@ const Settings = () => {
                       </div>
                     </div>
 
-                    <div className="border-t border-white/5 pt-16 space-y-10">
+                    <div className="border-t border-white/5 pt-10 md:pt-16 space-y-8 md:space-y-10">
                       <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Quota Threshold</h2>
-                        <span className="text-accent-gold font-black tracking-[0.2em] text-[14px] font-mono">{Math.floor(dailyLimit / 60)}H {dailyLimit % 60}M</span>
+                        <h2 className="text-lg md:text-2xl font-black text-white uppercase tracking-tighter">Quota Threshold</h2>
+                        <span className="text-accent-gold font-black tracking-[0.2em] text-[12px] md:text-[14px] font-mono">{Math.floor(dailyLimit / 60)}H {dailyLimit % 60}M</span>
                       </div>
                       <div className="relative h-2 bg-white/5 rounded-full">
                         <div className="absolute inset-y-0 left-0 bg-white rounded-full shadow-[0_0_20px_white] transition-all duration-300" style={{ width: `${(dailyLimit / 300) * 100}%` }} />
@@ -281,8 +299,8 @@ const Settings = () => {
 
                 {/* ACCESSIBILITY TAB */}
                 {activeTab === 'Accessibility' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl">
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-12">Accessibility Core</h2>
+                  <div className="glass-card p-8 md:p-16 border-white/5 shadow-3xl">
+                    <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-8 md:mb-12">Accessibility Core</h2>
                     <div className="space-y-12">
                       <div className="flex items-center justify-between border-b border-white/5 pb-12">
                         <div className="pr-10 space-y-3">
@@ -304,8 +322,8 @@ const Settings = () => {
 
                 {/* DOWNLOADS TAB */}
                 {activeTab === 'Downloads' && (
-                  <div className="glass-card p-12 md:p-16 border-white/5 shadow-3xl">
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-12">Storage Screen Cache</h2>
+                  <div className="glass-card p-8 md:p-16 border-white/5 shadow-3xl">
+                    <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-8 md:mb-12">Storage Screen Cache</h2>
                     <div className="space-y-8">
                       <div className="flex justify-between items-end">
                         <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em]">Offline Storage: 12GB / 30GB</span>
@@ -327,6 +345,64 @@ const Settings = () => {
                           transition={{ duration: 1.5, ease: 'circOut' }}
                           className="h-full bg-white rounded-full shadow-[0_0_25px_white]"
                         />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* LANGUAGE TAB */}
+                {activeTab === 'Language' && (
+                  <div className="glass-card p-8 md:p-16 border-white/5 space-y-10 md:space-y-12 shadow-3xl overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-10 opacity-5 hidden md:block">
+                       <Globe size={120} />
+                    </div>
+                    <div className="relative z-10 space-y-8 md:space-y-12">
+                      <div className="space-y-4">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Primary Interface Language</label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {['English', 'Hindi', 'Spanish', 'French', 'German', 'Japanese', 'Korean'].map((lang) => (
+                            <button
+                              key={lang}
+                              onClick={async () => {
+                                if (authUser) {
+                                  await updateDoc(doc(db, 'users', authUser.uid), { language: lang });
+                                  toast.success(`Language set to ${lang}`);
+                                }
+                              }}
+                              className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                                dbUser?.language === lang 
+                                  ? 'bg-accent-gold text-black border-accent-gold shadow-[0_0_20px_rgba(255,215,0,0.3)]' 
+                                  : 'bg-white/5 text-gray-400 border-white/5 hover:border-white/20'
+                              }`}
+                            >
+                              {lang}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-12 border-t border-white/5">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Subtitles & Captions</label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {['Off', 'English', 'Hindi', 'Spanish', 'French', 'German', 'Japanese', 'Korean'].map((opt) => (
+                            <button
+                              key={opt}
+                              onClick={async () => {
+                                if (authUser) {
+                                  await updateDoc(doc(db, 'users', authUser.uid), { subtitles: opt });
+                                  toast.success(`Subtitles set to ${opt}`);
+                                }
+                              }}
+                              className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                                dbUser?.subtitles === opt 
+                                  ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
+                                  : 'bg-white/5 text-gray-400 border-white/5 hover:border-white/20'
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>

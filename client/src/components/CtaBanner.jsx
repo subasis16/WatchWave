@@ -45,16 +45,16 @@ const CtaBanner = () => {
                 <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none" />
 
                 {/* Content Section */}
-                <div className="relative h-full flex flex-col md:flex-row items-center justify-between px-10 md:px-20 gap-8">
+                <div className="relative h-full flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-8 md:py-0 gap-6 md:gap-8">
                     <div className="space-y-3 text-center md:text-left">
-                        <h2 className="text-xl md:text-3xl font-black text-white tracking-tight leading-none">
+                        <h2 className="text-lg md:text-3xl font-black text-white tracking-tight leading-snug md:leading-none">
                             Discover your next favourites, plus new <br className="hidden lg:block" /> releases every week
                         </h2>
                     </div>
                     
                     <Link 
                         to="/about"
-                        className="glass-pill px-10 py-4 text-[10px] font-black uppercase tracking-[0.4em] text-white hover:bg-white/20 transition-all whitespace-nowrap border-white/10 hover:border-white/20 active:scale-95"
+                        className="glass-pill px-8 md:px-10 py-3.5 md:py-4 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-white hover:bg-white/20 transition-all whitespace-nowrap border-white/10 hover:border-white/20 active:scale-95"
                     >
                         More About WatchWave
                     </Link>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Play, Download, MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { saveVideo } from '../utils/offlineStorage';
 import toast from 'react-hot-toast';
+import { auth } from '../firebase';
 
 const HERO_DATA = [
   {
@@ -37,6 +38,7 @@ const HERO_DATA = [
 ];
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -77,8 +79,8 @@ const Hero = () => {
   const currentMovie = HERO_DATA[currentIndex];
 
   return (
-    <div className="relative h-[95vh] w-full overflow-hidden px-4 md:px-10 pt-28">
-      <div className="glass-card w-full h-full relative overflow-hidden group">
+    <div className="relative h-[78vh] md:h-[95vh] w-full overflow-hidden px-2 md:px-10 pt-20 md:pt-28">
+      <div className="glass-card w-full h-full relative overflow-hidden group rounded-[2rem] md:rounded-[3rem]">
         
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
@@ -101,7 +103,7 @@ const Hero = () => {
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute inset-0 z-10 flex flex-col justify-end p-8 md:p-16 pb-24 md:pb-32">
+        <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-16 pb-16 md:pb-32">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -111,33 +113,45 @@ const Hero = () => {
               transition={{ duration: 0.5 }}
               className="max-w-3xl"
             >
-              <div className="flex items-center gap-2 mb-6">
-                <span className="glass-pill px-3 py-1 flex items-center gap-1.5 text-[10px] font-bold text-white uppercase tracking-widest bg-white/10">
-                  <span className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-pulse"></span>
+              <div className="flex items-center gap-2 mb-4 md:mb-6">
+                <span className="glass-pill px-2.5 py-1 flex items-center gap-1.5 text-[8px] md:text-[10px] font-bold text-white uppercase tracking-widest bg-white/10">
+                  <span className="w-1 h-1 md:w-1.5 md:h-1.5 bg-accent-gold rounded-full animate-pulse"></span>
                   Trending Now
                 </span>
                 <div className="flex gap-2">
-                  {currentMovie.genres.map((genre, idx) => (
-                    <span key={idx} className="glass-pill px-3 py-1 text-[10px] font-bold bg-white/5 border-white/5 uppercase">
+                  {currentMovie.genres.slice(0, 2).map((genre, idx) => (
+                    <span key={idx} className="glass-pill px-2.5 py-1 text-[8px] md:text-[10px] font-bold bg-white/5 border-white/5 uppercase">
                       {genre}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <h1 className="text-6xl md:text-8xl font-black text-white mb-6 tracking-tighter leading-none uppercase">
+              <h1 className="text-4xl md:text-8xl font-black text-white mb-4 md:mb-6 tracking-tighter leading-none uppercase">
                 {currentMovie.title}
               </h1>
               
-              <p className="text-sm md:text-base text-gray-300 mb-10 line-clamp-3 max-w-xl font-medium leading-relaxed">
+              <p className="text-xs md:text-base text-gray-300 mb-6 md:mb-10 line-clamp-2 md:line-clamp-3 max-w-xl font-medium leading-relaxed opacity-80 md:opacity-100">
                 {currentMovie.description}
               </p>
 
-              <div className="flex flex-wrap items-center gap-4">
-                <Link to={`/player/${currentMovie.id}`} className="glass-pill-active px-10 py-3.5 flex items-center gap-3 font-bold text-base transition hover:scale-105 active:scale-95 shadow-xl">
-                  <Play className="w-5 h-5 fill-current" />
+              <div className="flex flex-wrap items-center gap-3">
+                <button 
+                  onClick={() => {
+                    if (!auth.currentUser) {
+                      toast.error("Transmission Locked. Sign in to watch!", {
+                        style: { background: 'rgba(0,0,0,0.8)', color: '#fff', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,215,0,0.3)' }
+                      });
+                      navigate('/auth');
+                      return;
+                    }
+                    navigate(`/player/${currentMovie.id}`);
+                  }} 
+                  className="glass-pill-active px-6 md:px-10 py-3 md:py-3.5 flex items-center gap-2 md:gap-3 font-bold text-sm md:text-base transition hover:scale-105 active:scale-95 shadow-xl"
+                >
+                  <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                   Watch
-                </Link>
+                </button>
                 <button 
                   onClick={async () => {
                     toast.loading(`Downloading ${currentMovie.title}...`, { id: 'download' });
@@ -153,12 +167,7 @@ const Hero = () => {
                   <Download className="w-5 h-5" />
                   Download
                 </button>
-                <button 
-                  onClick={() => toast.success("Options synchronized")}
-                  className="w-14 h-14 glass-pill flex items-center justify-center hover:bg-white/20 transition hover:rotate-90"
-                >
-                  <MoreHorizontal size={24} />
-                </button>
+
               </div>
             </motion.div>
           </AnimatePresence>

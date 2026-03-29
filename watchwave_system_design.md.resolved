@@ -1,0 +1,147 @@
+# 5. System Design
+
+This section details the abstract architectural design of the WatchWave platform. System design bridges the gap between the initial requirement specifications and the actual codebase implementation. The diagrams below visualize the data structures, operational boundaries, and dynamic flow of information across the Real-Time Streaming environment.
+
+## 5.1 Entity-Relationship (ER) Model Diagram
+
+The ER Diagram defines the logical structure of WatchWave's database (primarily mapped to Firebase Firestore NoSQL collections). It outlines the primary entities (Users, Rooms, Movies, Clips, Payments) and the relational mapping connecting them.
+
+```mermaid
+erDiagram
+    USER ||--o{ WATCH_ROOM : "hosts"
+    USER ||--o{ PAYMENT : "makes"
+    USER ||--o{ CLIP : "creates"
+    WATCH_ROOM ||--|| MOVIE : "currently streams"
+    CLIP }o--|| MOVIE : "extracted from"
+
+    USER {
+        string uid PK "Firebase Auth ID"
+        string name "Display Name"
+        string email "Unique Email"
+        string avatar "Base64 Compressed JPEG"
+        string bio "Profile Description"
+        boolean isOnline "Socket Presence Status"
+        string activePlan "Free | Solo | PartyHub"
+    }
+
+    WATCH_ROOM {
+        string roomId PK "Unique 6-char Code"
+        string hostId FK "References User.uid"
+        string currentMovieId FK "References Movie.movieId"
+        boolean isPasswordProtected
+        string hashedPassword "Optional Entry Lock"
+        datetime createdAt
+    }
+
+    MOVIE {
+        string movieId PK "TMDB ID / Internal ID"
+        string title "Media Title"
+        string description "Plot Synopsis"
+        string videoUrl "CDN Endpoint URL"
+        string posterUrl "TMDB Backdrop Image URL"
+        string genre "Category Array"
+        int matchPercentage "AI Computed Metric"
+    }
+
+    PAYMENT {
+        string paymentId PK "Database Receipt ID"
+        string userId FK "Subscriber ID"
+        string razorpayOrderId "Gateway Reference"
+        float amount "Transaction Value"
+        string status "Success | Failed"
+        datetime timestamp
+    }
+
+    CLIP {
+        string clipId PK "Generated Hash"
+        string userId FK "Creator ID"
+        string sourceMovieId FK "Original Media ID"
+        int startTime "Trim Start (Seconds)"
+        int endTime "Trim End (Seconds)"
+        string caption "Overlay Text"
+    }
+```
+
+---
+
+## 5.2 Data Flow Diagrams (DFD)
+
+Data Flow Diagrams map how information propagates through the system boundaries, passing from external inputs through the core WatchWave logic controllers, and finally resting in database stores or client UIs.
+
+### Level 0 Context DFD
+The Context Diagram establishes the absolute system boundary of WatchWave, isolating it alongside the external human actors (Hosts/Viewers) and external 3rd-party APIs (Razorpay, TMDB, Google Gemini).
+
+```mermaid
+graph TD
+    User([Standard Viewer])
+    Host([Party Host])
+    System(((WatchWave<br/>Streaming Engine)))
+    Razorpay[[Razorpay API]]
+    TMDB[[TMDB API]]
+    Gemini[[Google Gemini AI]]
+
+    User -- "Login Credentials, Room Join Requests, Real-Time Chat" --> System
+    System -- "Video Stream Chunks, Sync Overlays, Subtitles" --> User
+    
+    Host -- "Create Room Cmd, Play/Pause/Seek Commands, Mute Users" --> System
+    System -- "Host Dashboard UI, Participant Status Arrays" --> Host
+    
+    System -- "Order Payload" --> Razorpay
+    Razorpay -- "Subscription Success Webhooks" --> System
+    
+    System -- "Content Queries (Movie ID)" --> TMDB
+    TMDB -- "Posters, Ratings, Plot Metadata" --> System
+    
+    System -- "User Mood Description Prompts" --> Gemini
+    Gemini -- "Filtered Media Recommendations Array" --> System
+
+    classDef external fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff;
+    classDef system fill:#d69e2e,stroke:#b7791f,stroke-width:4px,color:#000;
+    class Razorpay,TMDB,Gemini external;
+    class System system;
+```
+
+### Level 1 Operational DFD (Watch Party Flow)
+This diagram drills down into the core application logic, specifically tracing the sophisticated bidirectional real-time data flows required to maintain a perfectly synchronized Watch Party.
+
+```mermaid
+graph TD
+    Host([Room Host])
+    Viewer([Remote Viewer])
+    
+    subgraph WatchWave Express Backend
+        Auth(1.0 Authentication<br>Firebase Admin)
+        RoomMgr(2.0 Room Management<br>In-Memory Store)
+        SocketRouter(3.0 Sync Engine<br>Socket.IO Bus)
+    end
+    
+    DB[(Firestore DB)]
+    
+    Host -- "1. Login Payload" --> Auth
+    Auth -- "2. Verify JWT" --> DB
+    Auth -- "3. Issue Bearer Token" --> Host
+    
+    Host -- "4. Generate Room (Code)" --> RoomMgr
+    RoomMgr -- "5. Room Created" --> SocketRouter
+    
+    Viewer -- "6. Join Request (Room Code)" --> SocketRouter
+    SocketRouter -- "7. Knock Event" --> Host
+    Host -- "8. Accept Entry" --> SocketRouter
+    SocketRouter -- "9. Grant Access" --> Viewer
+    
+    Host -- "10. Emit PLAY / PAUSE command" --> SocketRouter
+    SocketRouter -- "11. Broadcast Synced Video State" --> Viewer
+    
+    Viewer -- "12. Emit Floating Emoji Reaction" --> SocketRouter
+    SocketRouter -- "13. Render Emoji on All Screens" --> Host
+    
+    classDef process fill:#2b6cb0,stroke:#2c5282,color:#fff,stroke-width:2px;
+    classDef db fill:#4a5568,stroke:#2d3748,color:#fff,shape:cylinder;
+    class Auth,RoomMgr,SocketRouter process;
+    class DB db;
+```
+
+### System Architecture Summary
+1.  **ER Model:** Clearly delineates the core `WATCH_ROOM` relationship as the central orchestrator, demonstrating how `USER` interactions bind directly to isolated `MOVIE` playback sessions.
+2.  **Level 0 Context:** Visually proves the platform's heavy reliance on external computational engines—offloading payment logic to Razorpay and generative matching to Gemini.
+3.  **Level 1 Operation:** Visually maps the fundamental 13-step handshake required to achieve `<500ms` synchronized screening stability utilizing intermediate authentication and the central Node.js Socket bus.

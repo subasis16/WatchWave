@@ -49,7 +49,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className={`selection:bg-white selection:text-black ${!hidePadding ? 'pb-10' : ''}`}>
+    <div className={`selection:bg-white selection:text-black ${!hidePadding ? 'pb-10' : ''} overflow-x-hidden w-full relative`}>
       <Toaster position="top-right" reverseOrder={false} />
       {showIntro && <OpeningAnimation onComplete={() => setShowIntro(false)} />}
 
@@ -83,17 +83,17 @@ const App = () => {
       {!hideFooter && (
         <>
           <CtaBanner />
-          <footer className="mt-20 py-16 px-4 md:px-10">
-          <div className="glass-card p-10 md:p-16">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-              <div className="max-w-md">
-                <span className="text-2xl font-black text-white tracking-widest">
+          <footer className="mt-16 md:mt-20 py-10 md:py-16 px-4 md:px-10">
+          <div className="glass-card p-8 md:p-16 border-white/10">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-10 md:gap-12">
+              <div className="max-w-md w-full">
+                <span className="text-xl md:text-2xl font-black text-white tracking-widest">
                   WATCHWAVE
                 </span>
-                <p className="mt-4 text-gray-400 font-medium leading-relaxed">
+                <p className="mt-4 text-sm md:text-base text-gray-400 font-medium leading-relaxed">
                   Experience the future of entertainment with our streaming platform. Cinema-grade quality, anywhere you are.
                 </p>
-                <div className="flex gap-4 mt-8">
+                <div className="flex gap-4 mt-6 md:mt-8">
                   <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
                     <span className="font-bold text-xs">FB</span>
                   </div>
@@ -106,28 +106,28 @@ const App = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 sm:gap-20">
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-white font-black text-xs uppercase tracking-widest">Discover</h4>
-                  <Link to="/" className="text-sm text-gray-400 hover:text-white transition-colors">Home</Link>
-                  <Link to="/movies" className="text-sm text-gray-400 hover:text-white transition-colors">Movies</Link>
-                  <Link to="/party" className="text-sm text-gray-400 hover:text-white transition-colors">Parties</Link>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-20 w-full mt-8 md:mt-0">
+                <div className="flex flex-col gap-3 md:gap-4">
+                  <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Discover</h4>
+                  <Link to="/" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Home</Link>
+                  <Link to="/movies" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Movies</Link>
+                  <Link to="/party" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Parties</Link>
                 </div>
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-white font-black text-xs uppercase tracking-widest">Experience</h4>
-                  <Link to="/plans" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</Link>
-                  <Link to="/downloads" className="text-sm text-gray-400 hover:text-white transition-colors">Off-line</Link>
-                  <Link to="/contact" className="text-sm text-gray-400 hover:text-white transition-colors">Contact</Link>
+                <div className="flex flex-col gap-3 md:gap-4">
+                  <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Experience</h4>
+                  <Link to="/plans" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Pricing</Link>
+                  <Link to="/downloads" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Off-line</Link>
+                  <Link to="/contact" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Contact</Link>
                 </div>
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-white font-black text-xs uppercase tracking-widest">Legal</h4>
-                  <Link to="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">Terms</Link>
-                  <Link to="/data-privileges" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy</Link>
+                <div className="flex flex-col gap-3 md:gap-4">
+                  <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Legal</h4>
+                  <Link to="/terms" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Terms</Link>
+                  <Link to="/data-privileges" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Privacy</Link>
                 </div>
               </div>
             </div>
             
-            <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest gap-4">
+            <div className="mt-12 md:mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest gap-4">
               <p>&copy; 2026 WatchWave. All rights reserved.</p>
               <div className="flex gap-8">
                 <Link to="/data-privileges" className="hover:text-white transition-colors">Privacy</Link>

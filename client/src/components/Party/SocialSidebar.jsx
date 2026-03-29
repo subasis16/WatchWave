@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Search, UserPlus, ArrowLeft, Send } from 'lucide-react';
+import { MessageCircle, Search, UserPlus, ArrowLeft, Send, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
@@ -10,14 +10,15 @@ const socket = io.connect('http://localhost:5000');
 const SocialSidebar = () => {
     const [activeTab, setActiveTab] = useState('friends');
     const [idInput, setIdInput] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
     const [activeChatUser, setActiveChatUser] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [suggestedFriends, setSuggestedFriends] = useState([
+    const [currentMessage, setCurrentMessage] = useState('');
+    const [suggestedFriends] = useState([
         { id: 101, name: 'Elena', avatar: 'https://i.pravatar.cc/150?u=10' },
         { id: 102, name: 'Marcus', avatar: 'https://i.pravatar.cc/150?u=12' },
         { id: 103, name: 'Sophia', avatar: 'https://i.pravatar.cc/150?u=11' },
     ]);
-    const [currentMessage, setCurrentMessage] = useState('');
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
 
@@ -78,41 +79,66 @@ const SocialSidebar = () => {
             
             <div className="absolute top-0 right-0 w-64 h-64 bg-accent-gold/[0.04] blur-[120px] rounded-full pointer-events-none" />
 
-            {/* Tab Navigation */}
-            {activeTab !== 'chat' && (
-                <div className="flex px-6 pt-8 shrink-0 relative z-10 gap-2">
-                    <button
-                        onClick={() => setActiveTab('friends')}
-                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.3em] transition-all text-center rounded-xl ${activeTab === 'friends'
-                            ? 'glass-pill-active shadow-xl'
-                            : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
-                            }`}
-                    >
-                        Network
-                    </button>
+                <div className="px-6 pt-8 shrink-0 relative z-10 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <h2 className="text-[13px] font-black uppercase tracking-[0.4em] text-white">Socials</h2>
+                            <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest">Connect & Watch</p>
+                        </div>
+                        <div className="glass-pill px-4 py-1.5 text-[8px] font-black text-green-500 border-green-500/20 uppercase tracking-widest flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.1)] bg-white/[0.01]">
+                            <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />
+                            Live
+                        </div>
+                    </div>
 
-                    <button
-                        onClick={() => setActiveTab('discover')}
-                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.3em] transition-all text-center rounded-xl ${activeTab === 'discover'
-                            ? 'glass-pill-active shadow-xl'
-                            : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
-                            }`}
-                    >
-                        Discover
-                    </button>
-                </div>
-            )}
+                    {/* Networking Interface */}
+                    <div className="space-y-3">
+                        <motion.button 
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            onClick={() => {
+                                navigator.clipboard.writeText(window.location.href);
+                                toast.success("Invite Link Copied");
+                            }}
+                            className="w-full flex items-center justify-between p-4 glass-card border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all group relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-accent-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="flex flex-col items-start">
+                                <span className="text-[9px] font-black uppercase tracking-[0.25em] text-white/80 group-hover:text-white transition-colors">Invite Link</span>
+                                <span className="text-[7px] font-black text-gray-700 uppercase tracking-widest group-hover:text-accent-gold/50 transition-colors">Click to copy</span>
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:border-accent-gold/20 border border-white/5 transition-all">
+                                <Share2 size={14} className="text-gray-600 group-hover:text-accent-gold transition-colors" />
+                            </div>
+                        </motion.button>
 
-            {/* Dynamic Subheader */}
-            {activeTab !== 'chat' && (
-                <div className="px-8 py-6 shrink-0 z-10">
-                    <p className="text-gray-600 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
-                        {activeTab === 'friends' ? (
-                            <><span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" /> Online Connections ({friends.filter(f => f.isOnline).length})</>
-                        ) : 'Find More Friends'}
-                    </p>
+                        <div className="relative group">
+                            <Search size={12} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isSearching ? 'text-accent-gold' : 'text-gray-700'}`} />
+                            <input
+                                type="text"
+                                value={idInput}
+                                onFocus={() => setIsSearching(true)}
+                                onBlur={() => setTimeout(() => setIsSearching(false), 200)}
+                                onChange={(e) => setIdInput(e.target.value)}
+                                placeholder="Find connections..."
+                                className="w-full bg-white/[0.01] border border-white/5 rounded-xl pl-10 pr-10 py-3 text-[9px] font-bold tracking-[0.15em] uppercase text-white placeholder-gray-800 focus:outline-none focus:border-white/10 focus:bg-white/[0.02] transition-all shadow-inner"
+                            />
+                            {idInput && (
+                                <button 
+                                    onClick={() => {
+                                        toast.success(`Request sent to: ${idInput}`);
+                                        setIdInput('');
+                                    }}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-accent-gold hover:text-white transition-all"
+                                >
+                                    <UserPlus size={14} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            )}
+
+
 
             {/* Content Area flex container */}
             <div className="flex-1 overflow-y-auto hide-scrollbar px-6 pb-6 z-10">
@@ -125,107 +151,78 @@ const SocialSidebar = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="space-y-3"
+                            className="space-y-4"
                         >
+                            <div className="flex items-center justify-between px-2 pb-2">
+                                <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Active Now</span>
+                                <div className="h-[1px] flex-1 bg-white/5 mx-4" />
+                            </div>
+
                             {friends.map(friend => (
-                                <div key={friend.id} className="flex items-center p-3.5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.04] border border-white/5 cursor-pointer transition-all duration-300 group hover:scale-[1.02] hover:shadow-xl">
+                                <motion.div 
+                                    key={friend.id} 
+                                    whileHover={{ x: 4 }}
+                                    className="flex items-center p-3 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.02] cursor-pointer transition-all duration-500 group"
+                                >
                                     <div
-                                        className="relative shrink-0 hover:scale-105 transition-transform cursor-pointer"
+                                        className="relative shrink-0 transition-transform cursor-pointer"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             navigate('/profile');
                                         }}
                                         title={`View ${friend.name}'s Profile`}
                                     >
-                                        <img
-                                            src={friend.avatar}
-                                            alt={friend.name}
-                                            className={`w-12 h-12 rounded-xl object-cover border border-white/10 shadow-lg ${!friend.isOnline ? 'grayscale opacity-50' : ''}`}
-                                        />
+                                        <div className="w-11 h-11 p-0.5 rounded-xl glass-card border-white/10 group-hover:border-accent-gold/30 transition-colors">
+                                            <img
+                                                src={friend.avatar}
+                                                alt={friend.name}
+                                                className={`w-full h-full rounded-[0.5rem] object-cover ${!friend.isOnline ? 'grayscale opacity-30' : 'grayscale-0 opacity-100'} transition-all duration-700`}
+                                            />
+                                        </div>
                                         {friend.isOnline && (
-                                            <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border border-[#050505] rounded-lg animate-pulse shadow-[0_0_8px_#22c55e]" />
+                                            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[#0c0c0c] rounded-full shadow-[0_0_8px_#22c55e]" />
                                         )}
                                     </div>
 
                                     <div
                                         className="ml-4 flex flex-col flex-1 cursor-pointer"
                                         onClick={() => joinChatSession(friend)}
-                                        title={`Message ${friend.name}`}
                                     >
-                                        <h4 className="text-[12px] font-black tracking-widest uppercase text-white group-hover:text-accent-gold transition-colors">{friend.name}</h4>
-                                        <p className="text-[9px] font-bold text-gray-500 mt-1 uppercase tracking-widest line-clamp-1">{friend.status}</p>
+                                        <h4 className="text-[12px] font-black tracking-tight text-white/90 group-hover:text-white transition-colors">{friend.name}</h4>
+                                        <p className="text-[8px] font-black text-gray-700 mt-0.5 uppercase tracking-widest line-clamp-1 group-hover:text-gray-500 transition-colors">{friend.status}</p>
                                     </div>
 
                                     <button
-                                        className="ml-auto text-gray-500 hover:text-white bg-white/5 hover:bg-accent-gold p-2.5 rounded-xl transition-all shadow-md group-hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]"
+                                        className="ml-auto w-8 h-8 flex items-center justify-center text-gray-700 hover:text-white bg-white/5 hover:bg-white/[0.05] rounded-lg transition-all"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             joinChatSession(friend);
                                         }}
                                     >
-                                        <MessageCircle size={16} strokeWidth={2} />
+                                        <MessageCircle size={14} strokeWidth={2.5} />
                                     </button>
-                                </div>
+                                </motion.div>
                             ))}
-                        </motion.div>
-                    )}
 
-                    {/* DISCOVER TAB CONTENT */}
-                    {activeTab === 'discover' && (
-                        <motion.div
-                            key="discover"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="space-y-8"
-                        >
-                            <div className="space-y-4">
-                                <div className="relative group">
-                                    <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                                    <input
-                                        type="text"
-                                        value={idInput}
-                                        onChange={(e) => setIdInput(e.target.value)}
-                                        placeholder="Enter Room ID..."
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl pl-10 pr-4 py-4 text-[11px] font-bold tracking-widest uppercase text-white placeholder-gray-600 focus:outline-none focus:border-accent-gold/40 focus:bg-white/5 transition-all shadow-inner"
-                                    />
+                            <div className="pt-10 space-y-6">
+                                <div className="flex items-center justify-between px-2">
+                                    <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Connect More</span>
+                                    <div className="h-[1px] flex-1 bg-white/5 mx-4" />
                                 </div>
-                                <button 
-                                    onClick={() => {
-                                        if (idInput.trim()) {
-                                            toast.success(`Request sent to Room ID: ${idInput}`);
-                                            setIdInput('');
-                                        } else {
-                                            toast.error("Enter Room ID first");
-                                        }
-                                    }}
-                                    className="w-full glass-pill-active text-white text-[10px] font-black tracking-[0.3em] uppercase py-4 group hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all"
-                                >
-                                    Friend Request
-                                </button>
-                            </div>
-
-                            <div className="pt-8 border-t border-white/5">
-                                <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-6">
-                                    Recommended Targets
-                                </h4>
+                                
                                 <div className="space-y-3">
                                     {suggestedFriends.map(user => (
-                                        <div key={user.id} className="flex items-center p-3.5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 transition-all group hover:scale-[1.02] hover:shadow-xl cursor-pointer">
-                                            <img src={user.avatar} className="w-10 h-10 rounded-xl border border-white/10 shrink-0" alt={user.name} />
-                                            <div className="ml-4 flex flex-col">
-                                                <h4 className="text-[11px] font-black text-white group-hover:text-white uppercase tracking-widest">{user.name}</h4>
-                                                <p className="text-[8px] font-bold text-gray-600 mt-0.5 uppercase tracking-widest">Match Score</p>
+                                        <div key={user.id} className="flex items-center p-3 rounded-2xl bg-white/[0.01] hover:bg-white/[0.02] border border-white/[0.01] transition-all group cursor-pointer relative overflow-hidden">
+                                            <img src={user.avatar} className="w-8 h-8 rounded-lg border border-white/5 shrink-0 grayscale group-hover:grayscale-0 transition-all duration-700" alt={user.name} />
+                                            <div className="ml-3 flex flex-col">
+                                                <h4 className="text-[10px] font-black text-white/50 group-hover:text-white uppercase tracking-widest transition-colors">{user.name}</h4>
+                                                <p className="text-[7px] font-black text-gray-800 mt-0.5 uppercase tracking-widest">Connect</p>
                                             </div>
                                             <button 
-                                                onClick={() => {
-                                                    toast.success(`Request sent to ${user.name}`);
-                                                    setSuggestedFriends(prev => prev.filter(f => f.id !== user.id));
-                                                }}
-                                                className="ml-auto text-[9px] font-black tracking-[0.2em] uppercase text-gray-400 hover:text-gray-900 bg-white/5 hover:bg-white px-4 py-2.5 rounded-xl transition-all shadow-md group-hover:shadow-[0_0_15px_rgba(255,255,255,0.4)]"
+                                                onClick={() => toast.success(`Request sent to ${user.name}`)}
+                                                className="ml-auto w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white hover:text-black transition-all"
                                             >
-                                                Add
+                                                <UserPlus size={12} />
                                             </button>
                                         </div>
                                     ))}
@@ -233,6 +230,8 @@ const SocialSidebar = () => {
                             </div>
                         </motion.div>
                     )}
+
+
 
                     {/* CHAT INTERFACE TAB */}
                     {activeTab === 'chat' && activeChatUser && (
@@ -248,7 +247,7 @@ const SocialSidebar = () => {
                                 <button
                                     onClick={() => setActiveTab('friends')}
                                     className="text-gray-500 hover:text-white transition-colors glass-card p-2 rounded-xl border-white/5"
-                                    title="Back to Network"
+                                    title="Back to Socials"
                                 >
                                     <ArrowLeft size={16} />
                                 </button>
