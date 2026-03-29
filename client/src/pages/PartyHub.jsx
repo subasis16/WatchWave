@@ -1,16 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Play, Copy, Search, Share2, Video, Smile, Users } from 'lucide-react';
+import { Settings, Play, Copy, Search, Share2, Video, Smile, Users, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SocialSidebar from '../components/Party/SocialSidebar';
 import { toast } from 'react-hot-toast';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const PartyHub = () => {
     const [isLive, setIsLive] = useState(false);
     const [roomCode, setRoomCode] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [userProfile, setUserProfile] = useState({ name: 'Cinema Fanatic', avatar: null });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const docRef = doc(db, 'users', user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        setUserProfile({
+                            name: data.name || user.displayName || 'Cinema Fanatic',
+                            avatar: data.avatar || user.photoURL || null
+                        });
+                    } else {
+                        setUserProfile({
+                            name: user.displayName || 'Cinema Fanatic',
+                            avatar: user.photoURL || null
+                        });
+                    }
+                } catch (err) {
+                    console.error("Error fetching user data for PartyHub:", err);
+                }
+            }
+        });
+        return () => unsubscribe();
+    }, []);
 
     const handleGoLive = async () => {
         try {
@@ -116,7 +145,13 @@ const PartyHub = () => {
                                 <div className="relative group/avatar">
                                     <div className="w-48 h-48 rounded-[3.5rem] glass-card p-1.5 shadow-3xl relative overflow-hidden border-white/10 transition-all duration-1000 group-hover/avatar:-translate-y-2 group-hover/avatar:border-accent-gold/40">
                                         <div className="w-full h-full rounded-[3rem] overflow-hidden bg-white/5">
-                                            <img src="https://i.pravatar.cc/300?u=subasis" alt="Avatar" className="w-full h-full object-cover grayscale group-hover/avatar:grayscale-0 transition-all duration-1000" />
+                                            {userProfile.avatar ? (
+                                                <img src={userProfile.avatar} alt="Avatar" className="w-full h-full object-cover grayscale group-hover/avatar:grayscale-0 transition-all duration-1000" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                    <User size={64} className="text-white/20" />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className={`absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 ${isLive ? 'bg-green-500 shadow-[0_0_20px_#22c55e]' : 'bg-gray-800'}`}>
@@ -131,7 +166,7 @@ const PartyHub = () => {
                                             <h2 className="text-[11px] font-black tracking-[0.5em] uppercase text-accent-gold/60">Cinematic Experience / Alpha</h2>
                                         </div>
                                         <h3 className="text-6xl md:text-8xl font-black tracking-tighter text-white uppercase leading-[0.9] drop-shadow-2xl">
-                                            Personal<br />Theater
+                                            {userProfile.name.split(' ')[0]}'s<br />Theater
                                         </h3>
                                         <div className="flex items-center gap-6 pt-2">
                                             <div className="flex items-center gap-2">

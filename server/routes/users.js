@@ -29,6 +29,30 @@ router.post('/profile', async (req, res) => {
 // All routes below require authentication
 // ==========================================
 
+// GET /api/users/all/profiles — Get basic user profiles for social
+router.get('/all/profiles', verifyToken, async (req, res) => {
+    try {
+        const snapshot = await db.collection('users').limit(50).get();
+        const users = [];
+        snapshot.forEach(doc => {
+            if (doc.id !== req.user.uid) {
+                const data = doc.data();
+                users.push({
+                    id: doc.id,
+                    name: data.name || 'User',
+                    avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'U')}&background=random`,
+                    isOnline: data.isOnline || false,
+                    status: data.isOnline ? 'Online' : 'Offline',
+                    lastActive: data.lastActive || null
+                });
+            }
+        });
+        res.json({ success: true, users });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // GET /api/users/myList
 router.get('/myList', verifyToken, async (req, res) => {
     try {
