@@ -127,16 +127,15 @@ const PartyHub = () => {
                 <div className="flex-1 lg:w-[70%] p-8 lg:p-16 overflow-y-auto hide-scrollbar">
                     <div className="max-w-6xl mx-auto space-y-20">
 
-                        {/* 1. Primary Movie Lounge Card */}
                         <motion.section
                             initial={{ opacity: 0, scale: 0.98, y: 30 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             transition={{ duration: 1.2, ease: "circOut" }}
-                            className="glass-card p-12 md:p-20 relative overflow-hidden group border-white/5 shadow-3xl"
+                            className="glass-card p-8 md:p-20 relative overflow-hidden group border-white/5 shadow-3xl"
                         >
-                            <div className="absolute top-0 right-0 p-8">
-                                <button onClick={copyLink} className="flex items-center gap-3 glass-pill px-6 py-3 text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-all border-white/5 shadow-xl">
-                                    <Share2 size={16} /> Transmission Key
+                            <div className="absolute top-4 right-4 md:top-8 md:right-8 z-20">
+                                <button onClick={copyLink} className="flex items-center gap-2 md:gap-3 glass-pill px-4 py-2 md:px-6 md:py-3 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-all border-white/5 shadow-xl bg-black/40">
+                                    <Share2 size={14} className="md:w-4 md:h-4" /> <span className="hidden sm:inline">Transmission Key</span>
                                 </button>
                             </div>
 
@@ -159,14 +158,14 @@ const PartyHub = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-6 flex-1">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-[1px] w-8 bg-accent-gold/40" />
-                                            <h2 className="text-[11px] font-black tracking-[0.5em] uppercase text-accent-gold/60">Cinematic Experience / Alpha</h2>
+                                <div className="space-y-4 md:space-y-6 flex-1 text-center md:text-left">
+                                    <div className="space-y-2 md:space-y-4">
+                                        <div className="flex items-center justify-center md:justify-start gap-4">
+                                            <div className="h-[1px] w-6 md:w-8 bg-accent-gold/40" />
+                                            <h2 className="text-[9px] md:text-[11px] font-black tracking-[0.4em] md:tracking-[0.5em] uppercase text-accent-gold/60">Cinematic Experience / Alpha</h2>
                                         </div>
-                                        <h3 className="text-6xl md:text-8xl font-black tracking-tighter text-white uppercase leading-[0.9] drop-shadow-2xl">
-                                            {userProfile.name.split(' ')[0]}'s<br />Theater
+                                        <h3 className="text-4xl md:text-8xl font-black tracking-tighter text-white uppercase leading-[1] md:leading-[0.9] drop-shadow-2xl">
+                                            {userProfile.name.split(' ')[0]}'s<br className="hidden md:block" />Theater
                                         </h3>
                                         <div className="flex items-center gap-6 pt-2">
                                             <div className="flex items-center gap-2">

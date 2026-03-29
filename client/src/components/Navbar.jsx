@@ -154,7 +154,8 @@ const Navbar = () => {
     localStorage.removeItem(RECENT_KEY);
   };
 
-  const showDropdown = isSearchFocused;
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const showDropdown = isSearchFocused || (isMobileSearchOpen && searchQuery.trim().length > 0);
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const navItems = [
@@ -162,22 +163,33 @@ const Navbar = () => {
     { name: 'Movies', path: '/movies' },
     { name: 'Anime', path: '/anime' },
     { name: 'Party', path: '/party' },
-    { name: 'Plans & Prices', path: '/plans' },
+    { name: 'Plans', path: '/plans' },
   ];
 
   return (
     <>
       <nav className={`fixed top-2 md:top-4 left-1/2 -translate-x-1/2 w-[96%] md:w-[95%] max-w-7xl z-50 transition-all duration-300 ${isScrolled ? 'top-1 md:top-2' : ''}`}>
-        <div className="glass-card px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="text-xl font-black text-white tracking-widest hover:opacity-80 transition-opacity">
-              WATCHWAVE
+        <div className="glass-card px-3 md:px-8 py-2 md:py-3 flex items-center">
+          <div className="flex items-center gap-10 flex-1">
+            <Link to="/" className="flex flex-col items-center group leading-none">
+              <span 
+                className="text-3xl font-black tracking-tighter text-transparent bg-clip-text leading-none select-none"
+                style={{ 
+                  backgroundImage: 'linear-gradient(to bottom right, #ffffff, #FFD700, #DAA520)',
+                  filter: 'drop-shadow(0 0 12px rgba(255,215,0,0.5))'
+                }}
+              >
+                W
+              </span>
+              <span className="text-[8px] font-black text-white/60 tracking-[0.4em] uppercase group-hover:text-white transition-colors mt-0.5">
+                WATCHWAVE
+              </span>
             </Link>
 
             {/* -------- SMART SEARCH -------- */}
             <div className="hidden lg:flex items-center relative" ref={searchRef}>
-              <form onSubmit={handleSearchSubmit} className={`glass-pill flex items-center px-4 py-1.5 transition-all duration-300 ${isSearchFocused ? 'bg-white/15 ring-1 ring-white/20 w-72' : 'w-52'}`}>
-                <Search size={16} className={`shrink-0 transition-colors ${isSearchFocused ? 'text-white' : 'text-gray-400'}`} />
+              <form onSubmit={handleSearchSubmit} className={`glass-pill flex items-center px-4 py-1.5 transition-all duration-500 ${isSearchFocused ? 'bg-black/40 ring-1 ring-white/20 w-80' : 'w-64'}`}>
+                <Search size={16} className={`shrink-0 transition-colors ${isSearchFocused ? 'text-accent-gold' : 'text-gray-400'}`} />
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -203,7 +215,7 @@ const Navbar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.97 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute left-0 top-full mt-3 w-[440px] glass-card border-white/10 shadow-2xl overflow-hidden z-[200]"
+                    className="absolute left-0 top-full mt-3 w-[440px] glass-card bg-black/80 backdrop-blur-2xl border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden z-[200]"
                   >
                     {/* --- Live Search Results --- */}
                     {searchResults.length > 0 ? (
@@ -323,25 +335,25 @@ const Navbar = () => {
                 )}
               </AnimatePresence>
             </div>
-          </div>
-
-          {/* CENTER NAVIGATION */}
-          <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${location.pathname.startsWith(item.path)
-                  ? 'glass-pill-active'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {/* CENTER NAVIGATION */}
+            <div className="hidden md:flex items-center gap-2 shrink-0">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${location.pathname.startsWith(item.path)
+                    ? 'glass-pill-active'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* RIGHT TOOLS */}
-            <Link to="/downloads" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Offline Vault">
+          <div className="flex items-center gap-4 border-l border-white/5 pl-8 ml-auto shrink-0">
+            <Link to="/downloads" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95 shrink-0" title="Offline Vault">
               <Download size={18} />
             </Link>
 
@@ -359,32 +371,116 @@ const Navbar = () => {
               </button>
             </div>
 
-            <Link to="/settings" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95" title="Settings">
+            <Link to="/settings" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95 shrink-0" title="Settings">
               <Settings size={18} />
             </Link>
 
             {user ? (
-              <Link to="/profile" className="hidden md:flex items-center gap-3 glass-pill pl-1 pr-4 py-1 hover:scale-105 active:scale-95 transition-transform">
+              <Link to="/profile" className="hidden md:flex items-center glass-pill p-1 hover:scale-110 active:scale-95 transition-transform ml-2 shrink-0" title="View Profile">
                 <img
                   src={dbUser?.avatar || user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.displayName || 'U'}`}
                   alt="Avatar"
                   className="w-8 h-8 rounded-full border border-white/20 object-cover"
                 />
-                <span className="text-sm font-bold hidden sm:inline">{user.displayName || 'User'}</span>
               </Link>
             ) : (
-              <Link to="/auth" className="hidden md:flex glass-pill-active px-6 py-2 rounded-full text-sm font-bold hover:scale-105 active:scale-95 transition-transform">
+              <Link to="/auth" className="hidden md:flex glass-pill-active px-6 py-2 rounded-full text-sm font-bold hover:scale-105 active:scale-95 transition-transform ml-2">
                 Sign In
               </Link>
             )}
+          </div>
 
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden w-10 h-10 glass-pill flex items-center justify-center ml-auto"
-            >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={() => {
+                  setIsMobileSearchOpen(!isMobileSearchOpen);
+                  if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+                }}
+                className={`md:hidden w-10 h-10 glass-pill flex items-center justify-center transition-all ${isMobileSearchOpen ? 'bg-white/10 text-accent-gold' : ''}`}
+              >
+                <Search size={20} />
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(!isMobileMenuOpen);
+                  if (isMobileSearchOpen) setIsMobileSearchOpen(false);
+                }}
+                className="md:hidden w-10 h-10 glass-pill flex items-center justify-center"
+              >
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
         </div>
+
+        {/* Mobile Search Bar Overlay */}
+        <AnimatePresence>
+          {isMobileSearchOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="md:hidden mt-2 p-2 relative"
+              ref={searchRef}
+            >
+              <form onSubmit={handleSearchSubmit} className="glass-card bg-black/80 backdrop-blur-2xl border-white/10 flex items-center px-4 py-3 shadow-2xl">
+                <Search size={18} className="text-accent-gold shrink-0" />
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Search movies, anime..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none ml-3 w-full"
+                />
+                {searchQuery && (
+                   <button type="button" onClick={() => setSearchQuery('')} className="text-gray-500 hover:text-white ml-2">
+                     <X size={18} />
+                   </button>
+                )}
+              </form>
+
+              {/* Mobile Search Results Overlay */}
+              {isMobileSearchOpen && showDropdown && (
+                 <div className="absolute left-2 right-2 top-full mt-2 glass-card bg-black/90 backdrop-blur-3xl border-white/10 shadow-2xl overflow-hidden z-[210] max-h-[60vh] overflow-y-auto">
+                    {/* Reuse results content logic here or just show the same dropdown content */}
+                    {searchResults.length > 0 ? (
+                      <div className="py-2">
+                         {searchResults.map((item) => (
+                            <button
+                              key={item.id}
+                              onClick={() => handleSelectResult(item)}
+                              className="w-full flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                            >
+                              <img src={item.image} alt="" className="w-10 h-14 rounded-lg object-cover" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold text-white truncate">{item.title}</p>
+                                <p className="text-[10px] text-gray-400">{item.type} • {item.year}</p>
+                              </div>
+                            </button>
+                         ))}
+                      </div>
+                    ) : searchQuery.trim().length > 3 ? (
+                      <div className="p-8 text-center text-gray-500 text-sm">No results found</div>
+                    ) : (
+                      recommendations.length > 0 && (
+                        <div className="p-4">
+                           <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-4">Recommended</span>
+                           <div className="grid grid-cols-3 gap-2">
+                              {recommendations.slice(0, 3).map(item => (
+                                 <button key={item.id} onClick={() => handleSelectResult(item)} className="aspect-[2/3] rounded-lg overflow-hidden border border-white/5">
+                                    <img src={item.image} className="w-full h-full object-cover" alt="" />
+                                 </button>
+                              ))}
+                           </div>
+                        </div>
+                      )
+                    )}
+                 </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Mobile Menu */}
         <AnimatePresence>
@@ -396,17 +492,7 @@ const Navbar = () => {
               className="md:hidden mt-2 glass-card overflow-hidden"
             >
               <div className="px-4 py-4 space-y-2">
-                {/* Mobile Search */}
-                <form onSubmit={handleSearchSubmit} className="glass-pill flex items-center px-4 py-2 mb-4">
-                  <Search size={16} className="text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none ml-2 w-full"
-                  />
-                </form>
+                 {/* Navigation Links */}
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
@@ -432,8 +518,8 @@ const Navbar = () => {
                                     className="w-10 h-10 rounded-full border border-white/20 object-cover"
                                 />
                                 <div>
-                                    <p className="text-sm font-bold">{user.displayName || 'User'}</p>
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">View Profile</p>
+                                    <p className="text-sm font-bold">{dbUser?.name || user.displayName || 'User'}</p>
+                                    <p className="text-[10px] text-accent-gold font-black uppercase tracking-widest mt-0.5">Explore your profile →</p>
                                 </div>
                             </Link>
                             <Link

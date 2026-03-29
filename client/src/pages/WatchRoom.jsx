@@ -279,6 +279,10 @@ const WatchRoom = () => {
   const [currentUserData, setCurrentUserData] = useState(null);
   const [localVol, setLocalVol] = useState(65);
   const [micActive, setMicActive] = useState(false);
+  const [played, setPlayed] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [seeking, setSeeking] = useState(false);
+  const playerRef = useRef(null);
 
   useEffect(() => {
     let unsubscribeDoc = null;
@@ -394,8 +398,18 @@ const WatchRoom = () => {
       setMessages(prev => [...prev, message]);
     });
 
-    newSocket.on('sync_play', () => setIsPlaying(true));
-    newSocket.on('sync_pause', () => setIsPlaying(false));
+    newSocket.on('sync_play', ({ progress }) => {
+      setIsPlaying(true);
+      if (progress !== undefined && playerRef.current) {
+        playerRef.current.seekTo(progress);
+      }
+    });
+    newSocket.on('sync_pause', ({ progress }) => {
+      setIsPlaying(false);
+      if (progress !== undefined && playerRef.current) {
+        playerRef.current.seekTo(progress);
+      }
+    });
 
     newSocket.on('sync_content', ({ content }) => {
       setSelectedContent(content);
@@ -453,6 +467,13 @@ const WatchRoom = () => {
       }
     });
 
+    newSocket.on('sync_seek', ({ progress }) => {
+      if (!isOwner && playerRef.current) {
+        playerRef.current.seekTo(progress);
+        setPlayed(progress);
+      }
+    });
+
     newSocket.on('entry-declined', () => {
       if (!isOwner) {
         toast.error("The room owner declined your request.");
@@ -474,12 +495,48 @@ const WatchRoom = () => {
     setIsPlaying(newState);
     if (socket) {
       const currentRoomCode = location.pathname.split('/').pop();
+      const currentProgress = playerRef.current ? playerRef.current.getCurrentTime() / duration : 0;
       if (newState) {
-        socket.emit('sync_play', { roomCode: currentRoomCode, progress: 0 });
+        socket.emit('sync_play', { roomCode: currentRoomCode, progress: currentProgress });
       } else {
-        socket.emit('sync_pause', { roomCode: currentRoomCode, progress: 0 });
+        socket.emit('sync_pause', { roomCode: currentRoomCode, progress: currentProgress });
       }
     }
+  };
+
+  const handleProgress = (state) => {
+    if (!seeking) {
+      setPlayed(state.played);
+    }
+  };
+
+  const handleSeekMouseDown = () => {
+    setSeeking(true);
+  };
+
+  const handleSeekChange = (e) => {
+    setPlayed(parseFloat(e.target.value));
+  };
+
+  const handleSeekMouseUp = (e) => {
+    setSeeking(false);
+    const newPlayed = parseFloat(e.target.value);
+    playerRef.current.seekTo(newPlayed);
+    if (socket && isOwner) {
+      const currentRoomCode = location.pathname.split('/').pop();
+      socket.emit('sync_seek', { roomCode: currentRoomCode, progress: newPlayed });
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const date = new Date(seconds * 1000);
+    const hh = date.getUTCHours();
+    const mm = date.getUTCMinutes();
+    const ss = date.getUTCSeconds().toString().padStart(2, '0');
+    if (hh) {
+      return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
+    }
+    return `${mm}:${ss}`;
   };
 
   const handleSendMessage = (e) => {
@@ -540,14 +597,9 @@ const WatchRoom = () => {
       }
     }
 
-    // Fallback: convert youtube-nocookie embed URL to standard YouTube URL for ReactPlayer
-    if (!enrichedItem.videoUrl && enrichedItem.trailerUrl) {
-      let fallbackUrl = enrichedItem.trailerUrl;
-      if (fallbackUrl.includes('youtube-nocookie.com/embed/')) {
-        const videoId = fallbackUrl.split('/embed/')[1]?.split('?')[0];
-        if (videoId) fallbackUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      }
-      enrichedItem.videoUrl = fallbackUrl;
+    // YouTube fallbacks removed as per request
+    if (!enrichedItem.videoUrl) {
+      enrichedItem.videoUrl = ''; // Clear to prevent attempts to play YT
     }
 
     setSelectedContent(enrichedItem);
@@ -717,15 +769,18 @@ const WatchRoom = () => {
                   /* Real Cloudinary Video Player */
                   <div className="absolute inset-0 w-full h-full">
                     <ReactPlayer
-                      src={selectedContent.videoUrl}
+                      ref={playerRef}
+                      url={selectedContent.videoUrl}
                       playing={isPlaying}
-                      controls={true}
+                      controls={false}
                       volume={localVol / 100}
                       width="100%"
                       height="100%"
                       style={{ position: 'absolute', top: 0, left: 0 }}
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
+                      onProgress={handleProgress}
+                      onDuration={(d) => setDuration(d)}
                       config={{
                         file: {
                           attributes: {
@@ -795,9 +850,39 @@ const WatchRoom = () => {
 
           {/* Controls Bar */}
           <div className="p-8 bg-black/60 backdrop-blur-3xl z-20 space-y-6">
-            {/* Simple Progress Bar */}
-            <div className="w-full h-1 bg-white/5 rounded-full cursor-pointer group relative overflow-hidden">
-              <div className={`h-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out ${isPlaying ? 'w-[34%]' : 'w-[28%]'}`} />
+            {/* Real-time Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-gray-500">
+                <span>{formatTime(played * duration)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+              <div className="relative w-full h-1.5 group">
+                <input
+                  type="range"
+                  min={0}
+                  max={0.999999}
+                  step="any"
+                  value={played}
+                  onMouseDown={handleSeekMouseDown}
+                  onChange={handleSeekChange}
+                  onMouseUp={handleSeekMouseUp}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  disabled={!isOwner}
+                />
+                <div className="absolute inset-0 bg-white/5 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-accent-gold shadow-[0_0_15px_rgba(255,215,0,0.5)]"
+                    style={{ width: `${played * 100}%` }}
+                    transition={{ type: "spring", damping: 20, stiffness: 100 }}
+                  />
+                </div>
+                {isOwner && (
+                  <div 
+                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    style={{ left: `calc(${played * 100}% - 6px)` }}
+                  />
+                )}
+              </div>
             </div>
 
             <div className="flex justify-between items-center">

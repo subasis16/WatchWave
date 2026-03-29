@@ -67,16 +67,27 @@ const ContentRow = ({ title, data, ranked = false }) => {
                 onClick={() => handleCardClick(item)}
                 className="relative shrink-0 w-[160px] md:w-[240px] aspect-[2/3] group cursor-pointer"
               >
-                <div className="glass-card w-full h-full p-1.5 relative z-10 hover:scale-105 hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-                   {showTrailer && hoveredId === item.id && item.trailerUrl ? (
-                    <div className="w-full h-full rounded-2xl overflow-hidden">
-                      <iframe
-                        src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playlist=${item.trailerUrl.split('/').pop()}`}
-                        className="w-full h-full object-cover scale-150"
-                        title={item.title}
-                        frameBorder="0"
-                        allow="autoplay"
-                      ></iframe>
+                 <div className="glass-card w-full h-full p-1.5 relative z-10 hover:scale-105 hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+                   {showTrailer && hoveredId === item.id && (item.videoUrl || item.trailerUrl) ? (
+                    <div className="w-full h-full rounded-2xl overflow-hidden bg-black">
+                      {item.videoUrl ? (
+                        <video
+                          src={item.videoUrl}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <iframe
+                          src={`${item.trailerUrl}?autoplay=1&mute=1&controls=0&loop=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playlist=${item.trailerUrl.split('/').pop()}`}
+                          className="w-full h-full object-cover scale-150"
+                          title={item.title}
+                          frameBorder="0"
+                          allow="autoplay"
+                        ></iframe>
+                      )}
                     </div>
                   ) : (
                     <img

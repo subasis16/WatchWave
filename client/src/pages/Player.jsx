@@ -54,7 +54,7 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
             {/* Real Video Preview for Clip */}
             <div className="aspect-video w-full rounded-2xl overflow-hidden glass-card border-white/10 mt-6 relative group">
                 <ReactPlayer 
-                    src={content.trailerUrl}
+                    url={content.videoUrl || content.trailerUrl}
                     playing={isPlaying}
                     muted
                     width="100%"
@@ -139,7 +139,7 @@ const Player = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { volume, updateSetting, captions, toggleSetting, autoplay } = useSettings();
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showClipCreator, setShowClipCreator] = useState(false);
@@ -182,6 +182,15 @@ const Player = () => {
   }, [isPlaying]);
 
   useEffect(() => {
+    const handleMouseMove = () => resetIdle();
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [resetIdle]);
+
+  useEffect(() => {
     if (!isPlaying) {
       setIsIdle(false);
     } else {
@@ -190,13 +199,20 @@ const Player = () => {
   }, [isPlaying, resetIdle]);
 
   useEffect(() => {
-    const handleMouseMove = () => resetIdle();
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    };
-  }, [resetIdle]);
+    const video = playerRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn("⚠️ playback pre-empted check:", error);
+            });
+        }
+    } else {
+        video.pause();
+    }
+  }, [isPlaying]);
 
   const shouldShowUI = !isIdle || !isPlaying;
 
@@ -229,15 +245,6 @@ const Player = () => {
         const localContent = allSiteContent.find(c => c.id === id) || movies[0];
         if (localContent?.videoUrl) {
           resolvedUrl = localContent.videoUrl;
-        } else if (localContent?.trailerUrl) {
-          resolvedUrl = localContent.trailerUrl;
-        }
-      }
-
-      if (resolvedUrl && resolvedUrl.includes('youtube-nocookie.com/embed/')) {
-        const videoId = resolvedUrl.split('/embed/')[1]?.split('?')[0];
-        if (videoId) {
-          resolvedUrl = `https://www.youtube.com/watch?v=${videoId}`;
         }
       }
 
@@ -248,6 +255,12 @@ const Player = () => {
 
     fetchVideo();
   }, [id]);
+
+  useEffect(() => {
+    if (activeUrl) {
+        console.log('🎥 Active Playback URL:', activeUrl);
+    }
+  }, [activeUrl]);
 
   if (authLoading) return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
@@ -269,7 +282,7 @@ const Player = () => {
     
     // Save current time to seek back after resolution swap
     if (playerRef.current) {
-        seekTimeRef.current = playerRef.current.getCurrentTime();
+        seekTimeRef.current = playerRef.current.currentTime;
     }
     
     setResolution(newRes);
@@ -345,82 +358,58 @@ const Player = () => {
       <div
         className="absolute inset-0 z-0 opacity-20 blur-[120px] scale-150 pointer-events-none"
         style={{
-          backgroundImage: `url(${content.image})`,
+          backgroundImage: `url(${content?.image})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       />
 
-      <div 
-        className="w-full h-full relative z-10 overflow-hidden bg-black" 
-        onClick={() => {
-            const nextPlaying = !isPlaying;
-            setIsPlaying(nextPlaying);
-            if (nextPlaying) setIsIdle(true);
-        }}
-      >
+      <div className="w-full h-full relative z-10 overflow-hidden bg-black">
+        {/* Click to Pause/Play Overlay (behind controls) */}
+        <div 
+            className="absolute inset-0 z-10 cursor-pointer"
+            onClick={() => {
+                const nextPlaying = !isPlaying;
+                setIsPlaying(nextPlaying);
+                if (nextPlaying) setIsIdle(true);
+            }}
+        />
+
         <div className={`w-full h-full absolute inset-0 flex items-center justify-center`}>
-          {activeUrl && activeUrl.includes('youtube.com') ? (
-            <iframe
-                src={`https://www.youtube.com/embed/${activeUrl.split('v=')[1]}?autoplay=1&mute=${volume === 0 ? 1 : 0}&playsinline=1&controls=1`}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                title="YouTube Video Player"
-            />
-          ) : (
-            <ReactPlayer 
+            <video 
               ref={playerRef}
               src={activeUrl}
-              playing={isPlaying}
-            volume={volume / 100}
-            muted={volume === 0}
-            playsinline={true}
-            onProgress={(state) => {
-              setProgress(state.played * 100);
-              setCurrentSeconds(state.playedSeconds);
-              setCurrentTimeStr(new Date(state.playedSeconds * 1000).toISOString().substr(14, 5));
-            }}
-            onReady={() => {
-              if (playerRef.current) {
-                const dur = playerRef.current.getDuration();
+              autoPlay={false}
+              playsInline
+              muted={volume === 0}
+              className="w-full h-full object-cover"
+              style={{ transform: 'scale(1.03)', transition: 'all 1s' }}
+              onPlay={() => console.log('▶️ Native Video: started playing')}
+              onPause={() => console.log('⏸️ Native Video: paused')}
+              onTimeUpdate={(e) => {
+                const video = e.currentTarget;
+                const p = (video.currentTime / video.duration) * 100;
+                if (!isNaN(p)) setProgress(p);
+                setCurrentSeconds(video.currentTime);
+                setCurrentTimeStr(new Date(video.currentTime * 1000).toISOString().substr(14, 5));
+              }}
+              onLoadedMetadata={(e) => {
+                const dur = e.currentTarget.duration;
                 if (dur && !isNaN(dur)) {
                   setTotalDuration(dur);
                   setDurationStr(new Date(dur * 1000).toISOString().substr(14, 5));
                 }
                 
                 // Seek back to the saved time after resolution changes
-                if (seekTimeRef.current !== null) {
-                    playerRef.current.seekTo(seekTimeRef.current, 'seconds');
+                if (seekTimeRef.current !== null && playerRef.current) {
+                    playerRef.current.currentTime = seekTimeRef.current;
                     seekTimeRef.current = null;
-                    setIsPlaying(true);
                 }
-              }
-            }}
-            onError={(e) => console.log('Player Error:', e)}
-            width="100%"
-            height="100%"
-            style={{ transform: 'scale(1.03)', transition: 'all 1s', opacity: isPlaying ? 1 : 0.4, filter: isPlaying ? 'none' : 'grayscale(100%) blur(4px)' }}
-            config={{
-              youtube: {
-                playerVars: { 
-                  autoplay: 1, 
-                  controls: activeUrl && activeUrl.includes('youtube.com') ? 1 : 0, 
-                  modestbranding: 1, 
-                  rel: 0, 
-                  showinfo: 0, 
-                  disablekb: 0,
-                  cc_load_policy: captions ? 1 : 0 
-                }
-              },
-              file: {
-                attributes: {
-                  controlsList: 'nodownload'
-                }
-              }
-            }}
-          />
-          )}
+              }}
+              onWaiting={() => console.log('⏳ Native Video: buffering')}
+              onCanPlay={() => console.log('✅ Native Video: ready to play')}
+              onError={(e) => console.log('🆘 Native Video Error:', e)}
+            />
         </div>
         
         {/* Cinematic Subtitle Overlay */}
@@ -441,14 +430,18 @@ const Player = () => {
             )}
         </AnimatePresence>
         
-        {!isPlaying && !showClipCreator && (!activeUrl || !activeUrl.includes('youtube.com')) && (
-            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+        {!isPlaying && !showClipCreator && (
+            <div className="absolute inset-0 flex items-center justify-center z-20">
                 <motion.button 
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="w-24 h-24 rounded-full glass-pill-active flex items-center justify-center shadow-3xl transform transition-all"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsPlaying(true);
+                    }}
+                    className="w-24 h-24 rounded-full glass-pill flex items-center justify-center shadow-3xl transform transition-all hover:scale-110 active:scale-95 cursor-pointer border border-white/20"
                 >
-                    <Play size={40} fill="white" className="ml-2" />
+                    <Play size={40} fill="white" className="ml-2 text-white" />
                 </motion.button>
             </div>
         )}
@@ -456,7 +449,7 @@ const Player = () => {
 
       {/* Controls Area (Hidden for YouTube embeds since they have native controls) */}
       <AnimatePresence>
-        {shouldShowUI && !showClipCreator && (!activeUrl || !activeUrl.includes('youtube.com')) && (
+        {shouldShowUI && !showClipCreator && (
           <motion.div
             initial={{ opacity: 0, scale: 0.98, y: 20, x: "-50%" }}
             animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
@@ -470,7 +463,9 @@ const Player = () => {
                     if(playerRef.current) {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const percent = (e.clientX - rect.left) / rect.width;
-                        playerRef.current.seekTo(percent, 'fraction');
+                        if (playerRef.current) {
+                            playerRef.current.currentTime = percent * playerRef.current.duration;
+                        }
                         setProgress(percent * 100);
                     }
                 }}
@@ -497,7 +492,7 @@ const Player = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (playerRef.current) {
-                        playerRef.current.seekTo(currentSeconds - 10, 'seconds');
+                        playerRef.current.currentTime = Math.max(0, playerRef.current.currentTime - 10);
                       }
                     }}
                     className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
@@ -508,7 +503,7 @@ const Player = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (playerRef.current) {
-                        playerRef.current.seekTo(currentSeconds + 10, 'seconds');
+                        playerRef.current.currentTime = Math.min(playerRef.current.duration, playerRef.current.currentTime + 10);
                       }
                     }}
                     className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition border-white/5"
@@ -522,6 +517,7 @@ const Player = () => {
                   <div 
                     className="w-24 md:w-32 h-1 bg-white/5 rounded-full overflow-hidden cursor-pointer"
                     onClick={(e) => {
+                        e.stopPropagation();
                         const rect = e.currentTarget.getBoundingClientRect();
                         const newVol = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
                         updateSetting('volume', newVol);
@@ -565,7 +561,10 @@ const Player = () => {
                                 {resolutionsList.map(r => (
                                     <button
                                         key={r.value}
-                                        onClick={() => handleResolutionChange(r.value)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleResolutionChange(r.value);
+                                        }}
                                         className={`w-full text-left px-4 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${
                                             resolution === r.value 
                                             ? 'bg-accent-gold text-black shadow-[0_0_15px_rgba(255,215,0,0.3)]' 

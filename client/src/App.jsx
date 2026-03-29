@@ -87,9 +87,20 @@ const App = () => {
           <div className="glass-card p-8 md:p-16 border-white/10">
             <div className="flex flex-col md:flex-row justify-between items-start gap-10 md:gap-12">
               <div className="max-w-md w-full">
-                <span className="text-xl md:text-2xl font-black text-white tracking-widest">
-                  WATCHWAVE
-                </span>
+                <Link to="/" className="flex flex-col items-start group leading-none">
+                  <span 
+                    className="text-4xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text leading-none select-none"
+                    style={{ 
+                      backgroundImage: 'linear-gradient(to bottom right, #ffffff, #FFD700, #DAA520)',
+                      filter: 'drop-shadow(0 0 15px rgba(255,215,0,0.5))'
+                    }}
+                  >
+                    W
+                  </span>
+                  <span className="text-[10px] md:text-[12px] font-black text-white/50 tracking-[0.6em] uppercase group-hover:text-white transition-colors mt-1">
+                    WATCHWAVE
+                  </span>
+                </Link>
                 <p className="mt-4 text-sm md:text-base text-gray-400 font-medium leading-relaxed">
                   Experience the future of entertainment with our streaming platform. Cinema-grade quality, anywhere you are.
                 </p>

@@ -8,28 +8,28 @@ import { auth } from '../firebase';
 
 const HERO_DATA = [
   {
-    id: 'h1',
+    id: 'm1',
     title: 'Avengers: Endgame',
     image: 'https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg',
     genres: ['Action', 'Sci-Fi'],
     description: 'After the devastating events of Infinity War, the world is in ruins. With the help of remaining allies, the Avengers assemble once more in order to restore order to the world.',
   },
   {
-    id: 'h3',
+    id: 'b1',
     title: '3 Idiots',
     image: 'https://image.tmdb.org/t/p/w1280/66A9MqXOyVFCssoloscw79z8Tew.jpg', // Confirmed wide backdrop for 3 Idiots
     genres: ['Comedy', 'Drama'],
     description: 'In college, Farhan and Raju form a great bond with Rancho due to his positive and refreshing outlook on life. Years later, a bet gives them a chance to look for their long-lost friend.',
   },
   {
-    id: 'h4',
+    id: 't4',
     title: 'Oppenheimer',
     image: 'https://image.tmdb.org/t/p/w1280/nb3xI8XI3w4pMVZ38VijbsyBqP4.jpg',
     genres: ['Drama', 'History'],
     description: 'During World War II, Lt. Gen. Leslie Groves Jr. appoints physicist J. Robert Oppenheimer to work on the top-secret Manhattan Project.',
   },
   {
-    id: 'h5',
+    id: 'cr1',
     title: 'The Dark Knight',
     image: 'https://image.tmdb.org/t/p/w1280/qJ2tW6WMUDux911r6m7haRef0WH.jpg', // Wide backdrop for The Dark Knight
     genres: ['Action', 'Crime'],
@@ -155,7 +155,7 @@ const Hero = () => {
                 <button 
                   onClick={async () => {
                     toast.loading(`Downloading ${currentMovie.title}...`, { id: 'download' });
-                    const success = await saveVideo(currentMovie, "https://www.youtube.com/watch?v=dQw4w9WgXcQ"); // Mock URL
+                    const success = await saveVideo(currentMovie, "https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336485/ONE_PIECE__Season_2___Official_Trailer___Netflix_1080P_HD_ee4vjb.mp4"); // Using Cloudinary Sample
                     if (success) {
                       toast.success(`${currentMovie.title} added to Vault!`, { id: 'download' });
                     } else {
