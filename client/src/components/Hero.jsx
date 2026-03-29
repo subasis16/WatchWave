@@ -139,7 +139,7 @@ const Hero = () => {
                 <button 
                   onClick={() => {
                     if (!auth.currentUser) {
-                      toast.error("Transmission Locked. Sign in to watch!", {
+                      toast.error("Please sign in to watch!", {
                         style: { background: 'rgba(0,0,0,0.8)', color: '#fff', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,215,0,0.3)' }
                       });
                       navigate('/auth');

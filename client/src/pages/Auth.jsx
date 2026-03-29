@@ -55,7 +55,7 @@ const Auth = () => {
                     name: formData.name,
                     email: formData.email,
                     createdAt: new Date().toISOString(),
-                    bio: 'New explorer in the cinematic world.',
+                    bio: 'Lover of great movies.',
                     isOnline: true,
                     badges: ['b1']
                 });

@@ -163,6 +163,7 @@ const Navbar = () => {
     { name: 'Movies', path: '/movies' },
     { name: 'Anime', path: '/anime' },
     { name: 'Party', path: '/party' },
+    ...(user?.email === 'subasis16007@gmail.com' ? [{ name: 'Admin', path: '/admin' }] : []),
     { name: 'Plans', path: '/plans' },
   ];
 
@@ -360,15 +361,52 @@ const Navbar = () => {
             <div className="hidden md:flex relative items-center" ref={notifRef}>
               <button
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
-                className="w-10 h-10 glass-pill flex items-center justify-center relative hover:scale-110 active:scale-95"
+                className="w-10 h-10 glass-pill flex items-center justify-center relative hover:scale-110 active:scale-95 group transition-all"
               >
-                <Bell size={18} />
+                <Bell size={18} className={isNotifOpen ? 'text-accent-gold' : 'text-gray-400 group-hover:text-white'} />
                 {unreadCount > 0 && (
-                  <span className="bg-[#E50914] text-white absolute top-0 right-0 rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold shadow-lg">
+                  <span className="bg-[#E50914] text-white absolute -top-1 -right-1 rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center font-black shadow-[0_0_15px_rgba(229,9,20,0.4)] border-2 border-black/20">
                     {unreadCount}
                   </span>
                 )}
               </button>
+
+              <AnimatePresence>
+                {isNotifOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute top-full right-0 mt-4 w-80 glass-card bg-black/80 backdrop-blur-2xl border-white/10 shadow-3xl z-[220] overflow-hidden"
+                  >
+                    <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Transmission Log</span>
+                      {unreadCount > 0 && (
+                        <button onClick={() => notifications.forEach(n => !n.read && markAsRead(n.id))} className="text-[8px] font-black uppercase tracking-widest text-accent-gold hover:text-white transition-colors">Mark all</button>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                      {notifications.length === 0 ? (
+                        <div className="py-12 text-center text-gray-600 text-[10px] font-black uppercase tracking-widest italic">No active signals</div>
+                      ) : (
+                        notifications.map(notif => (
+                          <div 
+                            key={notif.id} 
+                            onClick={() => markAsRead(notif.id)}
+                            className={`px-6 py-5 border-b border-white/[0.03] transition-colors cursor-pointer group hover:bg-white/[0.02] ${notif.read ? 'opacity-50' : 'bg-white/[0.02]'}`}
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-accent-gold">{notif.type}</span>
+                              <span className="text-[8px] font-black text-gray-700 uppercase tracking-widest">{new Date(notif.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <p className="text-xs text-gray-400 group-hover:text-white transition-colors leading-relaxed">{notif.content}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <Link to="/settings" className="hidden md:flex w-10 h-10 glass-pill items-center justify-center text-gray-400 hover:text-white hover:scale-110 transition-all active:scale-95 shrink-0" title="Settings">

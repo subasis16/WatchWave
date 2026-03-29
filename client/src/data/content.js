@@ -1,15 +1,17 @@
 import soloLevelingImg from '../assets/solo-leveling.png';
+import dangalImg from '../assets/Screenshot 2026-03-29 231154.png';
+import slamDunkImg from '../assets/Screenshot 2026-03-29 231226.png';
 
 export const trending = [
   { id: 't1', title: 'Stranger Things', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F595%2F1489169.jpg', year: '2022', match: '99', age: '16+',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774338448/Stranger_Things_5___Official_Trailer___Netflix_2K_HD_dxdrjv.webm' },
-  { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+' },
+  { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336778/The_Dark_Knight_2008_Official_Trailer__1_-_Christopher_Nolan_Movie_HD_720P_HD_cwze2e.mp4' },
   { id: 't3', title: 'One Piece', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F617%2F1543011.jpg', year: '2024', match: '98', age: '14+',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336485/ONE_PIECE__Season_2___Official_Trailer___Netflix_1080P_HD_ee4vjb.mp4' },
-  { id: 't4', title: 'Oppenheimer', image: 'https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtZjg3YS00NmFiLWIyZmQtZTJmNTM5MjVmYTQ4XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '97', age: '18+' },
+  { id: 't4', title: 'Oppenheimer', image: 'https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtZjg3YS00NmFiLWIyZmQtZTJmNTM5MjVmYTQ4XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '97', age: '18+', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336778/The_Dark_Knight_2008_Official_Trailer__1_-_Christopher_Nolan_Movie_HD_720P_HD_cwze2e.mp4' },
   { id: 't5', title: 'Solo Leveling', image: soloLevelingImg, year: '2024', match: '96', age: '16+',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774337739/Solo_Leveling_-_Official_Trailer_English_Sub_1080P_HD_i6xyhx.mp4' }
 ];
 
 export const anime = [
-  { id: 'a1', title: 'One Piece', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F617%2F1543011.jpg', year: '1999', match: '99', age: 'TV-14' },
+  { id: 'a1', title: 'One Piece', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F617%2F1543011.jpg', year: '1999', match: '99', age: 'TV-14', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336485/ONE_PIECE__Season_2___Official_Trailer___Netflix_1080P_HD_ee4vjb.mp4' },
   { id: 'a3', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg', year: '2019', match: '99', age: 'TV-MA' },
   { id: 'a4', title: 'Jujutsu Kaisen', image: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg', year: '2020', match: '98', age: 'TV-MA' },
   { id: 'a5', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg', year: '2013', match: '99', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336292/Attack_on_Titan_Season_1_Trailer_1080P_HD_qolejg.mp4' },
@@ -17,6 +19,7 @@ export const anime = [
 ];
 
 export const movies = [
+  { id: 'tm2', title: 'Oppenheimer', image: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', year: '2023', match: '98', age: 'R', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336778/The_Dark_Knight_2008_Official_Trailer__1_-_Christopher_Nolan_Movie_HD_720P_HD_cwze2e.mp4' },
   { id: 'm1', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '99', age: 'PG-13', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336778/The_Dark_Knight_2008_Official_Trailer__1_-_Christopher_Nolan_Movie_HD_720P_HD_cwze2e.mp4' },
   { id: 'm4', title: 'Interstellar', image: 'https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', year: '2014', match: '97', age: 'PG-13', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774337936/Titanic_3D_Re-Release_Official_Trailer__1_-_Leonardo_DiCaprio__Kate_Winslet_Movie_2012_HD_1080P_HD_lyuxge.mp4' },
   { id: 'm5', title: 'Inception', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F6%2F16423.jpg', year: '2010', match: '96', age: 'PG-13', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774338448/Stranger_Things_5___Official_Trailer___Netflix_2K_HD_dxdrjv.webm' },
@@ -49,7 +52,7 @@ export const bollywoodHits = [
   { id: 'bh1', title: 'Animal', image: 'https://m.media-amazon.com/images/M/MV5BZThmNDg1NjUtNWJhMC00YjA3LWJiMjItNmM4ZDQ5ZGZiN2Y2XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '98', age: 'PG-13' },
   { id: 'bh2', title: 'Pathaan', image: 'https://m.media-amazon.com/images/M/MV5BNDdkNTY1MDQtY2I5MC00OTFlLTg5OWQtZWE2YzE5NWFiMDgzXkEyXkFqcGc@._V1_SX300.jpg', year: '2022', match: '99', age: 'R' },
   { id: 'bh3', title: 'KGF: Chapter 2', image: 'https://wsrv.nl/?url=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fen%2Fd%2Fd0%2FK.G.F_Chapter_2.jpg', year: '2016', match: '98', age: 'PG-13' },
-  { id: 'bh4', title: 'Dangal', image: 'https://m.media-amazon.com/images/M/MV5BMjMxNjM0NDMxNV5BMl5BanBnXkFtZTgwODQzODM3MDI@._V1_SX300.jpg', year: '2016', match: '99', age: 'PG' },
+  { id: 'bh4', title: 'Dangal', image: dangalImg, year: '2016', match: '99', age: 'PG' },
   { id: 'bh5', title: 'Kantara', image: 'https://m.media-amazon.com/images/M/MV5BY2VkZjk5ZjMtM2ExOS00ZDA1LTg1ZDEtYTliNGZiYTc4ZWZiXkEyXkFqcGc@._V1_SX300.jpg', year: '2014', match: '97', age: 'PG-13' }
 ];
 
@@ -157,7 +160,7 @@ export const sportAnime = [
   { id: 'sa2', title: 'Haikyuu!!', image: 'https://cdn.myanimelist.net/images/anime/7/76014.jpg', year: '2014', match: '99', age: 'TV-14' },
   { id: 'sa3', title: 'Kuroko no Basket', image: 'https://cdn.myanimelist.net/images/anime/11/50453.jpg', year: '2012', match: '95', age: 'TV-14' },
   { id: 'sa4', title: 'Hajime no Ippo', image: 'https://cdn.myanimelist.net/images/anime/4/86334.jpg', year: '2000', match: '98', age: 'TV-14' },
-  { id: 'sa5', title: 'Slam Dunk', image: 'https://wsrv.nl/?url=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fen%2F5%2F52%2FSlamDunk-Kanzenban01.jpg', year: '1993', match: '94', age: 'TV-14' }
+  { id: 'sa5', title: 'Slam Dunk', image: slamDunkImg, year: '1993', match: '94', age: 'TV-14' }
 ];
 
 export const sciFiAnime = [

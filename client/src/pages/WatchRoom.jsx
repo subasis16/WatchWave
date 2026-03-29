@@ -61,21 +61,21 @@ const ShareModal = ({ isOpen, onClose }) => {
         {!showInvites ? (
           <div className="flex flex-col gap-6 mt-4">
             <div className="text-center space-y-2">
-              <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Share Session</h3>
-              <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Share Screen</h2>
+              <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Invite Friends</h3>
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Bring the Squad</h2>
             </div>
             <div className="space-y-4">
               <button
                 onClick={handleCopy}
                 className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl glass-card border-white/5 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white transition-all transition-all duration-500"
               >
-                <Copy size={18} /> Copy Invite Key
+                <Copy size={18} /> Copy Invite Link
               </button>
               <button
                 onClick={() => setShowInvites(true)}
                 className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl glass-pill-active text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-2xl"
               >
-                <UserPlus size={18} /> Target Contacts
+                <UserPlus size={18} /> From My Friends
               </button>
             </div>
           </div>
@@ -199,14 +199,14 @@ const RoomSettings = ({ isOwner, socket, roomCode }) => {
           <div className="w-10 h-10 rounded-xl glass-card border-white/10 flex items-center justify-center text-white">
             <Settings size={20} />
           </div>
-          <h3 className="text-[10px] font-black text-white tracking-[0.3em] uppercase">Core Admin</h3>
+          <h3 className="text-[10px] font-black text-white tracking-[0.3em] uppercase">Room Settings</h3>
         </div>
       </div>
 
       <div className="space-y-8 relative z-10">
         <div className="space-y-4">
           <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">
-            <span>Media Gain</span>
+            <span>Movie Volume</span>
             <span className="text-accent-gold">{movieVol}%</span>
           </div>
           <input
@@ -400,13 +400,13 @@ const WatchRoom = () => {
 
     newSocket.on('sync_play', ({ progress }) => {
       setIsPlaying(true);
-      if (progress !== undefined && playerRef.current) {
+      if (progress !== undefined && playerRef.current && typeof playerRef.current.seekTo === 'function') {
         playerRef.current.seekTo(progress);
       }
     });
     newSocket.on('sync_pause', ({ progress }) => {
       setIsPlaying(false);
-      if (progress !== undefined && playerRef.current) {
+      if (progress !== undefined && playerRef.current && typeof playerRef.current.seekTo === 'function') {
         playerRef.current.seekTo(progress);
       }
     });
@@ -468,7 +468,7 @@ const WatchRoom = () => {
     });
 
     newSocket.on('sync_seek', ({ progress }) => {
-      if (!isOwner && playerRef.current) {
+      if (!isOwner && playerRef.current && typeof playerRef.current.seekTo === 'function') {
         playerRef.current.seekTo(progress);
         setPlayed(progress);
       }
@@ -495,7 +495,10 @@ const WatchRoom = () => {
     setIsPlaying(newState);
     if (socket) {
       const currentRoomCode = location.pathname.split('/').pop();
-      const currentProgress = playerRef.current ? playerRef.current.getCurrentTime() / duration : 0;
+      let currentProgress = 0;
+      if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function' && duration > 0) {
+        currentProgress = playerRef.current.getCurrentTime() / duration;
+      }
       if (newState) {
         socket.emit('sync_play', { roomCode: currentRoomCode, progress: currentProgress });
       } else {
@@ -521,7 +524,9 @@ const WatchRoom = () => {
   const handleSeekMouseUp = (e) => {
     setSeeking(false);
     const newPlayed = parseFloat(e.target.value);
-    playerRef.current.seekTo(newPlayed);
+    if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
+      playerRef.current.seekTo(newPlayed);
+    }
     if (socket && isOwner) {
       const currentRoomCode = location.pathname.split('/').pop();
       socket.emit('sync_seek', { roomCode: currentRoomCode, progress: newPlayed });
@@ -644,9 +649,9 @@ const WatchRoom = () => {
           <div className="absolute inset-0 bg-accent-gold/20 blur-[100px] animate-pulse rounded-full" />
           <div className="w-24 h-24 border-2 border-accent-gold/30 border-t-accent-gold rounded-full animate-spin mb-10 relative z-10 shadow-[0_0_50px_rgba(255,215,0,0.2)]" />
         </div>
-        <h2 className="text-[10px] font-black text-white tracking-[0.6em] uppercase mb-4 relative z-10">Encrypted Connection</h2>
-        <h3 className="text-4xl font-black text-white tracking-tighter uppercase relative z-10">Waiting for Server</h3>
-        <p className="text-gray-500 mt-6 text-[10px] font-black uppercase tracking-[0.2em] relative z-10 opacity-60">Handshaking via Global Servers</p>
+        <h2 className="text-[10px] font-black text-white tracking-[0.6em] uppercase mb-4 relative z-10">Joining the Party</h2>
+        <h3 className="text-4xl font-black text-white tracking-tighter uppercase relative z-10">Getting ready...</h3>
+        <p className="text-gray-500 mt-6 text-[10px] font-black uppercase tracking-[0.2em] relative z-10 opacity-60">Connecting with your friends</p>
       </div>
     );
   }
@@ -656,22 +661,13 @@ const WatchRoom = () => {
   return (
     <div className="min-h-screen text-white pt-24 pb-4 overflow-hidden flex flex-col h-screen font-sans selection:bg-accent-gold selection:text-black">
 
-      {/* Dev Toggles */}
-      <div className="fixed top-28 left-8 z-[100] flex gap-3">
-        <button
-          onClick={() => setIsOwner(!isOwner)}
-          className="glass-pill px-5 py-2.5 text-[8px] font-black uppercase tracking-[0.2em] border-white/10 hover:bg-white/10 transition-all text-gray-400 hover:text-white"
-        >
-          {isOwner ? 'Role: Host' : 'Role: Viewer'}
-        </button>
-      </div>
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative max-w-[1920px] mx-auto w-full px-6 gap-6 pb-6 mt-4">
 
         {/* =========================================
-            LEFT COLUMN: MAIN STAGE 
+            LEFT COLUMN: MAIN STAGE (Cinema Screen)
             ========================================= */}
-        <div className="flex-1 lg:w-[70%] flex flex-col relative overflow-hidden glass-card border-white/5 shadow-2xl">
+        <div className="flex-1 lg:w-[84%] flex flex-col relative overflow-hidden glass-card border-white/5 shadow-2xl">
 
           {/* Mood Selector Overlay */}
           <AnimatePresence>
@@ -685,39 +681,45 @@ const WatchRoom = () => {
                 {!currentMood ? (
                   <div className="text-center w-full max-w-5xl">
                     <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-16">
-                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-4">Sentiment Engine</h3>
-                      <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Connect Room Vibe</h2>
+                      <h3 className="text-[10px] font-black text-[#E50914] uppercase tracking-[0.8em] mb-4">Pick Your Mood</h3>
+                      <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none drop-shadow-[0_20px_50px_rgba(229,9,20,0.3)]">Set the Party<br/>Vibe</h2>
                     </motion.div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                      {moods.map((mood, idx) => (
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
+                      {moods.map((mood) => (
                         <motion.button
                           key={mood.id}
-                          initial={{ opacity: 0, y: 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.05, duration: 0.8, ease: "circOut" }}
-                          whileHover={{ scale: 1.02, y: -5 }}
-                          whileTap={{ scale: 0.98 }}
+                          whileHover={{ scale: 1.05, y: -5 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => setCurrentMood(mood)}
-                          className="group relative overflow-hidden rounded-[2.5rem] glass-card p-10 aspect-video flex flex-col justify-between items-center text-center transition-all bg-white/[0.02] border-white/5 hover:border-white/20 shadow-2xl"
+                          className="glass-card p-10 flex flex-col items-center gap-6 group hover:border-[#E50914]/40 shadow-3xl relative overflow-hidden bg-white/[0.01]"
                         >
-                          <div className={`p-4 rounded-2xl ${mood.color} text-white shadow-2xl brightness-90 group-hover:brightness-110 transition-all`}>
-                            <mood.icon size={32} />
+                          <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity ${mood.color}`} />
+                          <div className={`w-24 h-24 rounded-[2.5rem] ${mood.color} flex items-center justify-center text-white shadow-3xl group-hover:rotate-6 transition-all duration-700`}>
+                            <mood.icon size={44} strokeWidth={2.5} />
                           </div>
-                          <span className="font-black text-white text-sm tracking-[0.3em] uppercase">{mood.name}</span>
+                          <div className="text-center relative z-10">
+                            <h4 className="text-[12px] font-black text-white uppercase tracking-[0.4em] mb-2 group-hover:text-[#E50914] transition-colors">{mood.name}</h4>
+                            <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest leading-relaxed max-w-[150px]">{mood.description}</p>
+                          </div>
+                          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                              <Play size={12} fill="white" />
+                            </div>
+                          </div>
                         </motion.button>
                       ))}
                     </div>
-                    <button onClick={() => setShowMoodSelector(false)} className="mt-16 text-gray-500 hover:text-accent-gold text-[10px] font-black tracking-[0.3em] uppercase transition-all">Skip Connection</button>
+                    <button onClick={() => setShowMoodSelector(false)} className="mt-16 text-gray-500 hover:text-accent-gold text-[10px] font-black tracking-[0.3em] uppercase transition-all">Skip for Now</button>
                   </div>
                 ) : (
                   <div className="w-full max-w-6xl">
                     <button onClick={() => setCurrentMood(null)} className="mb-12 text-gray-400 hover:text-white flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] transition-colors">
-                      <ArrowLeft size={16} /> Back to Sentiment Catalog
+                      <ArrowLeft size={16} /> Back to Genres
                     </button>
                     <div className="mb-12">
-                      <h3 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.4em] mb-4">Recommended for {currentMood.name} Phase</h3>
-                      <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Content Stream</h2>
+                      <h3 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.4em] mb-4">Perfect for a {currentMood.name} night</h3>
+                      <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Pick a Movie</h2>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-8">
                       {recommendations.map((item, idx) => (
@@ -755,8 +757,8 @@ const WatchRoom = () => {
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-accent-gold animate-pulse shadow-[0_0_10px_#FFD700]" />
               <h2 className="text-[10px] font-black text-gray-300 tracking-[0.4em] uppercase">
-                <span className="opacity-40">Active Feed:</span>
-                <span className="text-white ml-2">{selectedContent ? selectedContent.title : 'Idle'}</span>
+                <span className="opacity-40">Now Playing:</span>
+                <span className="text-white ml-2">{selectedContent ? selectedContent.title : 'Waiting...'}</span>
               </h2>
             </div>
           </div>
@@ -795,7 +797,7 @@ const WatchRoom = () => {
                   /* Poster Image Fallback */
                   <>
                     <img
-                      src={selectedContent.image.replace('w500', 'original')}
+                      src={selectedContent.image?.includes('w500') ? selectedContent.image.replace('w500', 'original') : selectedContent.image}
                       alt="Video Feed"
                       className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${isPlaying ? 'opacity-70 scale-100' : 'opacity-30 scale-110 grayscale blur-xl'}`}
                     />
@@ -941,74 +943,82 @@ const WatchRoom = () => {
         </div>
 
         {/* =========================================
-            RIGHT COLUMN: SOCIAL PANEL
+            RIGHT COLUMN: SOCIAL PANEL (Compact Edition)
             ========================================= */}
-        <div className="w-full lg:w-[30%] lg:min-w-[400px] flex flex-col gap-6 shrink-0 overflow-y-auto custom-scrollbar">
+        <div className="w-full lg:w-[16%] flex flex-col gap-6 shrink-0 overflow-y-auto custom-scrollbar">
 
           {/* Header Action Row */}
-          <div className="flex items-center justify-between glass-pill p-4 border-white/5 shadow-2xl">
-            <div className="flex gap-3">
-              <button onClick={() => navigate('/party')} className="w-12 h-12 flex items-center justify-center rounded-2xl glass-pill border-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                <LogOut size={20} />
+          <div className="flex items-center justify-between glass-pill p-3 border-white/5 shadow-2xl gap-3 flex-wrap">
+            <div className="flex gap-2">
+              <button onClick={() => navigate('/party')} className="w-10 h-10 flex items-center justify-center rounded-xl glass-pill border-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                <LogOut size={16} />
               </button>
-              <button onClick={() => setIsShareModalOpen(true)} className="w-12 h-12 flex items-center justify-center rounded-2xl glass-pill border-white/10 text-gray-300 hover:border-accent-gold/50 hover:text-accent-gold transition-all">
-                <Share2 size={20} />
+              <button onClick={() => setIsShareModalOpen(true)} className="w-10 h-10 flex items-center justify-center rounded-xl glass-pill border-white/10 text-gray-300 hover:border-accent-gold/50 hover:text-accent-gold transition-all">
+                <Share2 size={16} />
               </button>
             </div>
 
-            <div className="flex -space-x-4">
-              {participants.map((p) => (
-                <div key={p.id} className="relative group">
-                  <img src={p.avatar} alt={p.name} className={`w-12 h-12 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-accent-gold shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'border-[#050505]'}`} />
-                  {p.isSpeaking && <div className="absolute inset-0 rounded-full border-2 border-white/50 animate-ping" />}
+            <div className="flex -space-x-2.5">
+              {participants.slice(0, 3).map((p) => (
+                <div key={p.id} className="relative group shrink-0">
+                  <img src={p.avatar} alt={p.name} className={`w-9 h-9 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-[#E50914] shadow-[0_0_10px_rgba(229,9,20,0.3)]' : 'border-[#050505]'}`} />
                 </div>
               ))}
-              <div className="w-12 h-12 rounded-full glass-card border-white/10 flex items-center justify-center text-[10px] font-black z-10">+2</div>
+              {participants.length > 3 && (
+                <div className="w-9 h-9 rounded-full glass-card border-white/10 flex items-center justify-center text-[7px] font-black z-10 bg-black/40">+{participants.length - 3}</div>
+              )}
             </div>
           </div>
 
           {/* Social Chat */}
           <div className="flex-1 min-h-[500px] glass-card border-white/5 flex flex-col overflow-hidden shadow-3xl">
-            <div className="px-8 py-6 border-b border-white/5 flex items-center gap-4 bg-white/[0.02] text-[10px] font-black text-gray-500 tracking-[0.3em] uppercase">
-              <div className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-pulse shadow-[0_0_10px_#FFD700]" />
+            <div className="px-8 py-6 border-b border-white/10 flex items-center gap-4 bg-gradient-to-r from-[#E50914]/10 to-transparent text-[10px] font-black text-[#E50914] tracking-[0.4em] uppercase shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+              <div className="w-1.5 h-1.5 bg-[#E50914] rounded-full animate-ping shadow-[0_0_10px_#E50914]" />
               Live Chat
             </div>
 
-            <div ref={chatScrollContainerRef} className="flex-1 overflow-y-auto px-8 py-10 space-y-10 custom-scrollbar scroll-smooth">
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex gap-5 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
-                  <div className="relative shrink-0">
-                    <img src={msg.avatar} className="w-12 h-12 rounded-2xl shadow-2xl border border-white/5 object-cover" alt={msg.user} />
-                    {msg.isMe && <div className="absolute inset-0 rounded-2xl bg-accent-gold/10 pointer-events-none" />}
-                  </div>
-                  <div className={`flex flex-col max-w-[80%] ${msg.isMe ? 'items-end' : 'items-start'}`}>
-                    <div className={`flex items-center gap-3 mb-2 opacity-40 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
-                      <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{msg.user}</span>
-                      <span className="text-[8px] font-mono text-gray-600">{msg.time}</span>
-                    </div>
-                    <div className={`px-5 py-3 rounded-[1.5rem] text-[13px] font-medium leading-loose shadow-2xl transition-all ${msg.isMe
-                      ? 'glass-pill-active border-accent-gold/20 rounded-tr-none'
-                      : 'glass-card border-white/5 rounded-tl-none bg-white/[0.03]'
-                      }`}>
-                      {msg.text}
-                    </div>
-                  </div>
+            <div ref={chatScrollContainerRef} className="flex-1 overflow-y-auto px-8 py-10 space-y-12 custom-scrollbar scroll-smooth">
+              {messages.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center opacity-20 space-y-4">
+                  <div className="h-px w-20 bg-white" />
+                  <span className="text-[9px] font-black uppercase tracking-[1em]">Join the Conversation...</span>
+                  <div className="h-px w-20 bg-white" />
                 </div>
-              ))}
+              ) : (
+                messages.map((msg) => (
+                  <div key={msg.id} className={`flex gap-6 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
+                    <div className="relative shrink-0">
+                      <img src={msg.avatar} className={`w-14 h-14 rounded-[1.5rem] shadow-2xl border border-white/10 object-cover ${msg.isMe ? 'grayscale-0' : 'grayscale group-hover:grayscale-0 transition-all duration-700'}`} alt={msg.user} />
+                    </div>
+                    <div className={`flex flex-col max-w-[90%] ${msg.isMe ? 'items-end text-right' : 'items-start text-left'}`}>
+                      <div className={`flex items-center gap-2 mb-1.5 opacity-20 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
+                        <span className="text-[7px] font-black text-white uppercase tracking-[0.1em]">{msg.user}</span>
+                        <span className="text-[6px] font-black text-gray-500 uppercase">{msg.time}</span>
+                      </div>
+                      <div className={`px-4 py-2.5 rounded-[1.2rem] text-[10px] font-bold leading-snug shadow-3xl transition-all ${msg.isMe
+                        ? 'bg-gradient-to-br from-[#E50914]/30 to-[#E50914]/10 text-white border-[#E50914]/40 rounded-tr-none'
+                        : 'bg-white/[0.04] text-gray-300 border-white/10 rounded-tl-none'
+                        } border backdrop-blur-3xl`}>
+                        {msg.text}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
-            <div className="p-8 border-t border-white/5 bg-white/[0.02]">
+            <div className="p-8 border-t border-white/5 bg-black/40 backdrop-blur-2xl">
               <form onSubmit={handleSendMessage} className="relative group">
-                <div className="absolute inset-0 bg-white/5 blur-xl group-focus-within:bg-accent-gold/5 transition-all rounded-3xl" />
+                <div className="absolute inset-0 bg-[#E50914]/5 blur-xl group-focus-within:bg-[#E50914]/10 transition-all rounded-3xl" />
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Send message..."
-                  className="w-full bg-black/50 backdrop-blur-md text-[13px] text-white rounded-[1.5rem] py-5 pl-8 pr-16 focus:outline-none border border-white/5 focus:border-white/20 transition-all shadow-2xl relative z-10 font-medium"
+                  placeholder="Say something..."
+                  className="w-full bg-black/50 backdrop-blur-md text-[11px] text-white rounded-2xl py-4 pl-6 pr-14 focus:outline-none border border-white/5 focus:border-[#E50914]/40 transition-all shadow-2xl relative z-10 font-medium"
                 />
-                <button type="submit" disabled={!input.trim()} className={`absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-xl transition-all z-20 ${input.trim() ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]' : 'text-gray-600'}`}>
-                  <Send size={16} />
+                <button type="submit" disabled={!input.trim()} className={`absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl transition-all z-20 ${input.trim() ? 'bg-[#E50914] text-white' : 'text-gray-700'}`}>
+                  <Send size={14} />
                 </button>
               </form>
             </div>

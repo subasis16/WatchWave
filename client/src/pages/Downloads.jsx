@@ -64,8 +64,8 @@ const Downloads = () => {
                 {/* Header section with sleek storage tracking */}
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
                     <div className="space-y-6">
-                        <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">Storage Layer / Local Screen</h3>
-                        <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-none">Cinematic <br/> Vault</h2>
+                        <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">My Offline Collection</h3>
+                        <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-none">Cinematic <br/> Favorites</h2>
                     </div>
 
                     <div className="w-full lg:w-[450px] glass-card p-8 md:p-10 border-white/5 shadow-3xl relative overflow-hidden group">
@@ -74,7 +74,7 @@ const Downloads = () => {
                         </div>
                         <div className="flex justify-between items-end mb-6 relative z-10">
                             <div className="space-y-1">
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Storage Allocation</span>
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Stored Content</span>
                                 <h4 className="text-2xl font-black text-white uppercase tracking-tighter">{storageUsed} GB <span className="text-gray-600 text-lg">/ {maxStorage} GB</span></h4>
                             </div>
                         </div>
@@ -105,8 +105,8 @@ const Downloads = () => {
                         <div className="w-24 h-24 rounded-[2rem] glass-card flex items-center justify-center mb-10 border-white/10 opacity-20">
                             <DownloadCloud size={40} className="text-white" strokeWidth={1.5} />
                         </div>
-                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Vault Empty</h2>
-                        <p className="text-[10px] text-gray-600 mt-6 uppercase tracking-[0.4em] font-bold max-w-xs leading-relaxed">Encrypted offline objects will be indexed here for cinematic playback.</p>
+                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Your List is Empty</h2>
+                        <p className="text-[10px] text-gray-600 mt-6 uppercase tracking-[0.4em] font-bold max-w-xs leading-relaxed">Movies you download for offline watching will appear here.</p>
                     </motion.div>
                 ) : (
                     <div className="space-y-10">

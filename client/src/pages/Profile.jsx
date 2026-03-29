@@ -83,7 +83,7 @@ const Profile = () => {
           toast.error("Image too large. Please use an image under 20MB.", { style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' }});
           return;
       }
-      toast("Syncing Image Engine...", { icon: '⚙️', id: 'img-upload', style: { background: 'rgba(255,255,255,0.1)', color: '#fff' }});
+      toast("Uploading Profile Photo...", { icon: '⚙️', id: 'img-upload', style: { background: 'rgba(255,255,255,0.1)', color: '#fff' }});
       
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -210,11 +210,6 @@ const Profile = () => {
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-gray-500 font-black text-[10px] uppercase tracking-widest">
-                <Hash size={12} className="text-accent-gold" />
-                screen-0034-alpha
-              </div>
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
             </div>
 
             <div className="flex items-center justify-center gap-4 w-full max-w-xl mx-auto pt-4">

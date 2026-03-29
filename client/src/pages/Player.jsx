@@ -48,8 +48,8 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
         </button>
 
         <div className="mb-12 space-y-4">
-            <h3 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.6em]">Scene Selector</h3>
-            <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Forge Highlight Clip</h2>
+            <h3 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.6em]">Pick a Scene</h3>
+            <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Create a Fan Clip</h2>
             
             {/* Real Video Preview for Clip */}
             <div className="aspect-video w-full rounded-2xl overflow-hidden glass-card border-white/10 mt-6 relative group">
@@ -94,7 +94,7 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
                     <div className="text-white text-base font-mono">00:43:12</div>
                 </div>
                 <div className="text-center font-black text-accent-gold">
-                    {(range[1] - range[0]) / 2}s Fragment
+                    {(range[1] - range[0]) / 2}s Clip
                 </div>
                 <div className="space-y-1 text-right">
                     <span className="opacity-40">Exit Screen</span>
@@ -107,7 +107,7 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
                   onClick={onClose}
                   className="py-5 rounded-2xl glass-card border-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition-all"
                 >
-                  Discard Fragment
+                  Discard Clip
                 </button>
                 <button 
                   disabled={isCapturing || clipSaved}
@@ -117,15 +117,15 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
                   {isCapturing ? (
                     <div className="flex items-center justify-center gap-3">
                         <div className="w-2 h-2 bg-white rounded-full animate-ping" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Processing Screen...</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Saving Clip...</span>
                     </div>
                   ) : clipSaved ? (
                     <div className="flex items-center justify-center gap-3 text-white">
                         <Check size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Connected!</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Saved!</span>
                     </div>
                   ) : (
-                    <span className="text-[10px] font-black uppercase tracking-widest">Forge Sequence</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Save Clip</span>
                   )}
                 </button>
             </div>

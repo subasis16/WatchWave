@@ -154,9 +154,9 @@ const SocialSidebar = () => {
     return (
         <div className="h-full w-full bg-[#050505]/95 backdrop-blur-2xl border-l border-white/5 flex flex-col z-20 overflow-hidden relative shadow-[-40px_0_100px_rgba(0,0,0,0.9)]">
             
-            {/* Background Neural Accents */}
-            <div className="absolute top-0 right-[-10%] w-[120%] h-80 bg-accent-gold/[0.03] blur-[150px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-80 bg-white/[0.02] blur-[150px] rounded-full pointer-events-none" />
+            {/* Background Theater Accents */}
+            <div className="absolute top-0 right-[-10%] w-[120%] h-80 bg-[#E50914]/[0.05] blur-[150px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-80 bg-[#E50914]/[0.02] blur-[150px] rounded-full pointer-events-none" />
 
             <div className="px-8 pt-12 shrink-0 relative z-20 space-y-10">
                 <div className="flex items-end justify-between">
@@ -165,15 +165,15 @@ const SocialSidebar = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="space-y-2"
                     >
-                        <h2 className="text-[16px] font-black uppercase tracking-[0.6em] text-white flex items-center gap-4">
-                            <span className="w-1.5 h-6 bg-accent-gold rounded-full" />
-                            Parties
+                        <h2 className="text-[16px] font-black uppercase tracking-[0.6em] text-[#E50914] flex items-center gap-4">
+                            <span className="w-1.5 h-6 bg-accent-gold rounded-full shadow-[0_0_15px_#FFD700]" />
+                            Watching Together
                         </h2>
-                        <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] ml-5">Neural Sync: Enabled</p>
+                        <p className="text-[9px] font-black text-gray-700 uppercase tracking-[0.4em] ml-5">Social Hub: Active</p>
                     </motion.div>
-                    <div className="glass-pill px-6 py-2.5 text-[9px] font-black text-green-500 border-green-500/20 uppercase tracking-[0.3em] flex items-center gap-3 shadow-[0_0_30px_rgba(34,197,94,0.2)] bg-white/[0.03] border backdrop-blur-3xl">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_#22c55e]" />
-                        Active
+                    <div className="glass-pill px-6 py-2.5 text-[9px] font-black text-[#E50914] border-[#E50914]/20 uppercase tracking-[0.3em] flex items-center gap-3 shadow-[0_0_30px_rgba(229,9,20,0.2)] bg-black/40 border backdrop-blur-3xl">
+                        <span className="w-2 h-2 bg-[#E50914] rounded-full animate-pulse shadow-[0_0_15px_#E50914]" />
+                        Party Live
                     </div>
                 </div>
 
@@ -183,16 +183,16 @@ const SocialSidebar = () => {
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                             navigator.clipboard.writeText(window.location.href);
-                            toast.success("Party Link Copied to Neural Interface");
+                            toast.success("Party Link Copied");
                         }}
-                        className="w-full flex items-center justify-between p-6 glass-card border-white/10 bg-white/[0.03] transition-all group relative overflow-hidden rounded-[2.5rem] shadow-2xl"
+                        className="w-full flex items-center justify-between p-6 glass-card border-white/10 bg-black/40 transition-all group relative overflow-hidden rounded-[2.5rem] shadow-3xl"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-accent-gold/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#E50914]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                         <div className="flex flex-col items-start relative z-10">
-                            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-white group-hover:text-accent-gold transition-colors">Start Watch Party</span>
-                            <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest group-hover:text-white/40 transition-colors mt-2">Broadcast your session</span>
+                            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 group-hover:text-white transition-colors">Invite More Friends</span>
+                            <span className="text-[8px] font-black text-gray-800 uppercase tracking-widest group-hover:text-accent-gold transition-colors mt-2">Send your party link</span>
                         </div>
-                        <div className="w-12 h-12 rounded-[1.5rem] bg-white/5 flex items-center justify-center group-hover:bg-accent-gold group-hover:text-black transition-all duration-500 shadow-2xl">
+                        <div className="w-12 h-12 rounded-[1.5rem] bg-white/5 flex items-center justify-center group-hover:bg-[#E50914] group-hover:text-white transition-all duration-500 shadow-2xl">
                             <Share2 size={18} className="group-hover:rotate-12 transition-transform duration-500" />
                         </div>
                     </motion.button>
@@ -220,10 +220,10 @@ const SocialSidebar = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex flex-col items-center justify-center py-24 space-y-5"
+                            className="flex flex-col items-center justify-center py-24 space-y-6"
                         >
-                            <Loader2 className="animate-spin text-accent-gold" size={40} strokeWidth={2.5} />
-                            <span className="text-[10px] font-black uppercase tracking-[0.6em] text-gray-700 animate-pulse">Initializing Network...</span>
+                            <Loader2 className="animate-spin text-[#E50914] drop-shadow-[0_0_15px_rgba(229,9,20,0.5)]" size={40} strokeWidth={2.5} />
+                            <span className="text-[10px] font-black uppercase tracking-[0.8em] text-white/40 animate-pulse">Finding Friends...</span>
                         </motion.div>
                     ) : activeTab === 'friends' && (
                         <motion.div
@@ -233,9 +233,9 @@ const SocialSidebar = () => {
                             exit={{ opacity: 0 }}
                             className="space-y-8"
                         >
-                            <div className="flex items-center justify-between px-3">
-                                <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">Network Peers</span>
-                                <div className="h-[1px] flex-1 bg-gradient-to-r from-white/5 to-transparent mx-6" />
+                             <div className="flex items-center justify-between px-3">
+                                <span className="text-[10px] font-black text-[#E50914] uppercase tracking-[0.6em]">Your Friends</span>
+                                <div className="h-[1px] flex-1 bg-gradient-to-r from-[#E50914]/20 to-transparent mx-6" />
                             </div>
 
                             {filteredFriends.length > 0 ? (
@@ -288,15 +288,15 @@ const SocialSidebar = () => {
                                         <Users size={32} className="text-gray-800" />
                                     </div>
                                     <div className="space-y-2">
-                                        <p className="text-[12px] font-black text-white/40 uppercase tracking-[0.4em]">Isolation Detected</p>
-                                        <p className="text-[9px] font-bold text-gray-800 uppercase tracking-widest leading-relaxed">Expand your network to<br/>begin collective viewing.</p>
+                                        <p className="text-[12px] font-black text-white/40 uppercase tracking-[0.4em]">No Friends Yet</p>
+                                        <p className="text-[9px] font-bold text-gray-800 uppercase tracking-widest leading-relaxed">Invite some friends to<br/>start watching together.</p>
                                     </div>
                                 </div>
                             )}
 
                             <div className="pt-16 space-y-10">
                                 <div className="flex items-center justify-between px-3">
-                                    <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">Neural Discovery</span>
+                                    <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">Suggested Friends</span>
                                     <div className="h-[1px] flex-1 bg-gradient-to-r from-white/5 to-transparent mx-6" />
                                 </div>
                                 
@@ -318,7 +318,7 @@ const SocialSidebar = () => {
                                             </div>
                                             <div className="ml-6 flex flex-col">
                                                 <h4 className="text-[12px] font-black text-white/50 group-hover:text-white uppercase tracking-[0.2em] transition-colors">{user.name}</h4>
-                                                <p className="text-[8px] font-black text-gray-800 mt-2 uppercase tracking-[0.4em]">Potential Ally</p>
+                                                <p className="text-[8px] font-black text-gray-800 mt-2 uppercase tracking-[0.4em]">Suggested Friend</p>
                                             </div>
                                             <motion.button 
                                                 whileHover={{ scale: 1.1, backgroundColor: '#fff', color: '#000' }}
@@ -330,7 +330,7 @@ const SocialSidebar = () => {
                                         </motion.div>
                                     )) : (
                                         <div className="text-center py-6">
-                                            <p className="text-[9px] font-black text-gray-800 uppercase tracking-[0.6em] italic">Deep scan complete. Network saturated.</p>
+                                            <p className="text-[9px] font-black text-gray-800 uppercase tracking-[0.6em] italic">No more suggestions for now.</p>
                                         </div>
                                     )}
                                 </div>
@@ -374,7 +374,7 @@ const SocialSidebar = () => {
                             <div className="flex-1 overflow-y-auto hide-scrollbar space-y-10 py-6 px-4 flex flex-col relative z-20">
                                 <div className="flex items-center justify-center gap-6 mb-8 opacity-20">
                                     <div className="h-[1px] w-16 bg-white" />
-                                    <div className="text-[10px] font-black tracking-[0.8em] text-center text-white uppercase">Neural Link Established</div>
+                                    <div className="text-[10px] font-black tracking-[0.8em] text-center text-white uppercase">Conversation Started</div>
                                     <div className="h-[1px] w-16 bg-white" />
                                 </div>
 
@@ -411,7 +411,7 @@ const SocialSidebar = () => {
                                         value={currentMessage}
                                         onChange={(e) => setCurrentMessage(e.target.value)}
                                         onKeyPress={handleKeyPress}
-                                        placeholder={`Neural Pulse to ${activeChatUser.name.split(' ')[0]}...`}
+                                        placeholder={`Message to ${activeChatUser.name.split(' ')[0]}...`}
                                         className="w-full bg-[#080808]/90 border border-white/10 rounded-[2.5rem] pl-10 pr-20 py-6 text-[13px] font-bold uppercase tracking-[0.3em] text-white placeholder-gray-800 focus:outline-none focus:border-accent-gold/60 focus:bg-black transition-all shadow-[inset_0_4px_30px_rgba(0,0,0,0.9)] backdrop-blur-3xl"
                                     />
                                     <motion.button
@@ -426,7 +426,7 @@ const SocialSidebar = () => {
                                 </div>
                                 <div className="mt-6 flex items-center justify-center gap-4 opacity-50">
                                     <div className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-ping" />
-                                    <span className="text-[8px] font-black text-gray-700 uppercase tracking-[0.8em]">End-to-End Encrypted Trace</span>
+                                    <span className="text-[8px] font-black text-gray-700 uppercase tracking-[0.8em]">Secure Chat Enabled</span>
                                 </div>
                             </div>
                         </motion.div>

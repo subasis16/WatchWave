@@ -100,7 +100,7 @@ const OfflinePlayer = () => {
                     </h2>
                 </div>
                 <div className="glass-pill px-6 py-2 border-accent-gold/20 text-[10px] font-black uppercase tracking-[0.4em] text-accent-gold shadow-[0_0_20px_rgba(255,215,0,0.1)]">
-                    Vault Storage Active
+                    Offline Mode
                 </div>
             </div>
 
@@ -109,7 +109,7 @@ const OfflinePlayer = () => {
                 <div className="flex flex-col items-center gap-6 z-10">
                     <Loader2 size={48} className="text-accent-gold animate-spin" />
                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">
-                        Loading from vault...
+                        Loading your movie...
                     </p>
                 </div>
             )}

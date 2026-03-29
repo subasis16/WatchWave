@@ -422,6 +422,17 @@ const UsersTab = () => {
         finally { setActionLoading(null); }
     };
 
+    const handleDeleteUser = async (uid) => {
+        if (!confirm('PERMANENTLY SEVER ACCESS? This will delete the user profile from the database forever.')) return;
+        setActionLoading(uid + '_del');
+        try {
+            await adminFetch(`/api/admin/users/${uid}`, { method: 'DELETE' });
+            setUsers(prev => prev.filter(u => u.uid !== uid));
+            toast.success('Identity Database Purged');
+        } catch (err) { toast.error(err.message); }
+        finally { setActionLoading(null); }
+    };
+
     const handleSubscription = async (uid) => {
         setActionLoading(uid + '_sub');
         try {
@@ -528,6 +539,14 @@ const UsersTab = () => {
                                             title={user.banned ? "Restore Screen" : "Sever Screen Access"}
                                         >
                                             {user.banned ? <CheckCircle size={18} /> : <Ban size={18} />}
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteUser(user.uid)}
+                                            disabled={actionLoading === user.uid + '_del'}
+                                            className="text-gray-600 hover:text-red-700 transition-colors disabled:opacity-30"
+                                            title="Permanent Deletion"
+                                        >
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
                                 </td>
@@ -676,6 +695,13 @@ const Admin = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         const checkAdmin = async () => {
+             // Instant access for the whitelist email on client-side
+            if (auth.currentUser?.email === 'subasis16007@gmail.com') {
+                setIsAdmin(true);
+                setAdminName(auth.currentUser.displayName || auth.currentUser.email);
+                return;
+            }
+
             try {
                 const token = await getToken();
                 const res = await fetch(`${API_URL}/api/admin/stats`, {
