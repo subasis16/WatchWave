@@ -7,8 +7,10 @@ import {
     LayoutDashboard, Users, Film, Bell, Shield, Search,
     Plus, Pencil, Trash2, Ban, CheckCircle, Send, X,
     TrendingUp, Activity, Tv, Star, ChevronDown, Save,
-    ArrowLeft, RefreshCw, AlertTriangle, Crown
+    ArrowLeft, RefreshCw, AlertTriangle, Crown, MessageSquare,
+    Mail, ExternalLink, Filter, Eye, Hash
 } from 'lucide-react';
+import { onSnapshot } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -58,56 +60,69 @@ const StatCard = ({ label, value, icon: Icon, color, sub }) => (
 // ============================================
 // DASHBOARD TAB
 // ============================================
-const DashboardTab = () => {
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        adminFetch('/api/admin/stats')
-            .then(data => setStats(data.stats))
-            .catch(err => toast.error(err.message))
-            .finally(() => setLoading(false));
-    }, []);
-
-    if (loading) return (
-        <div className="flex items-center justify-center h-96">
-            <div className="w-12 h-12 border-2 border-white/5 border-t-white rounded-full animate-spin shadow-[0_0_30px_rgba(255,255,255,0.1)]" />
-        </div>
-    );
-
+const DashboardTab = ({ stats, users, content, feedback, messages }) => {
     return (
         <div className="space-y-12 animate-slide-up">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard label="Total Users" value={stats?.totalUsers} icon={Users} color="bg-blue-500/10" />
-                <StatCard label="Active Subs" value={stats?.activeSubscriptions} icon={Crown} color="bg-accent-gold/10" sub="Active Network Users" />
-                <StatCard label="Live Rooms" value={stats?.activeRooms} icon={Tv} color="bg-green-500/10" sub="Social Watch Parties" />
-                <StatCard label="Custom Artifacts" value={stats?.customContent} icon={Film} color="bg-purple-500/10" />
+                <StatCard label="Total Identities" value={users?.length || stats?.totalUsers} icon={Users} color="bg-blue-500/10" sub="Registered Entities" />
+                <StatCard label="Active Subs" value={users?.filter(u => u.subscriptionStatus === 'active').length || stats?.activeSubscriptions} icon={Crown} color="bg-accent-gold/10" sub="Premium Access Hubs" />
+                <StatCard label="Live Buffers" value={stats?.activeRooms} icon={Tv} color="bg-green-500/10" sub="Active Watch Parties" />
+                <StatCard label="Media Artifacts" value={content?.length || stats?.customContent} icon={Film} color="bg-purple-500/10" sub="Custom Content Docs" />
             </div>
 
-            <div className="glass-card border-white/5 p-10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
-                    <Activity size={80} />
+            <div className="grid lg:grid-cols-2 gap-12">
+                {/* System Integrity */}
+                <div className="glass-card border-white/5 p-10 relative overflow-hidden h-fit">
+                    <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
+                        <Activity size={80} />
+                    </div>
+                    <h3 className="text-[10px] text-gray-500 font-black uppercase tracking-[0.5em] mb-10 flex items-center gap-3">
+                        <Activity size={14} className="text-accent-gold" /> Core System Integrity
+                    </h3>
+                    <div className="grid gap-6">
+                        {[
+                            { label: 'Primary API Hub', status: 'Operational', ok: true },
+                            { label: 'Direct Firestore Link', status: 'Established', ok: true },
+                            { label: 'Cloud Transmission', status: 'Connected', ok: true },
+                        ].map(item => (
+                            <div key={item.label} className="flex items-center justify-between px-8 py-5 glass-card border-white/5 bg-white/[0.01] hover:border-white/10 transition-all">
+                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">{item.label}</span>
+                                <span className={`flex items-center gap-3 font-black text-[9px] uppercase tracking-widest ${item.ok ? 'text-green-400' : 'text-red-400'}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${item.ok ? 'bg-green-400 animate-pulse shadow-[0_0_10px_#4ade80]' : 'bg-red-400 shadow-[0_0_10px_#f87171]'}`} />
+                                    {item.status}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <h3 className="text-[10px] text-gray-500 font-black uppercase tracking-[0.5em] mb-10 flex items-center gap-3">
-                    <Activity size={14} className="text-accent-gold" /> Core System Integrity
-                </h3>
-                <div className="grid lg:grid-cols-3 gap-8 text-sm">
-                    {[
-                        { label: 'Primary API Hub', status: 'Operational', ok: true },
-                        { label: 'Direct Firestore Link', status: 'Established', ok: true },
-                        { label: 'Real-time WebSocket', status: 'Connected', ok: true },
-                    ].map(item => (
-                        <div key={item.label} className="flex items-center justify-between px-8 py-5 glass-card border-white/5 bg-white/[0.01] hover:border-white/10 transition-all">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">{item.label}</span>
-                            <span className={`flex items-center gap-3 font-black text-[9px] uppercase tracking-widest ${item.ok ? 'text-green-400' : 'text-red-400'}`}>
-                                <span className={`w-1.5 h-1.5 rounded-full ${item.ok ? 'bg-green-400 animate-pulse shadow-[0_0_10px_#4ade80]' : 'bg-red-400 shadow-[0_0_10px_#f87171]'}`} />
-                                {item.status}
-                            </span>
-                        </div>
-                    ))}
+
+                {/* Live Feed (Real-time Activity) */}
+                <div className="glass-card border-white/5 p-10 relative overflow-hidden">
+                    <h3 className="text-[10px] text-gray-500 font-black uppercase tracking-[0.5em] mb-10 flex items-center gap-3">
+                        <TrendingUp size={14} className="text-accent-gold" /> Live Activity Feed
+                    </h3>
+                    <div className="space-y-6 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
+                        {[
+                            ...(users?.slice(0, 3).map(u => ({ type: 'user', name: u.name || u.email, msg: 'Joined the network', icon: Users, time: u.lastActive })) || []),
+                            ...(content?.slice(0, 3).map(c => ({ type: 'content', name: c.title, msg: 'New artifact published', icon: Film, time: c.createdAt })) || []),
+                            ...(feedback?.slice(0, 3).map(f => ({ type: 'feedback', name: f.email, msg: 'Transmission received', icon: MessageSquare, time: f.timestamp })) || []),
+                        ].sort((a, b) => new Date(b.time) - new Date(a.time)).map((item, i) => (
+                            <div key={i} className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/[0.02] border border-transparent hover:border-white/5 transition-all">
+                                <div className="w-10 h-10 rounded-xl bg-white/[0.03] flex items-center justify-center shrink-0">
+                                    <item.icon size={16} className="text-gray-500" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-white">
+                                        <span className="text-accent-gold">{item.name}</span> — {item.msg}
+                                    </p>
+                                    <p className="text-[8px] font-bold text-gray-600 uppercase tracking-widest">{new Date(item.time).toLocaleTimeString()}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-
         </div>
     );
 };
@@ -115,8 +130,8 @@ const DashboardTab = () => {
 // ============================================
 // CONTENT TAB
 // ============================================
-const ContentTab = () => {
-    const [content, setContent] = useState([]);
+const ContentTab = ({ initialContent }) => {
+    const [content, setContent] = useState(initialContent || []);
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({
@@ -125,14 +140,7 @@ const ContentTab = () => {
     });
     const [loading, setLoading] = useState(false);
 
-    const fetchContent = async () => {
-        try {
-            const data = await adminFetch('/api/admin/content');
-            setContent(data.content || []);
-        } catch (err) { toast.error(err.message); }
-    };
-
-    useEffect(() => { fetchContent(); }, []);
+    useEffect(() => { setContent(initialContent); }, [initialContent]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -156,7 +164,6 @@ const ContentTab = () => {
             setShowForm(false);
             setEditing(null);
             setForm({ title: '', description: '', image: '', backdrop: '', trailerUrl: '', type: 'movie', genre: '', year: new Date().getFullYear(), age: 'TV-14', match: 85 });
-            fetchContent();
         } catch (err) { toast.error(err.message); }
         finally { setLoading(false); }
     };
@@ -183,7 +190,6 @@ const ContentTab = () => {
         try {
             await adminFetch(`/api/admin/content/${id}`, { method: 'DELETE' });
             toast.success('Deleted!');
-            fetchContent();
         } catch (err) { toast.error(err.message); }
     };
 
@@ -396,18 +402,13 @@ const ContentTab = () => {
 // ============================================
 // USERS TAB
 // ============================================
-const UsersTab = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
+const UsersTab = ({ initialUsers }) => {
+    const [users, setUsers] = useState(initialUsers || []);
+    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [actionLoading, setActionLoading] = useState(null);
 
-    useEffect(() => {
-        adminFetch('/api/admin/users')
-            .then(data => setUsers(data.users || []))
-            .catch(err => toast.error(err.message))
-            .finally(() => setLoading(false));
-    }, []);
+    useEffect(() => { setUsers(initialUsers); }, [initialUsers]);
 
     const handleBan = async (uid, currentBanned) => {
         setActionLoading(uid);
@@ -566,6 +567,90 @@ const UsersTab = () => {
 };
 
 // ============================================
+// FEEDBACK TAB
+// ============================================
+const FeedbackTab = ({ feedbacks }) => (
+    <div className="space-y-10 animate-slide-up">
+        <div className="flex items-center justify-between">
+            <div>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Transmission Feed</h3>
+                <p className="text-[10px] text-gray-600 mt-2 font-bold uppercase tracking-[0.2em]">{feedbacks.length} Feedback Packets Intercepted</p>
+            </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {feedbacks.map(f => (
+                <div key={f.id} className="glass-card border-white/5 p-8 space-y-6 hover:border-white/10 transition-all group relative overflow-hidden">
+                    <div className="flex justify-between items-start">
+                        <div className="flex gap-1 text-accent-gold">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={10} fill={i < f.rating ? 'currentColor' : 'none'} className={i < f.rating ? '' : 'text-gray-700'} />)}
+                        </div>
+                        <span className="text-[8px] font-black text-gray-700 uppercase tracking-widest">{new Date(f.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <p className="text-sm text-gray-300 font-medium leading-relaxed">"{f.message}"</p>
+                    <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                        <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{f.email || 'Anonymous Agent'}</div>
+                        <span className="glass-pill px-3 py-1 text-[8px] font-black text-accent-gold border-accent-gold/20">{f.category}</span>
+                    </div>
+                </div>
+            ))}
+            {feedbacks.length === 0 && (
+                <div className="col-span-full py-20 text-center glass-card border-white/5 border-dashed">
+                    <MessageSquare size={32} className="mx-auto mb-4 opacity-10" />
+                    <p className="text-[10px] text-gray-600 uppercase tracking-widest font-black">Archive Empty. No feedback found.</p>
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+// ============================================
+// MESSAGES TAB (Contact)
+// ============================================
+const MessagesTab = ({ messages }) => (
+    <div className="space-y-10 animate-slide-up">
+        <div className="flex items-center justify-between">
+            <div>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Direct Signals</h3>
+                <p className="text-[10px] text-gray-600 mt-2 font-bold uppercase tracking-[0.2em]">{messages.length} Priority Encounters Logged</p>
+            </div>
+        </div>
+
+        <div className="glass-card border-white/5 overflow-hidden shadow-3xl">
+            <table className="w-full text-left">
+                <thead className="bg-white/[0.02] border-b border-white/5">
+                    <tr>
+                        <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Origin</th>
+                        <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Transmission Payload</th>
+                        <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 text-right">Time</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.03]">
+                    {messages.map((m) => (
+                        <tr key={m.id} className="group hover:bg-white/[0.01] transition-all duration-500">
+                            <td className="px-10 py-8">
+                                <p className="text-sm font-black text-white uppercase tracking-tight">{m.name}</p>
+                                <p className="text-[9px] text-gray-600 uppercase font-bold tracking-widest mt-1">{m.email}</p>
+                            </td>
+                            <td className="px-10 py-8 text-sm text-gray-400 font-medium leading-relaxed max-w-xl">{m.message}</td>
+                            <td className="px-10 py-8 text-right text-[10px] font-black text-gray-600 uppercase tracking-widest">
+                                {m.timestamp ? new Date(m.timestamp).toLocaleString() : 'Just now'}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            {messages.length === 0 && (
+                <div className="py-20 text-center">
+                    <Mail size={32} className="mx-auto mb-4 opacity-10" />
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black">Communication Hub Silent.</p>
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+// ============================================
 // NOTIFICATIONS TAB
 // ============================================
 const NotificationsTab = () => {
@@ -681,9 +766,11 @@ const NotificationsTab = () => {
 // ============================================
 const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'content', label: 'Content', icon: Film },
     { id: 'users', label: 'Users', icon: Users },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'feedback', label: 'Feedback', icon: MessageSquare },
+    { id: 'messages', label: 'Messages', icon: Mail },
 ];
 
 const Admin = () => {
@@ -691,39 +778,78 @@ const Admin = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isAdmin, setIsAdmin] = useState(null); 
     const [adminName, setAdminName] = useState('');
+    
+    // Real-time Data States
+    const [users, setUsers] = useState([]);
+    const [content, setContent] = useState([]);
+    const [feedback, setFeedback] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         window.scrollTo(0, 0);
         const checkAdmin = async () => {
-             // Instant access for the whitelist email on client-side
             if (auth.currentUser?.email === 'subasis16007@gmail.com') {
                 setIsAdmin(true);
                 setAdminName(auth.currentUser.displayName || auth.currentUser.email);
-                return;
-            }
-
-            try {
-                const token = await getToken();
-                const res = await fetch(`${API_URL}/api/admin/stats`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (res.status === 403 || res.status === 401) {
-                    setIsAdmin(false);
-                } else {
-                    setIsAdmin(true);
-                    setAdminName(auth.currentUser?.displayName || auth.currentUser?.email || 'Admin Operator');
-                }
-            } catch {
-                setIsAdmin(false);
+            } else {
+                try {
+                    const token = await getToken();
+                    const res = await fetch(`${API_URL}/api/admin/stats`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (res.status === 403 || res.status === 401) setIsAdmin(false);
+                    else {
+                        setIsAdmin(true);
+                        setAdminName(auth.currentUser?.displayName || auth.currentUser?.email || 'Admin Operator');
+                    }
+                } catch { setIsAdmin(false); }
             }
         };
 
-        const unsubscribe = auth.onAuthStateChanged(user => {
+        const unsubscribeAuth = auth.onAuthStateChanged(user => {
             if (!user) { setIsAdmin(false); return; }
             checkAdmin();
         });
-        return () => unsubscribe();
-    }, []);
+
+        // Initialize Real-time Listeners once admin status is confirmed
+        let unsubUsers, unsubContent, unsubFeedback, unsubMessages, statsInterval;
+        
+        if (isAdmin) {
+             unsubUsers = onSnapshot(query(collection(db, 'users'), orderBy('lastActive', 'desc'), limit(100)), (snapshot) => {
+                setUsers(snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() })));
+            });
+            unsubContent = onSnapshot(query(collection(db, 'content'), orderBy('createdAt', 'desc')), (snapshot) => {
+                setContent(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            });
+            unsubFeedback = onSnapshot(query(collection(db, 'feedback'), orderBy('timestamp', 'desc')), (snapshot) => {
+                setFeedback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            });
+            unsubMessages = onSnapshot(query(collection(db, 'contactMessages'), orderBy('timestamp', 'desc')), (snapshot) => {
+                setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            });
+
+            // Initial stats fetch
+            const fetchStats = () => {
+                adminFetch('/api/admin/stats')
+                    .then(data => setStats(data.stats))
+                    .catch(err => console.warn('Stats sync skipped:', err.message));
+            };
+
+            fetchStats();
+            const statsInterval = setInterval(fetchStats, 30000); // 30s polling for server-side metrics
+        }
+
+        return () => {
+            unsubscribeAuth();
+            if (unsubUsers) unsubUsers();
+            if (unsubContent) unsubContent();
+            if (unsubFeedback) unsubFeedback();
+            if (unsubMessages) unsubMessages();
+            if (statsInterval) clearInterval(statsInterval);
+        };
+    }, [isAdmin]);
 
     if (isAdmin === null) return (
         <div className="min-h-screen bg-transparent flex items-center justify-center">
@@ -744,7 +870,7 @@ const Admin = () => {
                 <h1 className="text-4xl font-black text-white mb-6 uppercase tracking-tighter">Access Denied</h1>
                 <p className="text-[10px] text-gray-500 mb-10 font-bold uppercase tracking-[0.2em] leading-relaxed">Your screen does not possess the required administrative certificates for this sector.</p>
                 <button onClick={() => navigate('/')} className="glass-pill-active px-10 py-5 font-black text-[10px] uppercase tracking-[0.4em] transition-all transform hover:scale-105">
-                    Admin Dashboard
+                    Return to Mission Hub
                 </button>
             </div>
         </div>
@@ -788,22 +914,20 @@ const Admin = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex gap-4 glass-card border-white/5 rounded-[2.5rem] p-3 mb-20 overflow-x-auto no-scrollbar shadow-3xl max-w-3xl">
+                <div className="flex gap-4 glass-card border-white/5 rounded-[2.5rem] p-3 mb-20 overflow-x-auto no-scrollbar shadow-3xl max-w-6xl">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-3 px-8 py-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-700 whitespace-nowrap flex-1 justify-center relative overflow-hidden group
+                            className={`flex items-center gap-3 px-8 py-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-700 whitespace-nowrap justify-center relative overflow-hidden group shrink-0
                                 ${activeTab === tab.id
-                                    ? 'glass-pill-active border-white/20 text-white shadow-2xl'
+                                    ? 'glass-pill-active border-white/20 shadow-2xl'
                                     : 'text-gray-600 hover:text-white hover:bg-white/[0.02]'
                                 }`}
                         >
-                            {activeTab === tab.id && (
-                                <motion.div layoutId="activeTab" className="absolute inset-0 bg-white shadow-3xl" />
-                            )}
-                            <tab.icon size={16} className="relative z-10" />
-                            <span className="relative z-10 hidden sm:inline">{tab.label}</span>
+                            <tab.icon size={16} />
+                            {tab.label}
+                            {activeTab === tab.id && <motion.div layoutId="tab-active" className="absolute bottom-0 left-0 w-full h-1 bg-accent-gold" />}
                         </button>
                     ))}
                 </div>
@@ -817,9 +941,11 @@ const Admin = () => {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.8, ease: "circOut" }}
                     >
-                        {activeTab === 'dashboard' && <DashboardTab />}
-                        {activeTab === 'content' && <ContentTab />}
-                        {activeTab === 'users' && <UsersTab />}
+                        {activeTab === 'dashboard' && <DashboardTab stats={stats} users={users} content={content} feedback={feedback} messages={messages} />}
+                        {activeTab === 'content' && <ContentTab initialContent={content} />}
+                        {activeTab === 'users' && <UsersTab initialUsers={users} />}
+                        {activeTab === 'feedback' && <FeedbackTab feedbacks={feedback} />}
+                        {activeTab === 'messages' && <MessagesTab messages={messages} />}
                         {activeTab === 'notifications' && <NotificationsTab />}
                     </motion.div>
                 </AnimatePresence>
