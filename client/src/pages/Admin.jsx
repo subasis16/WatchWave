@@ -39,6 +39,12 @@ const adminFetch = async (endpoint, options = {}) => {
 };
 
 // ============================================
+// STYLING TOKENS
+// ============================================
+const inputClass = "w-full bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-white text-[11px] font-bold uppercase tracking-widest focus:border-accent-gold/40 focus:outline-none transition-all placeholder:text-gray-600 shadow-inner";
+const labelClass = "block text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-2 pl-1";
+
+// ============================================
 // STAT CARD
 // ============================================
 const StatCard = ({ label, value, icon: Icon, color, sub }) => (
@@ -213,8 +219,7 @@ const ContentTab = ({ initialContent }) => {
         setForm({ ...form, trailerUrl: finalUrl });
     };
 
-    const inputClass = "w-full bg-white/[0.02] border border-white/5 rounded-2xl p-4 text-white text-[11px] font-bold uppercase tracking-widest focus:border-accent-gold/40 focus:outline-none transition-all placeholder:text-gray-600 shadow-inner";
-    const labelClass = "block text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-2 pl-1";
+
 
     return (
         <div className="space-y-10 animate-slide-up">
@@ -472,7 +477,7 @@ const UsersTab = ({ initialUsers }) => {
                         placeholder="Search Identity Database..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-14 pr-6 py-4 text-white text-[11px] font-bold uppercase tracking-widest focus:border-accent-gold/40 focus:outline-none transition-all placeholder:text-gray-600 shadow-inner"
+                        className={inputClass + " pl-14 pr-6"}
                     />
                 </div>
             </div>
@@ -766,11 +771,11 @@ const NotificationsTab = () => {
 // ============================================
 const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'content', label: 'Content', icon: Film },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'feedback', label: 'Feedback', icon: MessageSquare },
     { id: 'messages', label: 'Messages', icon: Mail },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
 const Admin = () => {
@@ -914,12 +919,12 @@ const Admin = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex gap-4 glass-card border-white/5 rounded-[2.5rem] p-3 mb-20 overflow-x-auto no-scrollbar shadow-3xl max-w-6xl">
+                <div className="flex gap-4 glass-card border-white/5 rounded-[2.5rem] p-3 mb-20 overflow-x-auto no-scrollbar shadow-3xl max-w-4xl">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-3 px-8 py-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-700 whitespace-nowrap justify-center relative overflow-hidden group shrink-0
+                            className={`flex items-center gap-3 px-8 py-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-700 whitespace-nowrap flex-1 justify-center relative overflow-hidden group
                                 ${activeTab === tab.id
                                     ? 'glass-pill-active border-white/20 shadow-2xl'
                                     : 'text-gray-600 hover:text-white hover:bg-white/[0.02]'
