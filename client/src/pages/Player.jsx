@@ -265,7 +265,7 @@ const Player = () => {
   if (authLoading) return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
       <Loader2 size={48} className="text-accent-gold animate-spin mb-6" />
-      <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Authenticating Transmission...</p>
+      <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Authenticating User...</p>
     </div>
   );
 
@@ -300,7 +300,7 @@ const Player = () => {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
         <Loader2 size={48} className="text-accent-gold animate-spin mb-6" />
-        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Loading Stream...</p>
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Loading Movie...</p>
       </div>
     );
   }
@@ -347,7 +347,7 @@ const Player = () => {
               <h2 className="text-xl md:text-2xl font-black text-white tracking-widest uppercase mb-1 drop-shadow-2xl">{content.title}</h2>
               <div className="flex items-center gap-4 opacity-60">
                 <span className="text-[9px] font-black uppercase tracking-[0.3em]">Season 1 : Episode 01</span>
-                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold">4K ALPHA STREAM</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold">4K ULTRA HD</span>
               </div>
             </div>
           </motion.div>

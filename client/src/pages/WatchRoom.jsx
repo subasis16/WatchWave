@@ -6,7 +6,6 @@ import {
   Edit2, Lock, UserX, Clock, Flag, Star, Smile, Heart, ThumbsUp, Laugh, Flame, Frown, Coffee, Zap, Skull, Info, PhoneOff, MessageSquare, ArrowLeft
 } from 'lucide-react';
 import { movies, series, anime } from '../data/content';
-import ReactPlayer from 'react-player';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import io from 'socket.io-client';
 import toast from 'react-hot-toast';
@@ -184,7 +183,7 @@ const RoomSettings = ({ isOwner, socket, roomCode }) => {
         })
       });
       if (!res.ok) throw new Error("Failed to file report");
-      toast.success("Moderation report securely filed with WatchWave Administration.", { icon: '🚩', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
+      toast.success("Moderation report securely filed with WatchWave Management.", { icon: '🚩', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
     } catch (err) {
       toast.error("Network error filing moderation report.", { icon: '⚠️' });
     }
@@ -285,6 +284,23 @@ const WatchRoom = () => {
   const playerRef = useRef(null);
 
   useEffect(() => {
+    const video = playerRef.current;
+    if (!video || !video.play) return;
+    if (isPlaying) {
+      const p = video.play();
+      if (p !== undefined) p.catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (playerRef.current && playerRef.current.volume !== undefined) {
+      playerRef.current.volume = localVol / 100;
+    }
+  }, [localVol]);
+
+  useEffect(() => {
     let unsubscribeDoc = null;
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -329,7 +345,7 @@ const WatchRoom = () => {
       icon: Frown,
       color: 'bg-gradient-to-br from-blue-500 to-indigo-600',
       description: 'Emotional hits',
-      keywords: ['Interstellar', 'The Last of Us', 'Violet', 'Silent']
+      keywords: ['Interstellar', 'The Last of Us', 'Violet', 'Silent', 'Titanic']
     },
     {
       id: 'relaxed',
@@ -345,7 +361,7 @@ const WatchRoom = () => {
       icon: Zap,
       color: 'bg-gradient-to-br from-purple-500 to-pink-500',
       description: 'Hype Action',
-      keywords: ['Avengers', 'Jujutsu', 'Demon Slayer', 'Titan', 'Solo Leveling', 'The Boys', 'Fight Club']
+      keywords: ['Avengers', 'Jujutsu', 'Demon Slayer', 'Titan', 'Solo Leveling', 'The Boys', 'Gladiator', 'John Wick']
     },
     {
       id: 'romantic',
@@ -441,7 +457,7 @@ const WatchRoom = () => {
                   toast.dismiss(t.id);
                   toast.success("Entry Granted");
                 }}
-                className="bg-[#E50914] text-white px-3 py-1.5 rounded text-xs font-bold"
+                className="bg-accent-gold text-black px-3 py-1.5 rounded text-xs font-bold shadow-[0_0_15px_rgba(255,215,0,0.5)]"
               >
                 Accept
               </button>
@@ -631,7 +647,7 @@ const WatchRoom = () => {
       if (!micActive) {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setMicActive(true);
-        toast.success("Voice Transmission Live", { icon: '🎙️', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+        toast.success("Voice Chat Live", { icon: '🎙️', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
       } else {
         setMicActive(false);
         toast("Voice Muted", { icon: '🔇', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
@@ -679,28 +695,28 @@ const WatchRoom = () => {
                 className="absolute inset-0 z-50 bg-black/95 backdrop-blur-3xl flex flex-col items-center justify-center p-12 overflow-y-auto custom-scrollbar"
               >
                 {!currentMood ? (
-                  <div className="text-center w-full max-w-5xl">
-                    <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-16">
-                      <h3 className="text-[10px] font-black text-[#E50914] uppercase tracking-[0.8em] mb-4">Pick Your Mood</h3>
-                      <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none drop-shadow-[0_20px_50px_rgba(229,9,20,0.3)]">Set the Party<br/>Vibe</h2>
+                  <div className="text-center w-full max-w-4xl">
+                    <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-12">
+                      <h3 className="text-sm font-semibold text-accent-gold mb-2">Pick Your Mood</h3>
+                      <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight drop-shadow-lg">Set the Party<br/>Vibe</h2>
                     </motion.div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                       {moods.map((mood) => (
                         <motion.button
                           key={mood.id}
                           whileHover={{ scale: 1.05, y: -5 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setCurrentMood(mood)}
-                          className="glass-card p-10 flex flex-col items-center gap-6 group hover:border-[#E50914]/40 shadow-3xl relative overflow-hidden bg-white/[0.01]"
+                          className="glass-card p-8 flex flex-col items-center gap-4 group hover:border-accent-gold/40 shadow-xl relative overflow-hidden bg-white/[0.01] rounded-3xl"
                         >
                           <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity ${mood.color}`} />
-                          <div className={`w-24 h-24 rounded-[2.5rem] ${mood.color} flex items-center justify-center text-white shadow-3xl group-hover:rotate-6 transition-all duration-700`}>
-                            <mood.icon size={44} strokeWidth={2.5} />
+                          <div className={`w-16 h-16 rounded-2xl ${mood.color} flex items-center justify-center text-white shadow-lg group-hover:rotate-6 transition-all duration-300`}>
+                            <mood.icon size={32} strokeWidth={2.5} />
                           </div>
                           <div className="text-center relative z-10">
-                            <h4 className="text-[12px] font-black text-white uppercase tracking-[0.4em] mb-2 group-hover:text-[#E50914] transition-colors">{mood.name}</h4>
-                            <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest leading-relaxed max-w-[150px]">{mood.description}</p>
+                            <h4 className="text-base font-semibold text-white mb-1 group-hover:text-accent-gold transition-colors">{mood.name}</h4>
+                            <p className="text-xs font-medium text-gray-400 leading-relaxed max-w-[150px] mx-auto">{mood.description}</p>
                           </div>
                           <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
@@ -739,7 +755,7 @@ const WatchRoom = () => {
                               </div>
                             </div>
                             <div className="absolute top-4 right-4 glass-pill bg-black/60 border-accent-gold/20 text-[8px] font-black text-accent-gold px-3 py-1.5 uppercase tracking-widest">
-                              {item.match}% SYNC
+                              {item.match}% MATCH
                             </div>
                           </div>
                           <h3 className="mt-5 text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-white truncate transition-colors">{item.title}</h3>
@@ -769,28 +785,31 @@ const WatchRoom = () => {
               <>
                 {selectedContent.videoUrl ? (
                   /* Real Cloudinary Video Player */
-                  <div className="absolute inset-0 w-full h-full">
-                    <ReactPlayer
-                      ref={playerRef}
-                      url={selectedContent.videoUrl}
-                      playing={isPlaying}
-                      controls={false}
-                      volume={localVol / 100}
-                      width="100%"
-                      height="100%"
-                      style={{ position: 'absolute', top: 0, left: 0 }}
+                  <div className="absolute inset-0 w-full h-full bg-black">
+                    <video
+                      ref={(el) => {
+                         if (el) {
+                           el.seekTo = (fraction) => { 
+                             if (el.duration) el.currentTime = fraction * el.duration; 
+                           };
+                           el.getCurrentTime = () => el.currentTime;
+                         }
+                         playerRef.current = el;
+                      }}
+                      src={selectedContent.videoUrl}
+                      className="w-full h-full object-cover"
+                      style={{ transform: 'scale(1.03)', transition: 'all 1s' }}
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
-                      onProgress={handleProgress}
-                      onDuration={(d) => setDuration(d)}
-                      config={{
-                        file: {
-                          attributes: {
-                            crossOrigin: 'anonymous',
-                            style: { objectFit: 'cover' }
-                          }
+                      onTimeUpdate={(e) => {
+                        if (!seeking && e.currentTarget.duration) {
+                          setPlayed(e.currentTarget.currentTime / e.currentTarget.duration);
                         }
                       }}
+                      onLoadedMetadata={(e) => {
+                        setDuration(e.currentTarget.duration);
+                      }}
+                      playsInline
                     />
                   </div>
                 ) : (
@@ -814,12 +833,12 @@ const WatchRoom = () => {
                 )}
               </>
             ) : (
-              <div className="text-center z-10 p-12">
-                <div className="glass-card p-16 rounded-[3rem] border-white/10 shadow-3xl">
-                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em] mb-8">Screen Operational</h3>
+              <div className="text-center z-10 p-8">
+                <div className="glass-card p-12 rounded-3xl border-white/10 shadow-2xl">
+                  <h3 className="text-sm font-medium text-gray-400 mb-6">Theater Screen Ready</h3>
                   <button
                     onClick={() => setShowMoodSelector(true)}
-                    className="glass-pill-active px-12 py-5 text-[10px] font-black uppercase tracking-[0.4em] transition-all shadow-2xl"
+                    className="glass-pill-active px-8 py-3 text-sm font-semibold transition-all shadow-lg"
                   >
                     Select Stream
                   </button>
@@ -961,7 +980,7 @@ const WatchRoom = () => {
             <div className="flex -space-x-2.5">
               {participants.slice(0, 3).map((p) => (
                 <div key={p.id} className="relative group shrink-0">
-                  <img src={p.avatar} alt={p.name} className={`w-9 h-9 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-[#E50914] shadow-[0_0_10px_rgba(229,9,20,0.3)]' : 'border-[#050505]'}`} />
+                  <img src={p.avatar} alt={p.name} className={`w-9 h-9 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-accent-gold shadow-[0_0_10px_rgba(255,215,0,0.3)]' : 'border-[#050505]'}`} />
                 </div>
               ))}
               {participants.length > 3 && (
@@ -971,34 +990,34 @@ const WatchRoom = () => {
           </div>
 
           {/* Social Chat */}
-          <div className="flex-1 min-h-[500px] glass-card border-white/5 flex flex-col overflow-hidden shadow-3xl">
-            <div className="px-8 py-6 border-b border-white/10 flex items-center gap-4 bg-gradient-to-r from-[#E50914]/10 to-transparent text-[10px] font-black text-[#E50914] tracking-[0.4em] uppercase shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-              <div className="w-1.5 h-1.5 bg-[#E50914] rounded-full animate-ping shadow-[0_0_10px_#E50914]" />
+          <div className="flex-1 min-h-[500px] glass-card border-white/5 flex flex-col overflow-hidden shadow-2xl rounded-3xl">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center gap-3 bg-gradient-to-r from-accent-gold/10 to-transparent text-sm font-semibold text-accent-gold shadow-sm">
+              <div className="w-2 h-2 bg-accent-gold rounded-full animate-pulse shadow-[0_0_10px_#FFD700]" />
               Live Chat
             </div>
 
-            <div ref={chatScrollContainerRef} className="flex-1 overflow-y-auto px-8 py-10 space-y-12 custom-scrollbar scroll-smooth">
+            <div ref={chatScrollContainerRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-6 custom-scrollbar scroll-smooth">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center opacity-20 space-y-4">
-                  <div className="h-px w-20 bg-white" />
-                  <span className="text-[9px] font-black uppercase tracking-[1em]">Join the Conversation...</span>
-                  <div className="h-px w-20 bg-white" />
+                <div className="h-full flex flex-col items-center justify-center opacity-40 space-y-3">
+                  <div className="h-px w-16 bg-white/20" />
+                  <span className="text-xs font-medium text-gray-300">Join the Conversation</span>
+                  <div className="h-px w-16 bg-white/20" />
                 </div>
               ) : (
                 messages.map((msg) => (
-                  <div key={msg.id} className={`flex gap-6 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
+                  <div key={msg.id} className={`flex gap-4 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
                     <div className="relative shrink-0">
-                      <img src={msg.avatar} className={`w-14 h-14 rounded-[1.5rem] shadow-2xl border border-white/10 object-cover ${msg.isMe ? 'grayscale-0' : 'grayscale group-hover:grayscale-0 transition-all duration-700'}`} alt={msg.user} />
+                      <img src={msg.avatar} className="w-10 h-10 rounded-full shadow-md border border-white/10 object-cover" alt={msg.user} />
                     </div>
-                    <div className={`flex flex-col max-w-[90%] ${msg.isMe ? 'items-end text-right' : 'items-start text-left'}`}>
-                      <div className={`flex items-center gap-2 mb-1.5 opacity-20 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
-                        <span className="text-[7px] font-black text-white uppercase tracking-[0.1em]">{msg.user}</span>
-                        <span className="text-[6px] font-black text-gray-500 uppercase">{msg.time}</span>
+                    <div className={`flex flex-col max-w-[85%] ${msg.isMe ? 'items-end text-right' : 'items-start text-left'}`}>
+                      <div className={`flex items-center gap-2 mb-1 opacity-60 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
+                        <span className="text-xs font-semibold text-white">{msg.user}</span>
+                        <span className="text-[10px] text-gray-400">{msg.time}</span>
                       </div>
-                      <div className={`px-4 py-2.5 rounded-[1.2rem] text-[10px] font-bold leading-snug shadow-3xl transition-all ${msg.isMe
-                        ? 'bg-gradient-to-br from-[#E50914]/30 to-[#E50914]/10 text-white border-[#E50914]/40 rounded-tr-none'
-                        : 'bg-white/[0.04] text-gray-300 border-white/10 rounded-tl-none'
-                        } border backdrop-blur-3xl`}>
+                      <div className={`px-4 py-2 rounded-2xl text-sm leading-relaxed shadow-lg ${msg.isMe
+                        ? 'bg-gradient-to-br from-white/[0.08] to-white/[0.02] text-white border border-white/20 rounded-tr-none'
+                        : 'bg-white/[0.04] text-gray-200 border border-white/10 rounded-tl-none'
+                        } backdrop-blur-xl`}>
                         {msg.text}
                       </div>
                     </div>
@@ -1007,18 +1026,17 @@ const WatchRoom = () => {
               )}
             </div>
 
-            <div className="p-8 border-t border-white/5 bg-black/40 backdrop-blur-2xl">
+            <div className="p-4 border-t border-white/5 bg-black/40 backdrop-blur-xl">
               <form onSubmit={handleSendMessage} className="relative group">
-                <div className="absolute inset-0 bg-[#E50914]/5 blur-xl group-focus-within:bg-[#E50914]/10 transition-all rounded-3xl" />
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Say something..."
-                  className="w-full bg-black/50 backdrop-blur-md text-[11px] text-white rounded-2xl py-4 pl-6 pr-14 focus:outline-none border border-white/5 focus:border-[#E50914]/40 transition-all shadow-2xl relative z-10 font-medium"
+                  className="w-full bg-black/50 backdrop-blur-sm text-sm text-white rounded-xl py-3 pl-4 pr-12 focus:outline-none border border-white/10 focus:border-accent-gold/40 transition-all shadow-inner font-medium"
                 />
-                <button type="submit" disabled={!input.trim()} className={`absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl transition-all z-20 ${input.trim() ? 'bg-[#E50914] text-white' : 'text-gray-700'}`}>
-                  <Send size={14} />
+                <button type="submit" disabled={!input.trim()} className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${input.trim() ? 'bg-accent-gold text-black' : 'text-gray-500'}`}>
+                  <Send size={16} />
                 </button>
               </form>
             </div>

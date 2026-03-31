@@ -102,7 +102,7 @@ const App = () => {
                     </span>
                   </Link>
                   <p className="mt-4 text-sm md:text-base text-gray-400 font-medium leading-relaxed">
-                    Experience the future of entertainment with our streaming platform. Cinema-grade quality, anywhere you are.
+                    Experience the magic of cinema with our streaming platform. Theater-grade quality, anywhere you are.
                   </p>
                   <div className="flex gap-4 mt-6 md:mt-8">
                     <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">

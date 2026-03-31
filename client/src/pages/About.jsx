@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PlayCircle, Users, Box, Cpu } from 'lucide-react';
+import { PlayCircle, Users, Box, Film } from 'lucide-react';
 
 const About = () => {
     useEffect(() => {
@@ -37,7 +37,7 @@ const About = () => {
                             WatchWave is the ultimate premium streaming destination, designed to bring a high-end, cinematic viewing experience straight to your modern devices.
                         </p>
                         <p className="text-[12px] font-bold text-gray-500 uppercase tracking-[0.4em] leading-[2.2]">
-                            Founded on the principle that streaming should be a shared, social, and ultra-luxurious experience, WatchWave offers an unparalleled visual UI fused with cutting-edge real-time features like the <span className="text-white">Watch Party Rooms</span>, enabling you to sync and watch together with friends worldwide.
+                            Founded on the principle that modern streaming should be a premium, shared experience, WatchWave offers a pristine theater-styled UI fused with seamless movie-sharing features like <span className="text-white">Watch Party Rooms</span>, enabling you to enjoy movies together with friends worldwide.
                         </p>
                     </motion.div>
 
@@ -46,7 +46,7 @@ const About = () => {
                             { icon: PlayCircle, title: 'Cinema UI', desc: 'Clean, immersive viewing experience.' },
                             { icon: Users, title: 'Watch Together', desc: 'Real-time watch parties with friends.' },
                             { icon: Box, title: 'Downloads', desc: 'Save movies & shows for offline viewing.' },
-                            { icon: Cpu, title: 'Smart Picks', desc: 'Personalized recommendations for you.' }
+                            { icon: Film, title: 'Curated Picks', desc: 'Personalized movie recommendations for you.' }
                         ].map((item, i) => (
                             <motion.div 
                                 key={i}
@@ -72,7 +72,7 @@ const About = () => {
                     <div className="relative z-10 max-w-2xl">
                         <h2 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.6em] mb-6">Our Mission</h2>
                         <h3 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none mb-8">
-                            To revolutionize cinema through beautiful design and frictionless interactivity.
+                            To bring the magic of the movie theater straight to your living room.
                         </h3>
                         <div className="h-1 w-24 bg-white/20 rounded-full" />
                     </div>

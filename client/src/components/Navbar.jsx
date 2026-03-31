@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Menu, X, Settings, Download, Clock, TrendingUp, Flame, Star } from 'lucide-react';
+import { Search, Bell, Menu, X, Settings, Download, Clock, TrendingUp, Flame, Star, User } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -7,6 +7,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotification } from '../context/NotificationContext';
 import { movies, series, anime, bollywood, trending } from '../data/content';
+import { useTranslation } from '../utils/i18n';
 
 // Combine all content into one searchable pool
 const ALL_CONTENT = [
@@ -41,6 +42,8 @@ const Navbar = () => {
   const { notifications, markAsRead } = useNotification();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const notifRef = useRef(null);
+  
+  const { t } = useTranslation();
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -159,12 +162,12 @@ const Navbar = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const navItems = [
-    { name: 'Series', path: '/series' },
-    { name: 'Movies', path: '/movies' },
-    { name: 'Anime', path: '/anime' },
-    { name: 'Party', path: '/party' },
-    ...(user?.email === 'subasis16007@gmail.com' ? [{ name: 'Admin', path: '/admin' }] : []),
-    { name: 'Plans', path: '/plans' },
+    { name: t('Series'), path: '/series' },
+    { name: t('Movies'), path: '/movies' },
+    { name: t('Anime'), path: '/anime' },
+    { name: t('Party'), path: '/party' },
+    ...(user?.email === 'subasis16007@gmail.com' ? [{ name: t('Admin'), path: '/admin' }] : []),
+    { name: t('Plans'), path: '/plans' },
   ];
 
   return (

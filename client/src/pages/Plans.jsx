@@ -33,7 +33,7 @@ const Plans = () => {
   const handlePayment = async () => {
     if (!selectedPlan) return;
     if (!currentUser) {
-      toast.error("Connection Failed. Screen authentication required.");
+      toast.error("Please login to continue payment.");
       navigate('/auth');
       return;
     }
@@ -43,7 +43,7 @@ const Plans = () => {
     try {
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
-        toast.error("Transmission Error. Razorpay SDK dropped.");
+        toast.error("Payment gateway failed to load. Please check your connection.");
         setIsProcessing(false);
         return;
       }
@@ -110,7 +110,7 @@ const Plans = () => {
       const paymentObject = new window.Razorpay(options);
 
       paymentObject.on('payment.failed', function (response) {
-        toast.error(`Transaction Dropped. Reason: ${response.error.description}`);
+        toast.error(`Payment Failed: ${response.error.description}`);
         setIsProcessing(false);
       });
 
@@ -118,7 +118,7 @@ const Plans = () => {
 
     } catch (error) {
       console.error("Payment flow error: ", error);
-      toast.error("Critical Failure. Secure tunnel collapsed.");
+      toast.error("Payment failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -130,36 +130,36 @@ const Plans = () => {
       name: 'Solo Screen',
       icon: Crown,
       price: 499,
-      period: 'Cycle',
-      description: 'Optimized for individual immersion',
+      period: 'Month',
+      description: 'Perfect for individual viewing',
       features: [
-        '8K Resolution Authorization',
-        'Singular Active Transmission',
-        'Cinematic Sound Encryption',
-        'Offline Storage',
-        'Zero Data Intervention',
-        'Dynamic Scaling',
+        '4K Ultra HD Quality',
+        'Watch on 1 Screen',
+        'Cinema-Grade Audio',
+        'Unlimited Downloads',
+        'Ad-Free Experience',
+        'Mobile \u0026 Tablet Access',
       ],
-      highlight: 'Standard Feature',
+      highlight: 'Standard',
     },
     {
       id: 'group',
       name: 'Party Hub',
       icon: Users,
       price: 1499,
-      period: 'Cycle',
-      description: 'Connected multi-user environment',
+      period: 'Month',
+      description: 'Watch together with friends',
       features: [
-        '8K Global Multi-stream',
-        'Up to 12 Parallel Screens',
-        'Advanced Sharing Features',
-        'Priority Bandwidth Tunnel',
-        'Administrative Controls',
-        'Cross-Platform Play',
-        'Offline Hub',
-        'Elite Command Support',
+        '4K Ultra HD Quality',
+        'Watch on up to 12 Screens',
+        'Host Watch Parties',
+        'Priority Bandwidth',
+        'Premium Support',
+        'Watch on Any Device',
+        'Unlimited Downloads',
+        'Exclusive Content',
       ],
-      highlight: 'Maximum Efficacy',
+      highlight: 'Most Popular',
       minUsers: 5,
     },
   ];
@@ -178,12 +178,12 @@ const Plans = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center space-y-8 mb-24">
-          <h3 className="text-[10px] font-black tracking-[0.8em] text-gray-600 uppercase">System Tiers / Entitlements</h3>
+          <h3 className="text-[10px] font-black tracking-[0.8em] text-gray-600 uppercase">Choose Your Plan</h3>
           <h1 className="text-4xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">
             Subscription <br/> Access
           </h1>
           <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">
-            Select your cinematic authorization level. Tier changes are processed in real-time across all screens.
+            Select the perfect plan for your viewing needs. Upgrade or downgrade at any time.
           </p>
         </div>
 
@@ -225,7 +225,7 @@ const Plans = () => {
 
                 {/* Pricing Screen */}
                 <div className="mb-10 md:mb-16 p-6 md:p-10 glass-card border-white/5 bg-white/[0.01] shadow-inner relative z-10 overflow-hidden">
-                  <div className="flex items-baseline gap-2 md:gap-4">
+                    <div className="flex items-baseline gap-2 md:gap-4">
                     <span className="text-gray-600 text-lg md:text-2xl font-bold font-mono">₹</span>
                     <span className="text-5xl md:text-7xl font-black text-white tracking-widest leading-none">{plan.price}</span>
                     <span className="text-gray-600 text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em]"> / {plan.period}</span>
@@ -233,7 +233,7 @@ const Plans = () => {
                   {plan.id === 'group' && (
                     <div className="mt-12 pt-12 border-t border-white/5 space-y-6">
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-600">
-                         <span>Network Resolution</span>
+                         <span>Party Size</span>
                          <span className="text-accent-gold">{groupSize} Screens</span>
                       </div>
                       <input
@@ -253,9 +253,9 @@ const Plans = () => {
                   )}
                 </div>
 
-                {/* Directives */}
+                {/* Features */}
                 <div className="space-y-6 mb-16 relative z-10">
-                  <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4">Core Directives</h4>
+                  <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4">Included Features</h4>
                    {plan.features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-4 md:gap-6 text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
                       <div className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-700 ${isSelected ? 'bg-accent-gold shadow-[0_0_10px_#FFD700]' : 'bg-white/10'}`} />
@@ -274,7 +274,7 @@ const Plans = () => {
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:animate-[sheen_2s_infinite]" />
-                  {isSelected ? 'Ready to Initialize' : `Select ${plan.name}`}
+                  {isSelected ? 'Continue to Payment' : `Select ${plan.name}`}
                 </button>
               </motion.div>
             );
@@ -293,13 +293,13 @@ const Plans = () => {
               className="glass-pill-active w-full md:w-auto px-10 md:px-24 py-6 md:py-8 font-black text-[10px] md:text-[12px] uppercase tracking-[0.4em] md:tracking-[0.6em] transition-all transform md:hover:scale-105 shadow-[0_40px_100px_rgba(255,255,255,0.08)] flex items-center justify-center mx-auto disabled:opacity-50 group/final"
             >
               {isProcessing ? (
-                <><Loader2 className="w-6 h-6 mr-4 animate-spin" /> Tunnel Initialization...</>
+                <><Loader2 className="w-6 h-6 mr-4 animate-spin" /> Processing Payment...</>
               ) : (
-                <>Connect to Secure Server</>
+                <>Proceed to Checkout</>
               )}
             </button>
             <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em] mt-10">
-              Feature SEC-256 Active. Multi-region Authorization support.
+              Secure payments powered by Razorpay.
             </p>
           </motion.div>
         )}

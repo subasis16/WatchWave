@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Mail, MapPin, Phone, Send, Fingerprint } from 'lucide-react';
+import { Mail, MapPin, Phone, Send, Film } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
@@ -61,14 +61,14 @@ const Contact = () => {
                         </div>
                     </div>
 
-                    {/* Transmission Form */}
+                    {/* Contact Form */}
                     <motion.div 
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="glass-card p-8 md:p-16 border-white/5 shadow-3xl relative overflow-hidden"
                     >
                          <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
-                            <Fingerprint size={120} strokeWidth={1} />
+                            <Film size={120} strokeWidth={1} />
                          </div>
 
                         <div className="relative z-10 space-y-12">

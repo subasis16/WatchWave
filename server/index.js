@@ -81,21 +81,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// 404 handler
-app.use((req, res, next) => {
-    // Check if it's one of our custom endpoints that wasn't modularized
-    if (req.path.startsWith('/api/users/') || req.path.startsWith('/api/notifications/')) {
-        return next();
-    }
-    res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
-});
-
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error('Unhandled Error:', err);
-    res.status(500).json({ error: 'Internal server error.' });
-});
-
+// Error handlers moved to the bottom of the middleware chain
 // ==========================================
 // SOCKET.IO ΓÇö Real-Time Features
 // ==========================================
@@ -252,6 +238,17 @@ app.post('/api/notifications/send', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+
+// 404 handler
+app.use((req, res, next) => {
+    res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled Error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
 });
 
 // ==========================================

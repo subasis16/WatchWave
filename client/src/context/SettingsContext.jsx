@@ -14,7 +14,9 @@ const defaultSettings = {
   highContrast: false,
   motionReduction: false,
   volume: 80,
-  captions: true
+  captions: true,
+  language: 'English',
+  subtitles: 'Off'
 };
 
 export const SettingsProvider = ({ children }) => {

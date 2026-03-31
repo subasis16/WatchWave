@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { saveVideo } from '../utils/offlineStorage';
 import toast from 'react-hot-toast';
 import { auth } from '../firebase';
+import { useTranslation } from '../utils/i18n';
 
 const HERO_DATA = [
   {
@@ -41,6 +42,7 @@ const Hero = () => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const { t } = useTranslation();
 
   const nextSlide = useCallback(() => {
     setDirection(1);
@@ -116,7 +118,7 @@ const Hero = () => {
               <div className="flex items-center gap-2 mb-4 md:mb-6">
                 <span className="glass-pill px-2.5 py-1 flex items-center gap-1.5 text-[8px] md:text-[10px] font-bold text-white uppercase tracking-widest bg-white/10">
                   <span className="w-1 h-1 md:w-1.5 md:h-1.5 bg-accent-gold rounded-full animate-pulse"></span>
-                  Trending Now
+                  {t('Trending Now')}
                 </span>
                 <div className="flex gap-2">
                   {currentMovie.genres.slice(0, 2).map((genre, idx) => (
@@ -150,7 +152,7 @@ const Hero = () => {
                   className="glass-pill-active px-6 md:px-10 py-3 md:py-3.5 flex items-center gap-2 md:gap-3 font-bold text-sm md:text-base transition hover:scale-105 active:scale-95 shadow-xl"
                 >
                   <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
-                  Watch
+                  {t('Watch')}
                 </button>
                 <button 
                   onClick={async () => {
@@ -165,7 +167,7 @@ const Hero = () => {
                   className="glass-pill px-8 py-3.5 flex items-center gap-3 font-bold text-base bg-white/10 hover:bg-white/20 transition hover:scale-105 active:scale-95"
                 >
                   <Download className="w-5 h-5" />
-                  Download
+                  {t('Download')}
                 </button>
 
               </div>

@@ -84,25 +84,21 @@ const PartyHub = () => {
     };
 
     return (
-        <div className="relative min-h-screen flex flex-col pt-24 font-sans text-white overflow-hidden bg-black selection:bg-[#E50914] selection:text-white">
+        <div className="relative min-h-screen flex flex-col pt-24 font-sans text-white overflow-hidden bg-black selection:bg-accent-gold selection:text-black">
             {/* Cinematic Theater Backdrop */}
             <div className="absolute inset-0 z-0 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#1a0505] via-black to-black" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(229,9,20,0.05)_1px,transparent_1px)] bg-[length:60px_60px] opacity-20" />
-                <div className="absolute top-[-30%] left-[-10%] w-[80%] h-[80%] bg-[#E50914]/[0.08] blur-[220px] rounded-full animate-pulse" />
-                <div className="absolute top-[-30%] right-[-10%] w-[80%] h-[80%] bg-accent-gold/[0.05] blur-[200px] rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
-                <div className="absolute bottom-[-15%] inset-x-0 h-40 bg-gradient-to-t from-[#E50914]/10 to-transparent blur-3xl opacity-40" />
-                <div className="absolute inset-0 opacity-20">
-                    {[...Array(8)].map((_, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ y: "110vh", x: Math.random() * 100 + "vw", opacity: 0 }}
-                            animate={{ y: "-10vh", opacity: [0, 1, 0] }}
-                            transition={{ duration: 15 + Math.random() * 10, repeat: Infinity, delay: Math.random() * 15 }}
-                            className="absolute w-[2px] h-20 bg-gradient-to-b from-transparent via-white/40 to-transparent blur-[2px]"
-                        />
-                    ))}
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-[#0a0a0a]" />
+                
+                {/* Theatre Spotlights */}
+                <div className="absolute top-0 left-1/4 w-[50%] h-[100%] bg-[conic-gradient(from_180deg_at_50%_0%,rgba(255,215,0,0)_0deg,rgba(255,215,0,0.03)_180deg,rgba(255,215,0,0)_360deg)] blur-2xl transform -translate-x-1/2 pointer-events-none" />
+                <div className="absolute top-0 right-1/4 w-[50%] h-[100%] bg-[conic-gradient(from_180deg_at_50%_0%,rgba(255,215,0,0)_0deg,rgba(255,215,0,0.03)_180deg,rgba(255,215,0,0)_360deg)] blur-2xl transform translate-x-1/2 pointer-events-none" />
+
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.03)_1px,transparent_1px)] bg-[length:60px_60px] opacity-30" />
+                <div className="absolute top-[-30%] left-[-10%] w-[80%] h-[80%] bg-accent-gold/[0.04] blur-[220px] rounded-full animate-pulse" />
+                <div className="absolute top-[-30%] right-[-10%] w-[80%] h-[80%] bg-accent-gold/[0.03] blur-[200px] rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
+                
+                {/* Stage Floor Glow */}
+                <div className="absolute bottom-[-20%] inset-x-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.05),transparent_70%)] blur-2xl opacity-60" />
             </div>
 
             <div className="relative z-10 max-w-[1700px] mx-auto w-full flex flex-col lg:flex-row flex-1 overflow-hidden">
@@ -110,66 +106,66 @@ const PartyHub = () => {
                 <div className="flex-1 lg:w-[70%] p-8 lg:p-16 overflow-y-auto hide-scrollbar">
                     <div className="max-w-6xl mx-auto space-y-20">
                         <motion.section initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="relative">
-                            <div className="absolute -inset-10 border-[40px] border-black/80 rounded-[5rem] pointer-events-none z-10 hidden md:block opacity-20" />
-                            <div className="glass-card p-10 md:p-24 relative overflow-hidden group border-white/5 shadow-[0_50px_100px_rgba(0,0,0,0.8)] bg-gradient-to-br from-white/[0.03] to-transparent backdrop-blur-3xl rounded-[4rem]">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-[#E50914]/5 via-transparent to-accent-gold/5" />
+                            <div className="absolute -inset-10 border-[40px] border-black/50 border-t-white/5 rounded-[5rem] pointer-events-none z-10 hidden md:block opacity-40 shadow-[inset_0_-40px_100px_rgba(0,0,0,1)]" />
+                            <div className="glass-card p-10 md:p-24 relative overflow-hidden group border-white/5 shadow-[0_50px_100px_rgba(0,0,0,0.8)] bg-gradient-to-br from-white/[0.02] to-transparent backdrop-blur-3xl rounded-[4rem]">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-transparent to-accent-gold/5" />
                                 <div className="absolute top-8 right-8 z-30">
-                                    <button onClick={copyLink} className="flex items-center gap-4 glass-pill px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 hover:text-white transition-all border-white/5 bg-black/60 hover:bg-black/90 group shadow-2xl">
-                                        <Share2 size={18} className="text-[#E50914] group-hover:scale-110 transition-transform" /> <span className="hidden sm:inline">Invite Friends</span>
+                                    <button onClick={copyLink} className="flex items-center gap-3 glass-pill px-6 py-2.5 text-xs font-semibold text-gray-400 hover:text-white transition-all border-white/5 bg-black/60 hover:bg-white/5 group shadow-xl">
+                                        <Share2 size={16} className="text-accent-gold group-hover:scale-110 transition-transform" /> <span className="hidden sm:inline">Invite Friends</span>
                                     </button>
                                 </div>
 
-                                <div className="relative flex flex-col md:flex-row items-center gap-16">
+                                <div className="relative flex flex-col md:flex-row items-center gap-10">
                                     <div className="relative group/avatar">
-                                        <div className="w-56 h-56 rounded-[4rem] glass-card p-2 shadow-[0_30px_60px_-12px_rgba(0,0,0,0.6)] relative overflow-hidden border-white/10 transition-all duration-1000 group-hover/avatar:-translate-y-4 group-hover/avatar:border-[#E50914]/40 bg-gradient-to-br from-white/10 to-transparent">
-                                            <div className="w-full h-full rounded-[3.5rem] overflow-hidden bg-black/40 relative">
+                                        <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass-card p-2 shadow-2xl relative overflow-hidden border-white/5 transition-all duration-1000 bg-gradient-to-br from-white/5 to-transparent">
+                                            <div className="w-full h-full rounded-2xl overflow-hidden bg-black/60 relative">
                                                 {userProfile.avatar ? (
-                                                    <img src={userProfile.avatar} alt="Avatar" className="w-full h-full object-cover group-hover/avatar:scale-110 transition-all duration-1000" />
+                                                    <img src={userProfile.avatar} alt="Avatar" className="w-full h-full object-cover group-hover/avatar:scale-105 transition-all duration-500" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center">
-                                                        <User size={80} className="text-white/10 group-hover/avatar:text-[#E50914]/20 transition-all duration-1000" />
+                                                        <User size={48} className="text-white/10 group-hover/avatar:text-accent-gold/30 transition-all duration-500" />
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
-                                        <div className={`absolute -bottom-4 -right-4 w-14 h-14 rounded-3xl flex items-center justify-center shadow-[0_15px_30px_rgba(34,197,94,0.3)] transition-all duration-500 ${isLive ? 'bg-green-500' : 'bg-[#1a1a1a] border border-white/10'}`}>
-                                            <div className={`w-4 h-4 rounded-full ${isLive ? 'bg-white animate-pulse shadow-[0_0_20px_#fff]' : 'bg-gray-800'}`} />
+                                        <div className={`absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-500 ${isLive ? 'bg-accent-gold' : 'bg-[#1a1a1a] border border-white/10'}`}>
+                                            <div className={`w-3 h-3 rounded-full ${isLive ? 'bg-black animate-pulse shadow-[0_0_10px_rgba(0,0,0,0.5)]' : 'bg-gray-800'}`} />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-6 md:space-y-10 flex-1 text-center md:text-left">
-                                        <div className="space-y-4 md:space-y-6">
-                                            <div className="flex items-center justify-center md:justify-start gap-4">
-                                                <div className="h-[2px] w-12 bg-[#E50914] shadow-[0_0_15px_#E50914]" />
-                                                <h2 className="text-[12px] font-black tracking-[0.6em] uppercase text-[#E50914] drop-shadow-lg">WatchWave Studios Presents</h2>
+                                    <div className="space-y-6 flex-1 text-center md:text-left">
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-center md:justify-start gap-3">
+                                                <div className="h-[1px] w-8 bg-accent-gold shadow-[0_0_10px_rgba(255,215,0,0.5)]" />
+                                                <h2 className="text-[13px] font-medium text-accent-gold drop-shadow-lg">WatchWave Studios Presents</h2>
                                             </div>
-                                            <h3 className="text-4xl md:text-8xl font-black tracking-tighter text-white uppercase leading-[0.85] italic drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-                                                {userProfile.name.split(' ')[0]}<br /> Theater
+                                            <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white drop-shadow-xl">
+                                                {userProfile.name.split(' ')[0]} Theater
                                             </h3>
-                                            <div className="flex items-center justify-center md:justify-start gap-10 pt-4">
-                                                <div className="flex items-center gap-3">
-                                                    <Users className="w-4 h-4 text-[#E50914]" />
-                                                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500">12 Spectators</span>
+                                            <div className="flex items-center justify-center md:justify-start gap-6 pt-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="w-4 h-4 text-accent-gold" />
+                                                    <span className="text-sm font-medium text-gray-400">Join the Audience</span>
                                                 </div>
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-2">
                                                     <div className="w-2 h-2 rounded-full bg-accent-gold shadow-[0_0_10px_#FFD700] animate-pulse" />
-                                                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500">Premium Lounge</span>
+                                                    <span className="text-sm font-medium text-gray-400">Premium Lounge</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {!isLive ? (
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleGoLive} disabled={isLoading} className="glass-pill-active py-6 px-16 flex items-center justify-center gap-5 transition-all duration-700 shadow-[0_20px_50px_rgba(255,255,255,0.1)] text-[12px] font-black uppercase tracking-[0.4em] relative overflow-hidden group/btn disabled:opacity-50 mt-4">
-                                                <Video size={22} /> {isLoading ? "Initializing..." : "Start Watching"}
+                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleGoLive} disabled={isLoading} className="glass-pill-active py-3 px-8 flex items-center justify-center gap-3 transition-all duration-300 shadow-lg text-sm font-semibold relative overflow-hidden group/btn disabled:opacity-50 mt-2">
+                                                <Video size={18} /> {isLoading ? "Preparing Theater..." : "Start Watching"}
                                             </motion.button>
                                         ) : (
-                                            <div className="flex flex-wrap gap-6 justify-center md:justify-start">
-                                                <div className="glass-pill border-green-500/20 text-white font-black py-5 px-10 flex items-center gap-4 shadow-2xl uppercase tracking-widest text-[10px]">
-                                                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping opacity-75" />
-                                                    Party Live
+                                            <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-2">
+                                                <div className="glass-pill border-accent-gold/20 text-white font-medium py-3 px-6 flex items-center gap-3 shadow-lg text-sm">
+                                                    <div className="w-2.5 h-2.5 bg-accent-gold rounded-full animate-ping opacity-75 shadow-[0_0_10px_rgba(255,215,0,0.8)]" />
+                                                    Auditorium Live
                                                 </div>
-                                                <button onClick={() => navigate(`/room/${roomCode}`, { state: { roomCode } })} className="glass-pill-active py-5 px-12 flex items-center gap-4 transition-all duration-700 transform hover:scale-105 shadow-3xl text-[11px] font-black uppercase tracking-[0.4em]">
-                                                    <Play size={18} fill="white" /> Join Party
+                                                <button onClick={() => navigate(`/room/${roomCode}`, { state: { roomCode } })} className="glass-pill-active py-3 px-8 flex items-center gap-3 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm font-semibold">
+                                                    <Play size={16} fill="white" /> Join Party
                                                 </button>
                                             </div>
                                         )}
@@ -205,9 +201,9 @@ const PartyHub = () => {
             </AnimatePresence>
 
             {/* MOBILE TOGGLE BUTTON */}
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsSidebarOpen(true)} className="fixed bottom-8 right-8 w-16 h-16 bg-[#E50914] rounded-full flex items-center justify-center text-white shadow-[0_15px_30px_rgba(229,9,20,0.4)] z-50 lg:hidden border-none outline-none">
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsSidebarOpen(true)} className="fixed bottom-8 right-8 w-16 h-16 bg-accent-gold rounded-full flex items-center justify-center text-black shadow-[0_15px_30px_rgba(255,215,0,0.3)] z-50 lg:hidden border-none outline-none">
                 <Users size={24} />
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent-gold rounded-full border-4 border-[#050505] animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full border-4 border-[#050505] animate-pulse" />
             </motion.button>
 
             <style dangerouslySetInnerHTML={{

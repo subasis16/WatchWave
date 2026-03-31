@@ -155,8 +155,8 @@ const SocialSidebar = () => {
         <div className="h-full w-full bg-[#050505]/95 backdrop-blur-2xl border-l border-white/5 flex flex-col z-20 overflow-hidden relative shadow-[-40px_0_100px_rgba(0,0,0,0.9)]">
             
             {/* Background Theater Accents */}
-            <div className="absolute top-0 right-[-10%] w-[120%] h-80 bg-[#E50914]/[0.05] blur-[150px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-80 bg-[#E50914]/[0.02] blur-[150px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 right-[-10%] w-[120%] h-80 bg-accent-gold/[0.04] blur-[150px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-80 bg-accent-gold/[0.02] blur-[150px] rounded-full pointer-events-none" />
 
             <div className="px-8 pt-12 shrink-0 relative z-20 space-y-10">
                 <div className="flex items-end justify-between">
@@ -165,14 +165,14 @@ const SocialSidebar = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="space-y-2"
                     >
-                        <h2 className="text-[16px] font-black uppercase tracking-[0.6em] text-[#E50914] flex items-center gap-4">
+                        <h2 className="text-base font-semibold text-accent-gold flex items-center gap-3">
                             <span className="w-1.5 h-6 bg-accent-gold rounded-full shadow-[0_0_15px_#FFD700]" />
                             Watching Together
                         </h2>
-                        <p className="text-[9px] font-black text-gray-700 uppercase tracking-[0.4em] ml-5">Social Hub: Active</p>
+                        <p className="text-xs font-medium text-gray-500 ml-5">Social Hub: Active</p>
                     </motion.div>
-                    <div className="glass-pill px-6 py-2.5 text-[9px] font-black text-[#E50914] border-[#E50914]/20 uppercase tracking-[0.3em] flex items-center gap-3 shadow-[0_0_30px_rgba(229,9,20,0.2)] bg-black/40 border backdrop-blur-3xl">
-                        <span className="w-2 h-2 bg-[#E50914] rounded-full animate-pulse shadow-[0_0_15px_#E50914]" />
+                    <div className="glass-pill px-4 py-2 text-xs font-bold text-accent-gold border-accent-gold/20 flex items-center gap-2 shadow-sm bg-black/40 border backdrop-blur-xl">
+                        <span className="w-2 h-2 bg-accent-gold rounded-full animate-pulse" />
                         Party Live
                     </div>
                 </div>
@@ -185,20 +185,20 @@ const SocialSidebar = () => {
                             navigator.clipboard.writeText(window.location.href);
                             toast.success("Party Link Copied");
                         }}
-                        className="w-full flex items-center justify-between p-6 glass-card border-white/10 bg-black/40 transition-all group relative overflow-hidden rounded-[2.5rem] shadow-3xl"
+                        className="w-full flex items-center justify-between p-4 glass-card border-white/10 bg-black/40 transition-all group relative overflow-hidden rounded-3xl shadow-lg"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#E50914]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-accent-gold/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="flex flex-col items-start relative z-10">
-                            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 group-hover:text-white transition-colors">Invite More Friends</span>
-                            <span className="text-[8px] font-black text-gray-800 uppercase tracking-widest group-hover:text-accent-gold transition-colors mt-2">Send your party link</span>
+                            <span className="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors">Invite More Friends</span>
+                            <span className="text-xs font-medium text-gray-500 group-hover:text-accent-gold transition-colors mt-1">Send your party link</span>
                         </div>
-                        <div className="w-12 h-12 rounded-[1.5rem] bg-white/5 flex items-center justify-center group-hover:bg-[#E50914] group-hover:text-white transition-all duration-500 shadow-2xl">
-                            <Share2 size={18} className="group-hover:rotate-12 transition-transform duration-500" />
+                        <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-accent-gold group-hover:text-black transition-all duration-300 shadow-md">
+                            <Share2 size={16} className="group-hover:rotate-12 transition-transform duration-300" />
                         </div>
                     </motion.button>
 
                     <div className="relative group">
-                        <Search size={16} className={`absolute left-6 top-1/2 -translate-y-1/2 transition-all duration-700 ${isSearching ? 'text-accent-gold scale-125' : 'text-gray-700'}`} />
+                        <Search size={16} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-300 ${isSearching ? 'text-accent-gold scale-110' : 'text-gray-500'}`} />
                         <input
                             type="text"
                             value={searchQuery}
@@ -206,7 +206,7 @@ const SocialSidebar = () => {
                             onBlur={() => setTimeout(() => setIsSearching(false), 200)}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Find connections..."
-                            className="w-full bg-white/[0.02] border border-white/10 rounded-[2rem] pl-16 pr-14 py-5 text-[11px] font-bold tracking-[0.3em] uppercase text-white placeholder-gray-800 focus:outline-none focus:border-accent-gold/40 focus:bg-white/[0.05] transition-all shadow-[inset_0_4px_20px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+                            className="w-full bg-white/[0.02] border border-white/10 rounded-full pl-12 pr-6 py-3 text-sm font-medium text-white placeholder-gray-500 focus:outline-none focus:border-accent-gold/40 focus:bg-white/[0.05] transition-all shadow-inner backdrop-blur-md"
                         />
                     </div>
                 </div>
@@ -222,7 +222,7 @@ const SocialSidebar = () => {
                             exit={{ opacity: 0 }}
                             className="flex flex-col items-center justify-center py-24 space-y-6"
                         >
-                            <Loader2 className="animate-spin text-[#E50914] drop-shadow-[0_0_15px_rgba(229,9,20,0.5)]" size={40} strokeWidth={2.5} />
+                            <Loader2 className="animate-spin text-accent-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]" size={40} strokeWidth={2.5} />
                             <span className="text-[10px] font-black uppercase tracking-[0.8em] text-white/40 animate-pulse">Finding Friends...</span>
                         </motion.div>
                     ) : activeTab === 'friends' && (
@@ -233,99 +233,99 @@ const SocialSidebar = () => {
                             exit={{ opacity: 0 }}
                             className="space-y-8"
                         >
-                             <div className="flex items-center justify-between px-3">
-                                <span className="text-[10px] font-black text-[#E50914] uppercase tracking-[0.6em]">Your Friends</span>
-                                <div className="h-[1px] flex-1 bg-gradient-to-r from-[#E50914]/20 to-transparent mx-6" />
+                            <div className="flex items-center justify-between px-2">
+                                <span className="text-xs font-semibold text-accent-gold uppercase tracking-wider">Your Friends</span>
+                                <div className="h-px flex-1 bg-gradient-to-r from-accent-gold/20 to-transparent mx-4" />
                             </div>
 
                             {filteredFriends.length > 0 ? (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {filteredFriends.map((friend, idx) => (
                                         <motion.div 
                                             key={friend.id}
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: idx * 0.05 }}
-                                            whileHover={{ x: 10, backgroundColor: 'rgba(255,255,255,0.02)' }}
-                                            className="flex items-center p-5 rounded-[2.5rem] bg-transparent border border-white/5 hover:border-accent-gold/20 cursor-pointer transition-all duration-500 group relative overflow-hidden"
+                                            whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.02)' }}
+                                            className="flex items-center p-3 rounded-2xl bg-transparent border border-white/5 hover:border-accent-gold/20 cursor-pointer transition-all duration-300 group relative overflow-hidden"
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-accent-gold/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                             
                                             <div className="relative shrink-0" onClick={(e) => { e.stopPropagation(); navigate('/profile'); }}>
-                                                <div className="w-14 h-14 p-0.5 rounded-[1.5rem] glass-card border-white/10 group-hover:border-accent-gold/40 transition-all duration-700 rotate-0 group-hover:rotate-6 shadow-2xl">
+                                                <div className="w-12 h-12 p-0.5 rounded-2xl border border-white/10 group-hover:border-accent-gold/40 transition-all duration-300 shadow-sm bg-white/[0.01]">
                                                     <img
                                                         src={friend.avatar}
                                                         alt={friend.name}
-                                                        className={`w-full h-full rounded-[1.3rem] object-cover ${!friend.isOnline ? 'grayscale opacity-30 scale-95' : 'grayscale-0 opacity-100 scale-100'} transition-all duration-1000`}
+                                                        className={`w-full h-full rounded-[14px] object-cover ${!friend.isOnline ? 'grayscale opacity-50' : 'grayscale-0 opacity-100'} transition-all`}
                                                     />
                                                 </div>
                                                 {friend.isOnline && (
-                                                    <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-[4px] border-[#050505] rounded-full shadow-[0_0_15px_#22c55e] z-10" />
+                                                    <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-[#050505] rounded-full z-10" />
                                                 )}
                                             </div>
 
                                             <div
-                                                className="ml-6 flex flex-col flex-1 cursor-pointer relative z-10"
+                                                className="ml-4 flex flex-col flex-1 cursor-pointer relative z-10"
                                                 onClick={() => joinChatSession(friend)}
                                             >
-                                                <h4 className="text-[16px] font-black tracking-[0.1em] text-white/90 group-hover:text-accent-gold transition-all duration-500">{friend.name}</h4>
-                                                <p className={`text-[9px] font-black uppercase tracking-[0.3em] mt-1.5 ${friend.isOnline ? 'text-accent-gold/70' : 'text-gray-800'}`}>{friend.status}</p>
+                                                <h4 className="text-sm font-semibold text-white/90 group-hover:text-accent-gold transition-colors">{friend.name}</h4>
+                                                <p className={`text-xs font-medium mt-0.5 ${friend.isOnline ? 'text-accent-gold/80' : 'text-gray-500'}`}>{friend.status}</p>
                                             </div>
 
                                             <motion.button
-                                                whileHover={{ scale: 1.1, rotate: -10 }}
-                                                className="ml-auto w-12 h-12 flex items-center justify-center text-gray-700 hover:text-white bg-white/5 rounded-[1.2rem] border border-white/5 transition-all relative z-10 group-hover:border-white/20"
+                                                whileHover={{ scale: 1.05 }}
+                                                className="ml-auto w-10 h-10 flex items-center justify-center text-gray-500 hover:text-white bg-white/5 rounded-xl border border-white/5 transition-colors relative z-10"
                                                 onClick={(e) => { e.stopPropagation(); joinChatSession(friend); }}
                                             >
-                                                <MessageCircle size={18} strokeWidth={2.5} />
+                                                <MessageCircle size={16} />
                                             </motion.button>
                                         </motion.div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="py-16 px-8 flex flex-col items-center justify-center text-center space-y-6 bg-white/[0.01] rounded-[3rem] border border-dashed border-white/10 backdrop-blur-sm">
-                                    <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center shadow-inner">
-                                        <Users size={32} className="text-gray-800" />
+                                <div className="py-12 px-6 flex flex-col items-center justify-center text-center space-y-4 bg-white/[0.01] rounded-3xl border border-dashed border-white/10">
+                                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center">
+                                        <Users size={24} className="text-gray-600" />
                                     </div>
-                                    <div className="space-y-2">
-                                        <p className="text-[12px] font-black text-white/40 uppercase tracking-[0.4em]">No Friends Yet</p>
-                                        <p className="text-[9px] font-bold text-gray-800 uppercase tracking-widest leading-relaxed">Invite some friends to<br/>start watching together.</p>
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-semibold text-gray-400">No Friends Yet</p>
+                                        <p className="text-xs font-medium text-gray-600">Invite some friends to start watching together.</p>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="pt-16 space-y-10">
-                                <div className="flex items-center justify-between px-3">
-                                    <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">Suggested Friends</span>
-                                    <div className="h-[1px] flex-1 bg-gradient-to-r from-white/5 to-transparent mx-6" />
+                            <div className="pt-10 space-y-6">
+                                <div className="flex items-center justify-between px-2">
+                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Suggested Friends</span>
+                                    <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent mx-4" />
                                 </div>
                                 
-                                <div className="grid grid-cols-1 gap-5">
+                                <div className="grid grid-cols-1 gap-3">
                                     {suggestedUsers.length > 0 ? suggestedUsers.map((user, idx) => (
                                         <motion.div 
                                             key={user.id} 
-                                            initial={{ opacity: 0, y: 20 }}
+                                            initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.2 + idx * 0.1 }}
-                                            className="flex items-center p-5 rounded-[2.2rem] bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/20 transition-all duration-700 group cursor-pointer relative overflow-hidden"
+                                            transition={{ delay: 0.1 + idx * 0.05 }}
+                                            className="flex items-center p-3 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 transition-colors group cursor-pointer"
                                         >
-                                            <div className="relative">
+                                            <div className="relative shrink-0">
                                                 <img 
                                                     src={user.avatar} 
-                                                    className="w-12 h-12 rounded-[1.2rem] border border-white/10 shrink-0 grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:rotate-12 group-hover:scale-110 shadow-xl" 
+                                                    className="w-10 h-10 rounded-xl border border-white/5 object-cover grayscale group-hover:grayscale-0 transition-all" 
                                                     alt={user.name} 
                                                 />
                                             </div>
-                                            <div className="ml-6 flex flex-col">
-                                                <h4 className="text-[12px] font-black text-white/50 group-hover:text-white uppercase tracking-[0.2em] transition-colors">{user.name}</h4>
-                                                <p className="text-[8px] font-black text-gray-800 mt-2 uppercase tracking-[0.4em]">Suggested Friend</p>
+                                            <div className="ml-4 flex flex-col flex-1">
+                                                <h4 className="text-sm font-semibold text-white/70 group-hover:text-white transition-colors">{user.name}</h4>
+                                                <p className="text-xs font-medium text-gray-600 mt-0.5">Suggested Friend</p>
                                             </div>
                                             <motion.button 
-                                                whileHover={{ scale: 1.1, backgroundColor: '#fff', color: '#000' }}
+                                                whileHover={{ scale: 1.05 }}
                                                 onClick={() => sendFriendRequest(user.id, user.name)}
-                                                className="ml-auto w-10 h-10 flex items-center justify-center rounded-[1.2rem] bg-white/5 text-white/30 border border-white/5 transition-all shadow-2xl"
+                                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white/50 hover:bg-white hover:text-black transition-colors"
                                             >
-                                                <UserPlus size={16} />
+                                                <UserPlus size={14} />
                                             </motion.button>
                                         </motion.div>
                                     )) : (
@@ -348,86 +348,86 @@ const SocialSidebar = () => {
                             transition={{ type: "spring", damping: 30, stiffness: 250 }}
                             className="flex flex-col h-full pt-2"
                         >
-                            <div className="flex items-center gap-6 bg-white/[0.04] p-6 rounded-[3rem] border border-white/10 mb-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] shrink-0 backdrop-blur-3xl relative overflow-hidden group">
+                            <div className="flex items-center gap-4 bg-white/[0.04] p-4 rounded-3xl border border-white/10 mb-6 shadow-xl shrink-0 backdrop-blur-3xl relative overflow-hidden group">
                                 <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-accent-gold/40 to-transparent" />
                                 <button
                                     onClick={() => setActiveTab('friends')}
-                                    className="text-gray-500 hover:text-white transition-all glass-card p-4 rounded-[1.5rem] border-white/10 hover:border-white/20 relative z-10 shadow-xl"
+                                    className="text-gray-500 hover:text-white transition-all glass-card p-2.5 rounded-xl border-white/10 hover:border-white/20 relative z-10 shadow-sm"
                                 >
-                                    <ArrowLeft size={20} />
+                                    <ArrowLeft size={18} />
                                 </button>
-                                <div className="relative cursor-pointer z-10" onClick={() => navigate('/profile')}>
-                                    <img src={activeChatUser.avatar} className="w-16 h-16 rounded-[1.5rem] object-cover border border-white/20 shadow-2xl group-hover:scale-110 transition-transform duration-700" />
+                                <div className="relative cursor-pointer z-10 shrink-0" onClick={() => navigate('/profile')}>
+                                    <img src={activeChatUser.avatar} className="w-12 h-12 rounded-xl object-cover border border-white/20 shadow-md group-hover:scale-105 transition-transform duration-300" />
                                     {activeChatUser.isOnline && (
-                                        <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-[4px] border-[#0c0c0c] rounded-full shadow-[0_0_20px_#22c55e]" />
+                                        <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-[#0c0c0c] rounded-full shadow-[0_0_10px_#22c55e]" />
                                     )}
                                 </div>
                                 <div className="flex flex-col cursor-pointer z-10" onClick={() => navigate('/profile')}>
-                                    <h4 className="text-[18px] font-black uppercase tracking-[0.2em] text-white leading-tight">{activeChatUser.name}</h4>
-                                    <div className="flex items-center gap-2 mt-2">
+                                    <h4 className="text-base font-semibold text-white leading-tight">{activeChatUser.name}</h4>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
                                         <div className="w-1.5 h-1.5 rounded-full bg-accent-gold animate-pulse" />
-                                        <p className="text-[10px] text-accent-gold font-black tracking-[0.4em] uppercase opacity-80">{activeChatUser.status}</p>
+                                        <p className="text-xs text-accent-gold font-medium uppercase tracking-wider">{activeChatUser.status}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto hide-scrollbar space-y-10 py-6 px-4 flex flex-col relative z-20">
-                                <div className="flex items-center justify-center gap-6 mb-8 opacity-20">
-                                    <div className="h-[1px] w-16 bg-white" />
-                                    <div className="text-[10px] font-black tracking-[0.8em] text-center text-white uppercase">Conversation Started</div>
-                                    <div className="h-[1px] w-16 bg-white" />
+                            <div className="flex-1 overflow-y-auto hide-scrollbar space-y-6 py-4 px-2 flex flex-col relative z-20">
+                                <div className="flex items-center justify-center gap-4 mb-4 opacity-30">
+                                    <div className="h-px w-12 bg-white" />
+                                    <div className="text-xs font-semibold tracking-wider text-center text-white uppercase">Conversation Started</div>
+                                    <div className="h-px w-12 bg-white" />
                                 </div>
 
                                 {messages.map((msg, index) => {
                                     const isMe = msg.author === "Me";
                                     return (
-                                        <motion.div 
-                                            key={index}
-                                            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            className={`flex gap-6 max-w-[90%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'}`}
-                                        >
-                                            {!isMe && (
-                                                <img src={activeChatUser.avatar} className="w-10 h-10 rounded-[1.2rem] shadow-2xl shrink-0 border border-white/10 mt-auto shadow-black" />
-                                            )}
-                                            <div className="flex flex-col">
-                                                <div className={`${isMe ? 'bg-accent-gold/15 text-white border-accent-gold/50 rounded-br-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-bl-sm'} border backdrop-blur-3xl rounded-[2.2rem] px-7 py-5 text-[14px] font-bold tracking-wide shadow-[0_20px_50px_rgba(0,0,0,0.8)] leading-relaxed relative`}>
-                                                    {msg.text}
+                                            <motion.div 
+                                                key={index}
+                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                className={`flex gap-3 max-w-[85%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'}`}
+                                            >
+                                                {!isMe && (
+                                                    <img src={activeChatUser.avatar} className="w-8 h-8 rounded-full shadow-sm shrink-0 border border-white/10 mt-auto" />
+                                                )}
+                                                <div className="flex flex-col">
+                                                    <div className={`${isMe ? 'bg-accent-gold/15 text-white border-accent-gold/30 rounded-br-sm' : 'bg-white/5 text-gray-200 border-white/10 rounded-bl-sm'} border backdrop-blur-xl rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-lg relative`}>
+                                                        {msg.text}
+                                                    </div>
+                                                    <span className={`text-[10px] font-medium text-gray-500 mt-1 px-2 ${isMe ? 'text-right' : 'text-left'}`}>
+                                                        {msg.time}
+                                                    </span>
                                                 </div>
-                                                <span className={`text-[9px] font-black text-gray-700 uppercase tracking-[0.3em] mt-4 px-2 ${isMe ? 'text-right' : 'text-left'}`}>
-                                                    {msg.time}
-                                                </span>
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })}
-                                <div ref={messagesEndRef} />
-                            </div>
+                                            </motion.div>
+                                        );
+                                    })}
+                                    <div ref={messagesEndRef} />
+                                </div>
 
-                            <div className="pt-10 border-t border-white/5 mt-8 shrink-0 relative bg-transparent z-10 px-2 pb-2">
-                                <div className="relative group">
-                                    <input
-                                        type="text"
-                                        value={currentMessage}
-                                        onChange={(e) => setCurrentMessage(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        placeholder={`Message to ${activeChatUser.name.split(' ')[0]}...`}
-                                        className="w-full bg-[#080808]/90 border border-white/10 rounded-[2.5rem] pl-10 pr-20 py-6 text-[13px] font-bold uppercase tracking-[0.3em] text-white placeholder-gray-800 focus:outline-none focus:border-accent-gold/60 focus:bg-black transition-all shadow-[inset_0_4px_30px_rgba(0,0,0,0.9)] backdrop-blur-3xl"
-                                    />
-                                    <motion.button
-                                        whileHover={{ scale: 1.1, x: -4 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        onClick={sendMessage}
-                                        disabled={!currentMessage.trim()}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-14 h-14 rounded-[1.8rem] flex items-center justify-center bg-accent-gold text-black shadow-[0_10px_30px_rgba(212,175,55,0.5)] hover:shadow-accent-gold/80 transition-all disabled:opacity-10 cursor-pointer border-none"
-                                    >
-                                        <Send size={20} strokeWidth={3} className="ml-1" />
-                                    </motion.button>
-                                </div>
-                                <div className="mt-6 flex items-center justify-center gap-4 opacity-50">
-                                    <div className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-ping" />
-                                    <span className="text-[8px] font-black text-gray-700 uppercase tracking-[0.8em]">Secure Chat Enabled</span>
-                                </div>
+                                <div className="pt-4 border-t border-white/5 mt-4 shrink-0 relative bg-transparent z-10 px-2 pb-2">
+                                    <div className="relative group">
+                                        <input
+                                            type="text"
+                                            value={currentMessage}
+                                            onChange={(e) => setCurrentMessage(e.target.value)}
+                                            onKeyPress={handleKeyPress}
+                                            placeholder={`Message ${activeChatUser.name.split(' ')[0]}...`}
+                                            className="w-full bg-[#080808]/90 border border-white/10 rounded-2xl pl-5 pr-14 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent-gold/40 focus:bg-black transition-all shadow-inner backdrop-blur-md"
+                                        />
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={sendMessage}
+                                            disabled={!currentMessage.trim()}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl flex items-center justify-center bg-accent-gold text-black shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer border-none"
+                                        >
+                                            <Send size={16} className="ml-0.5" />
+                                        </motion.button>
+                                    </div>
+                                    <div className="mt-4 flex items-center justify-center gap-2 opacity-50">
+                                        <div className="w-1.5 h-1.5 bg-accent-gold rounded-full animate-ping" />
+                                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">Secure Chat Enabled</span>
+                                    </div>
                             </div>
                         </motion.div>
                     )}

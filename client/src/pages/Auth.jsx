@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, ShieldCheck, User, Eye, EyeOff, Crown, ArrowRight, Fingerprint, LockKeyhole } from 'lucide-react';
+import { Mail, ShieldCheck, User, Eye, EyeOff, Crown, ArrowRight, Film, LockKeyhole } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -81,21 +81,6 @@ const Auth = () => {
       <div className="absolute inset-0 z-0 opacity-40">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-white/[0.04] blur-[180px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent-gold/[0.06] blur-[150px] rounded-full" />
-        
-        {/* Floating Particles */}
-        {[...Array(20)].map((_, i) => (
-            <motion.div
-                key={i}
-                initial={{ opacity: 0, x: Math.random() * 1000, y: Math.random() * 800 }}
-                animate={{ 
-                    opacity: [0.1, 0.4, 0.1],
-                    y: [null, Math.random() * 800],
-                    x: [null, Math.random() * 1000]
-                }}
-                transition={{ duration: Math.random() * 10 + 10, repeat: Infinity, ease: "linear" }}
-                className="absolute w-1 h-1 bg-accent-gold/40 rounded-full"
-            />
-        ))}
       </div>
 
       <motion.div
@@ -106,7 +91,7 @@ const Auth = () => {
       >
         <div className="text-center mb-10 md:mb-12">
             <div className="inline-flex items-center justify-center p-4 md:p-5 rounded-3xl glass-card mb-6 md:mb-8 border-white/10 shadow-3xl bg-white/5">
-                <Fingerprint size={32} className={`transition-colors duration-500 ${isLogin ? 'text-white' : 'text-accent-gold'}`} />
+                <Film size={32} className={`transition-colors duration-500 ${isLogin ? 'text-white' : 'text-accent-gold'}`} />
             </div>
           <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.6em] mb-4">WatchWave / {isLogin ? 'Sign In' : 'Sign Up'}</h3>
           <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase">

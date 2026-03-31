@@ -4,14 +4,16 @@ import { Play, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import MovieModal from './MovieModal';
+import { useTranslation } from '../utils/i18n';
 
-const ContentRow = ({ title, data, ranked = false }) => {
+const ContentRow = ({ title, data, ranked = false, linkTo }) => {
   const navigate = useNavigate();
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
   const trailerTimerRef = useRef(null);
+  const { t } = useTranslation();
 
   const handleMouseEnter = (id) => {
     setHoveredId(id);
@@ -48,10 +50,16 @@ const ContentRow = ({ title, data, ranked = false }) => {
         </h2>
         {!ranked && (
           <button 
-            onClick={() => toast.success(`Browsing all ${title}`)}
+            onClick={() => {
+              if (linkTo) {
+                navigate(linkTo);
+              } else {
+                toast.success(`Browsing all ${title}`);
+              }
+            }}
             className="glass-pill px-4 py-1.5 text-xs font-bold text-gray-400 hover:text-white"
           >
-            See all
+            {t('See all')}
           </button>
         )}
       </div>

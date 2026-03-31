@@ -48,16 +48,10 @@ const Settings = () => {
     { id: 'Account', icon: User },
     { id: 'Subscription', icon: CreditCard },
     { id: 'Playback', icon: PlayCircle },
-    { id: 'Safety', icon: ShieldCheck },
-    { id: 'Wellbeing', icon: HeartPulse },
     { id: 'Accessibility', icon: Accessibility },
-    { id: 'Language', icon: Globe },
-    { id: 'Downloads', icon: Download }
+    { id: 'Language', icon: Globe }
   ];
 
-  const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
-  const weekData = [45, 120, 90, 60, 200, 150, 80];
-  const maxTime = Math.max(...weekData);
 
   const CustomToggle = ({ checked, onChange }) => (
     <button
@@ -218,84 +212,9 @@ const Settings = () => {
                   </div>
                 )}
 
-                {/* SAFETY TAB */}
-                {activeTab === 'Safety' && (
-                  <div className="glass-card p-8 md:p-16 border-white/5 space-y-12 md:space-y-16 shadow-3xl">
-                    <div className="space-y-10">
-                      <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Age Filter</h2>
-                        <div className="glass-card px-6 py-2.5 font-black text-accent-gold border-accent-gold/10 text-[12px] shadow-2xl">
-                          {ratings[rating]}
-                        </div>
-                      </div>
-                      <div className="relative h-2 bg-white/5 rounded-full">
-                        <div className="absolute inset-y-0 left-0 bg-accent-gold rounded-full shadow-[0_0_25px_rgba(255,215,0,0.5)] transition-all duration-500" style={{ width: `${(rating / 4) * 100}%` }} />
-                        <input
-                          type="range"
-                          min="0"
-                          max="4"
-                          step="1"
-                          value={rating}
-                          onChange={(e) => updateSetting('rating', parseInt(e.target.value))}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="flex items-center justify-between border-t border-white/5 pt-16">
-                      <div className="pr-10 space-y-3">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Profile Lock</h2>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Require a PIN to access this profile.</p>
-                      </div>
-                      <CustomToggle checked={pinEnabled} onChange={() => toggleSetting('pinEnabled')} />
-                    </div>
-                  </div>
-                )}
 
-                {/* WELLBEING TAB */}
-                {activeTab === 'Wellbeing' && (
-                  <div className="glass-card p-6 md:p-16 border-white/5 space-y-12 md:space-y-20 shadow-3xl">
-                    <div className="space-y-8 md:space-y-12">
-                      <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Playback Dynamics</h2>
-                      <div className="flex items-end justify-between h-48 md:h-56 gap-2 md:gap-6">
-                        {weekData.map((mins, i) => (
-                          <div key={i} className="flex flex-col items-center flex-1 group relative">
-                            <div className="w-full flex justify-end flex-col h-full rounded-lg md:rounded-[1.2rem] bg-white/[0.03] overflow-hidden border border-white/5">
-                              <motion.div
-                                initial={{ height: 0 }}
-                                animate={{ height: `${(mins / maxTime) * 100}%` }}
-                                transition={{ duration: 1.5, delay: i * 0.1, ease: "circOut" }}
-                                className={`w-full ${mins > dailyLimit ? 'bg-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.2)]' : 'bg-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)]'} transition-all`}
-                              />
-                            </div>
-                            <span className="text-[7px] md:text-[10px] text-gray-600 mt-4 md:mt-6 font-black tracking-widest">
-                              {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][i]}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    <div className="border-t border-white/5 pt-10 md:pt-16 space-y-8 md:space-y-10">
-                      <div className="flex justify-between items-center">
-                        <h2 className="text-lg md:text-2xl font-black text-white uppercase tracking-tighter">Quota Threshold</h2>
-                        <span className="text-accent-gold font-black tracking-[0.2em] text-[12px] md:text-[14px] font-mono">{Math.floor(dailyLimit / 60)}H {dailyLimit % 60}M</span>
-                      </div>
-                      <div className="relative h-2 bg-white/5 rounded-full">
-                        <div className="absolute inset-y-0 left-0 bg-white rounded-full shadow-[0_0_20px_white] transition-all duration-300" style={{ width: `${(dailyLimit / 300) * 100}%` }} />
-                        <input
-                          type="range"
-                          min="30"
-                          max="300"
-                          step="15"
-                          value={dailyLimit}
-                          onChange={(e) => updateSetting('dailyLimit', parseInt(e.target.value))}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* ACCESSIBILITY TAB */}
                 {activeTab === 'Accessibility' && (
@@ -320,35 +239,7 @@ const Settings = () => {
                   </div>
                 )}
 
-                {/* DOWNLOADS TAB */}
-                {activeTab === 'Downloads' && (
-                  <div className="glass-card p-8 md:p-16 border-white/5 shadow-3xl">
-                    <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-8 md:mb-12">Storage Screen Cache</h2>
-                    <div className="space-y-8">
-                      <div className="flex justify-between items-end">
-                        <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em]">Offline Storage: 12GB / 30GB</span>
-                        <button 
-                          onClick={() => {
-                            if (window.confirm("Are you sure you want to wipe local index? Offline movies will be purged.")) {
-                              toast.success("Cache Purged. 12GB Recovered.");
-                            }
-                          }}
-                          className="text-accent-gold hover:text-white text-[10px] font-black uppercase tracking-[0.4em] transition-all"
-                        >
-                          Wipe Screen Cache
-                        </button>
-                      </div>
-                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: '40%' }}
-                          transition={{ duration: 1.5, ease: 'circOut' }}
-                          className="h-full bg-white rounded-full shadow-[0_0_25px_white]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
+
 
                 {/* LANGUAGE TAB */}
                 {activeTab === 'Language' && (
@@ -360,17 +251,18 @@ const Settings = () => {
                       <div className="space-y-4">
                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Primary Interface Language</label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {['English', 'Hindi', 'Spanish', 'French', 'German', 'Japanese', 'Korean'].map((lang) => (
+                          {['English', 'Hindi'].map((lang) => (
                             <button
                               key={lang}
                               onClick={async () => {
+                                updateSetting('language', lang);
                                 if (authUser) {
                                   await updateDoc(doc(db, 'users', authUser.uid), { language: lang });
-                                  toast.success(`Language set to ${lang}`);
                                 }
+                                toast.success(`Language set to ${lang}`);
                               }}
                               className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                                dbUser?.language === lang 
+                                (dbUser?.language || 'English') === lang 
                                   ? 'bg-accent-gold text-black border-accent-gold shadow-[0_0_20px_rgba(255,215,0,0.3)]' 
                                   : 'bg-white/5 text-gray-400 border-white/5 hover:border-white/20'
                               }`}
@@ -384,17 +276,18 @@ const Settings = () => {
                       <div className="space-y-4 pt-12 border-t border-white/5">
                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Subtitles & Captions</label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {['Off', 'English', 'Hindi', 'Spanish', 'French', 'German', 'Japanese', 'Korean'].map((opt) => (
+                          {['Off', 'English', 'Hindi'].map((opt) => (
                             <button
                               key={opt}
                               onClick={async () => {
+                                updateSetting('subtitles', opt);
                                 if (authUser) {
                                   await updateDoc(doc(db, 'users', authUser.uid), { subtitles: opt });
-                                  toast.success(`Subtitles set to ${opt}`);
                                 }
+                                toast.success(`Subtitles set to ${opt}`);
                               }}
                               className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                                dbUser?.subtitles === opt 
+                                (dbUser?.subtitles || 'Off') === opt 
                                   ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
                                   : 'bg-white/5 text-gray-400 border-white/5 hover:border-white/20'
                               }`}

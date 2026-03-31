@@ -1,8 +1,10 @@
 import Hero from '../components/Hero';
 import ContentRow from '../components/ContentRow';
 import { trending, anime, movies, series, bollywood } from '../data/content';
+import { useTranslation } from '../utils/i18n';
 
 const Home = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-transparent selection:bg-accent-gold selection:text-black overflow-hidden relative">
       {/* Cinematic Background Field */}
@@ -14,11 +16,11 @@ const Home = () => {
       <div className="relative z-10 pb-20">
         <Hero />
         <div className="mt-12 space-y-2">
-          <ContentRow title="Now Trending" data={trending.slice(0, 5)} ranked={true} />
-          <ContentRow title="Absolute Classics" data={movies.slice(0, 5)} />
-          <ContentRow title="Anime World" data={anime.slice(0, 5)} />
-          <ContentRow title="Bingeworthy Series" data={series.slice(0, 5)} />
-          <ContentRow title="Bollywood Hits" data={bollywood.slice(0, 5)} />
+          <ContentRow title={t('Now Trending')} data={trending.slice(0, 5)} ranked={true} />
+          <ContentRow title={t('Absolute Classics')} data={movies.slice(0, 5)} linkTo="/movies" />
+          <ContentRow title={t('Anime World')} data={anime.slice(0, 5)} linkTo="/anime" />
+          <ContentRow title={t('Bingeworthy Series')} data={series.slice(0, 5)} linkTo="/series" />
+          <ContentRow title={t('Bollywood Hits')} data={bollywood.slice(0, 5)} linkTo="/movies" />
         </div>
       </div>
     </div>
