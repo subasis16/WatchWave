@@ -21,11 +21,7 @@ const SOCKET_URL = 'http://localhost:5000';
 const ShareModal = ({ isOpen, onClose }) => {
   const [showInvites, setShowInvites] = useState(false);
 
-  const mockFriends = [
-    { id: 1, name: 'Elena Rogers', avatar: 'https://i.pravatar.cc/150?u=11' },
-    { id: 2, name: 'Marcus Chen', avatar: 'https://i.pravatar.cc/150?u=12' },
-    { id: 3, name: 'Sarah Jenkins', avatar: 'https://i.pravatar.cc/150?u=13' },
-  ];
+  const mockFriends = [];
 
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -256,11 +252,7 @@ const WatchRoom = () => {
   const location = useLocation();
   const chatScrollContainerRef = useRef(null);
 
-  const [messages, setMessages] = useState([
-    { id: 1, user: 'Arjun', text: 'Waiting for the stream to start! 🔥', avatar: 'https://i.pravatar.cc/150?u=1', time: '10:02' },
-    { id: 2, user: 'Sarah', text: 'Any suggestions for the vibe?', avatar: 'https://i.pravatar.cc/150?u=2', time: '10:03' },
-    { id: 3, user: 'You', text: 'Lets checks the mood vibes.', avatar: 'https://i.pravatar.cc/150?u=3', time: '10:05', isMe: true },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [floatingReactions, setFloatingReactions] = useState([]);
@@ -319,8 +311,6 @@ const WatchRoom = () => {
 
   const participants = [
     { id: 1, name: currentUserData?.name || 'You', avatar: currentUserData?.avatar || auth.currentUser?.photoURL || 'https://i.pravatar.cc/150?u=3', isMuted: false, isHost: true, isSpeaking: false },
-    { id: 2, name: 'Arjun', avatar: 'https://i.pravatar.cc/150?u=1', isMuted: true, isHost: false, isSpeaking: false },
-    { id: 3, name: 'Sarah', avatar: 'https://i.pravatar.cc/150?u=2', isMuted: false, isHost: false, isSpeaking: true },
   ];
 
   const reactions = [
