@@ -93,7 +93,7 @@ const Profile = () => {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          const MAX_SIZE = 500; // Perfect, retina crisp compression size
+          const MAX_SIZE = 200; // Keep small to stay under Firestore 1MB doc limit
           
           // Math calc aspect ratio down-sampler
           if (width > height && width > MAX_SIZE) {
@@ -109,8 +109,8 @@ const Profile = () => {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Drop payload safely to 80% JPEG compression (often <100kb payload!)
-          const compressedData = canvas.toDataURL('image/jpeg', 0.8);
+          // Aggressive compression to stay under Firestore limits (~20-40kb)
+          const compressedData = canvas.toDataURL('image/jpeg', 0.5);
           
           setProfileData(prev => ({ ...prev, avatar: compressedData }));
           

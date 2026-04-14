@@ -35,10 +35,10 @@ const OpeningAnimation = ({ onComplete }) => {
       {/* The massive W that scales up like the Netflix N */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: [0.8, 1, 30], opacity: [0, 1, 0] }}
+        animate={{ scale: [0.8, 1, 8], opacity: [0, 1, 0] }}
         transition={{ 
           duration: 3.8, 
-          times: [0, 0.4, 1], // Fade in, hold shape briefly, then massive zoom and fade out
+          times: [0, 0.4, 1], // Zoom out smoothly
           ease: "easeInOut" 
         }}
         className="relative flex items-center justify-center"

@@ -5,6 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { API_URL } from '../utils/api';
 
 const Plans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -53,7 +54,7 @@ const Plans = () => {
 
       let data;
       try {
-        const response = await fetch('http://localhost:5000/api/payments/create-order', {
+        const response = await fetch(`${API_URL}/api/payments/create-order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

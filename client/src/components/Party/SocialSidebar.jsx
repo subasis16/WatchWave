@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import { toast } from 'react-hot-toast';
 import { auth } from '../../firebase';
+import { API_URL } from '../../utils/api';
 
-const socket = io.connect('http://localhost:5000');
+const socket = io.connect(API_URL);
 
 const SocialSidebar = () => {
     const [activeTab, setActiveTab] = useState('friends');
@@ -31,13 +32,13 @@ const SocialSidebar = () => {
             const token = await user.getIdToken();
             
             // Fetch Friends
-            const friendsRes = await fetch('http://localhost:5000/api/friends', {
+            const friendsRes = await fetch(`${API_URL}/api/friends`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const friendsData = await friendsRes.json();
             
             // Fetch All Users for Suggestions
-            const usersRes = await fetch('http://localhost:5000/api/users/all/profiles', {
+            const usersRes = await fetch(`${API_URL}/api/users/all/profiles`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const usersData = await usersRes.json();
@@ -126,7 +127,7 @@ const SocialSidebar = () => {
             const user = auth.currentUser;
             const token = await user.getIdToken();
             
-            const res = await fetch('http://localhost:5000/api/friends/request', {
+            const res = await fetch(`${API_URL}/api/friends/request`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

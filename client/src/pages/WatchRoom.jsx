@@ -10,10 +10,11 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import io from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { auth, db } from '../firebase';
+import { API_URL } from '../utils/api';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = API_URL;
 
 /* ====================================================
    SHARE MODAL COMPONENT
@@ -166,7 +167,7 @@ const RoomSettings = ({ isOwner, socket, roomCode }) => {
     try {
       if (!auth.currentUser) throw new Error("Unauthenticated");
       const token = await auth.currentUser.getIdToken();
-      const res = await fetch(`http://localhost:5000/api/feedback/report`, {
+      const res = await fetch(`${API_URL}/api/feedback/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

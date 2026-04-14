@@ -1,12 +1,13 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
 import toast from 'react-hot-toast';
+import { API_URL } from '../utils/api';
 
 const NotificationContext = createContext();
 
 export const useNotification = () => useContext(NotificationContext);
 
-const socket = io('http://localhost:5000');
+const socket = io(API_URL);
 
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);

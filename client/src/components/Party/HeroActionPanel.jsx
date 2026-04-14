@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Wand2, Users, Play, Radio, Shield } from 'lucide-react';
+import { API_URL } from '../../utils/api';
 
 const HeroActionPanel = () => {
     const navigate = useNavigate();
@@ -34,7 +35,7 @@ const HeroActionPanel = () => {
                 host_id: '84920156'
             };
 
-            const response = await fetch('http://localhost:5000/api/party/create', {
+            const response = await fetch(`${API_URL}/api/party/create`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

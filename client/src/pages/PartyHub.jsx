@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { API_URL } from '../utils/api';
 
 const PartyHub = () => {
     const [isLive, setIsLive] = useState(false);
@@ -48,7 +49,7 @@ const PartyHub = () => {
             setIsLoading(true);
             const code = Math.random().toString(36).substring(2, 8).toUpperCase();
             const token = await auth.currentUser.getIdToken();
-            const res = await fetch('http://localhost:5000/api/party/create', {
+            const res = await fetch(`${API_URL}/api/party/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
