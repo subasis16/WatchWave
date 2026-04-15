@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. USERS COLLECTION
+    // Users can read/write their own profile. Anyone logged in can read names/avatars.
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+      
+      // Sub-collections (Friends, Notifications, etc.)
+      match /friends/{friendId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /friendRequests/{requestId} {
+        allow read, write: if request.auth != null && (request.auth.uid == userId || request.auth.uid == requestId);
+      }
+      match /notifications/{notifId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // 2. ROOMS COLLECTION (Party Hub)
+    // Anyone logged in can create/join rooms.
+    match /rooms/{roomCode} {
+      allow read, create: if request.auth != null;
+      allow update: if request.auth != null && (
+        request.resource.data.participants.size() >= resource.data.participants.size() || 
+        request.auth.uid == resource.data.host_id
+      );
+      
+      // Messages & Reactions inside rooms
+      match /messages/{messageId} {
+        allow read, create: if request.auth != null;
+      }
+      match /reactions/{reactionId} {
+        allow read, create: if request.auth != null;
+      }
+    }
+
+    // 3. CLIPS & CONTENT
+    // Content is read-only for public. Clips can be created by logged-in users.
+    match /content/{contentId} {
+      allow read: if true; 
+      allow write: if false; 
+    }
+    
+    match /clips/{clipId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // 4. REPORTS
+    match /reports/{reportId} {
+      allow create: if request.auth != null;
+    }
+  }
+}

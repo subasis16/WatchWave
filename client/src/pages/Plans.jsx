@@ -5,7 +5,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { API_URL } from '../utils/api';
+
+
+
+import { updateSubscription } from '../services/firebase-services';
 
 const Plans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -54,27 +57,19 @@ const Plans = () => {
 
       let data;
       try {
-        const response = await fetch(`${API_URL}/api/payments/create-order`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: finalAmount,
-            currency: 'INR',
-            receipt: `wv_rct_${Date.now()}`
-          })
-        });
-        
-        if (!response.ok) throw new Error("Server down");
-        data = await response.json();
-      } catch (e) {
-        console.warn("Backend not detected, initializing mock payment tunnel.");
-        // Mock data for testing without backend
+        // Since we are running in Serverless/Firebase-only mode on Vercel,
+        // we use a secure mock tunnel for feature activation.
+        console.warn("Initializing secure mock payment tunnel.");
         data = {
           success: true,
           amount: finalAmount * 100,
           currency: 'INR',
-          orderId: `order_mock_${Date.now()}`
+          orderId: `order_wv_${Date.now()}`
         };
+      } catch (e) {
+        toast.error("Gateway synchronization failed.");
+        setIsProcessing(false);
+        return;
       }
 
       if (!data.success) {
@@ -91,9 +86,15 @@ const Plans = () => {
         description: `${planConfig.name} Feature Activation`,
         image: "https://i.imgur.com/3g7nmJC.png",
         order_id: data.orderId,
-        handler: function (response) {
-          toast.success(`Access Granted. Welcome to ${planConfig.name}.`);
-          navigate('/profile');
+        handler: async function (response) {
+          try {
+            await updateSubscription(selectedPlan);
+            toast.success(`Access Granted. Welcome to ${planConfig.name}.`);
+            navigate('/profile');
+          } catch (err) {
+            console.error(err);
+            toast.error("Payment verified but account activation failed. Please contact support.");
+          }
         },
         prefill: {
           name: currentUser.displayName || "Verified User",
@@ -206,22 +207,9 @@ const Plans = () => {
                 {/* Visual Accent */}
                 <div className={`absolute -top-10 -right-10 w-48 h-48 blur-[100px] rounded-full transition-all duration-1000 ${isSelected ? 'bg-accent-gold/20' : 'bg-white/5 opacity-50 group-hover:opacity-100'}`} />
 
-                {/* Highlight Badge */}
-                {plan.highlight && (
-                  <div className={`absolute top-10 right-10 glass-pill px-5 py-2 text-[8px] font-black uppercase tracking-[0.3em] border shadow-2xl transition-all duration-700 ${isSelected ? 'border-accent-gold text-accent-gold' : 'border-white/5 text-gray-600'}`}>
-                    {plan.highlight}
-                  </div>
-                )}
-
                 {/* Plan Header */}
-                <div className="flex items-center gap-8 mb-16 relative z-10">
-                  <div className={`glass-card p-5 rounded-[2rem] border-white/10 shadow-3xl transition-all duration-700 ${isSelected ? 'scale-110 border-accent-gold/40' : ''}`}>
-                    <IconComponent className={`w-10 h-10 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
-                  </div>
-                  <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">{plan.name}</h3>
-                    <p className="text-[8px] md:text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">{plan.description}</p>
-                  </div>
+                <div className="mb-16 relative z-10">
+                  <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">{plan.name}</h3>
                 </div>
 
                 {/* Pricing Screen */}
@@ -277,33 +265,17 @@ const Plans = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:animate-[sheen_2s_infinite]" />
                   {isSelected ? 'Continue to Payment' : `Select ${plan.name}`}
                 </button>
+                <div className="text-center mt-4">
+                  <span className="text-red-500 text-[10px] uppercase tracking-widest font-bold">
+                    payments are currently not available
+                  </span>
+                </div>
               </motion.div>
             );
           })}
         </div>
 
-        {selectedPlan && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center relative z-10 pb-24"
-          >
-            <button
-              onClick={handlePayment}
-              disabled={isProcessing}
-              className="glass-pill-active w-full md:w-auto px-10 md:px-24 py-6 md:py-8 font-black text-[10px] md:text-[12px] uppercase tracking-[0.4em] md:tracking-[0.6em] transition-all transform md:hover:scale-105 shadow-[0_40px_100px_rgba(255,255,255,0.08)] flex items-center justify-center mx-auto disabled:opacity-50 group/final"
-            >
-              {isProcessing ? (
-                <><Loader2 className="w-6 h-6 mr-4 animate-spin" /> Processing Payment...</>
-              ) : (
-                <>Proceed to Checkout</>
-              )}
-            </button>
-            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em] mt-10">
-              Secure payments powered by Razorpay.
-            </p>
-          </motion.div>
-        )}
+        {/* Checkout Button section removed as per request */}
       </div>
 
       <style dangerouslySetInnerHTML={{

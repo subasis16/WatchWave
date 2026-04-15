@@ -1,9 +1,25 @@
+import React, { useState, useEffect } from 'react';
 import ContentRow from '../components/ContentRow';
 import { series, trendingSeries, newReleaseSeries, indianSeries, hollywoodActionSeries, hollywoodCrimeSeries, tvComedy } from '../data/content';
 import { useTranslation } from '../utils/i18n';
+import { getContentByType } from '../services/firebase-services';
 
 const Series = () => {
   const { t } = useTranslation();
+  const [dbSeries, setDbSeries] = useState([]);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const data = await getContentByType('series');
+        setDbSeries(data);
+      } catch (err) {
+        console.error("Error fetching series from Firestore:", err);
+      }
+    };
+    fetchContent();
+  }, []);
+
   return (
     <div className="min-h-screen bg-transparent selection:bg-accent-gold selection:text-black overflow-hidden font-sans">
       {/* Cinematic Background Field */}
@@ -30,6 +46,7 @@ const Series = () => {
         </div>
 
         <div className="space-y-12 pb-12">
+          {dbSeries.length > 0 && <ContentRow title={t('Curated Originals')} data={dbSeries} />}
           <ContentRow title={t('New Releases')} data={newReleaseSeries} />
           <ContentRow title={t('Indian Originals')} data={indianSeries} />
           <ContentRow title={t('Hollywood Action')} data={hollywoodActionSeries} />

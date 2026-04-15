@@ -34,8 +34,8 @@ const OpeningAnimation = ({ onComplete }) => {
 
       {/* The massive W that scales up like the Netflix N */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: [0.8, 1, 8], opacity: [0, 1, 0] }}
+        initial={{ scale: 0.8, opacity: 0, filter: 'blur(10px)' }}
+        animate={{ scale: [0.8, 1, 8], opacity: [0, 1, 0], filter: ['blur(10px)', 'blur(0px)', 'blur(20px)'] }}
         transition={{ 
           duration: 3.8, 
           times: [0, 0.4, 1], // Zoom out smoothly
@@ -45,10 +45,11 @@ const OpeningAnimation = ({ onComplete }) => {
       >
         {/* The 'W' Text with specialized styling */}
         <h1 
-          className="text-8xl md:text-[150px] font-black tracking-tighter text-transparent bg-clip-text"
+          className="text-[120px] md:text-[220px] font-black tracking-tighter text-transparent bg-clip-text"
           style={{ 
+            fontFamily: '"Oswald", sans-serif',
             backgroundImage: 'linear-gradient(to bottom right, #ffffff, rgba(255,215,0,0.8), #000000)',
-            textShadow: '0 0 50px rgba(255,215,0,0.4)'
+            textShadow: '0 0 70px rgba(255,215,0,0.5)'
           }}
         >
           W
@@ -57,8 +58,8 @@ const OpeningAnimation = ({ onComplete }) => {
 
       {/* Subtext 'WATCHWAVE' that appears and then scales/fades with the main logo */}
       <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: [0, 1, 0], y: [50, 0, 0], scale: [1, 1, 2] }}
+        initial={{ opacity: 0, y: 50, letterSpacing: '0.5em' }}
+        animate={{ opacity: [0, 1, 0], y: [50, 0, -20], scale: [1, 1, 1.2], letterSpacing: ['0.5em', '1.5em', '2em'] }}
         transition={{ 
           duration: 3.8,
           times: [0, 0.4, 1],
@@ -66,7 +67,10 @@ const OpeningAnimation = ({ onComplete }) => {
         }}
         className="absolute bottom-1/4"
       >
-        <h2 className="text-[12px] font-black text-gray-500 uppercase tracking-[1em] drop-shadow-2xl ml-4">
+        <h2 
+          className="text-[16px] md:text-[20px] font-black text-white uppercase"
+          style={{ fontFamily: '"Oswald", sans-serif', textShadow: '0 0 20px rgba(255,215,0,0.3)' }}
+        >
           WatchWave
         </h2>
       </motion.div>

@@ -7,22 +7,40 @@ import {
 } from 'lucide-react';
 import { movies, series, anime } from '../data/content';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import io from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { auth, db } from '../firebase';
-import { API_URL } from '../utils/api';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, getDoc } from 'firebase/firestore';
-
-const SOCKET_URL = API_URL;
+import { doc, onSnapshot, getDoc, collection, addDoc, query, orderBy, updateDoc } from 'firebase/firestore';
+import { 
+  updateRoomSync, updateRoomContent, sendRoomMessage, listenToRoomSync, 
+  listenToRoomMessages, sendReaction, listenToReactions, submitReport,
+  listenToRoomParticipants, getFriendsList
+} from '../services/firebase-services';
 
 /* ====================================================
    SHARE MODAL COMPONENT
    ==================================================== */
 const ShareModal = ({ isOpen, onClose }) => {
   const [showInvites, setShowInvites] = useState(false);
+  const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const mockFriends = [];
+  useEffect(() => {
+    if (showInvites) {
+      setLoading(true);
+      getFriendsList().then(data => {
+        setFriends(data.map(f => ({
+          id: f.friendUid,
+          name: f.name,
+          avatar: f.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name)}&background=random`
+        })));
+        setLoading(false);
+      }).catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+    }
+  }, [showInvites]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -31,13 +49,8 @@ const ShareModal = ({ isOpen, onClose }) => {
   };
 
   const handleInvite = (name) => {
-    console.log(`Invite sent to ${name}`);
     toast.success(`Invite sent to ${name}`, { icon: '✉️', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
   };
-
-  useEffect(() => {
-    if (!isOpen) setShowInvites(false);
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -63,7 +76,7 @@ const ShareModal = ({ isOpen, onClose }) => {
             <div className="space-y-4">
               <button
                 onClick={handleCopy}
-                className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl glass-card border-white/5 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white transition-all transition-all duration-500"
+                className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl glass-card border-white/5 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-lg"
               >
                 <Copy size={18} /> Copy Invite Link
               </button>
@@ -85,20 +98,26 @@ const ShareModal = ({ isOpen, onClose }) => {
             </div>
 
             <div className="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-              {mockFriends.map(friend => (
-                <div key={friend.id} className="flex items-center justify-between p-4 rounded-2xl glass-card border-white/5">
-                  <div className="flex items-center gap-4">
-                    <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full object-cover border border-white/10 shadow-lg" />
-                    <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">{friend.name}</span>
+              {loading ? (
+                <div className="py-10 text-center text-[10px] font-black text-white/40 animate-pulse uppercase tracking-widest">Searching...</div>
+              ) : friends.length > 0 ? (
+                friends.map(friend => (
+                  <div key={friend.id} className="flex items-center justify-between p-4 rounded-2xl glass-card border-white/5">
+                    <div className="flex items-center gap-4">
+                      <img src={friend.avatar} alt={friend.name} className="w-10 h-10 rounded-full object-cover border border-white/10 shadow-lg" />
+                      <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">{friend.name}</span>
+                    </div>
+                    <button
+                      onClick={() => handleInvite(friend.name)}
+                      className="px-4 py-2 rounded-full glass-pill border-accent-gold/20 text-accent-gold text-[8px] font-black uppercase tracking-widest hover:bg-accent-gold hover:text-black transition-all"
+                    >
+                      Invite
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleInvite(friend.name)}
-                    className="px-4 py-2 rounded-full glass-pill border-accent-gold/20 text-accent-gold text-[8px] font-black uppercase tracking-widest hover:bg-accent-gold hover:text-black transition-all"
-                  >
-                    Invite
-                  </button>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="py-10 text-center text-[10px] font-black text-white/20 uppercase tracking-widest">No friends found</div>
+              )}
             </div>
           </div>
         )}
@@ -110,140 +129,7 @@ const ShareModal = ({ isOpen, onClose }) => {
 /* ====================================================
    ROLE-BASED SETTINGS PANEL
    ==================================================== */
-const RoomSettings = ({ isOwner, socket, roomCode }) => {
-  const [banText, setBanText] = useState(false);
-  const [banPhoto, setBanPhoto] = useState(false);
-  const [roomTitle, setRoomTitle] = useState('COZY GAMING & CHILL - RYU STREAMS');
 
-  const [movieVol, setMovieVol] = useState(65);
-  const [voiceVol, setVoiceVol] = useState(45);
-
-  useEffect(() => {
-    if (!socket) return;
-    const handleMovieSync = ({ gain }) => setMovieVol(gain);
-    const handleVoiceSync = ({ gain }) => setVoiceVol(gain);
-    const handleMuteSync = ({ mute }) => setBanText(mute);
-
-    socket.on('sync_media_gain', handleMovieSync);
-    socket.on('sync_voice_chat', handleVoiceSync);
-    socket.on('sync_global_mute', handleMuteSync);
-
-    return () => {
-      socket.off('sync_media_gain', handleMovieSync);
-      socket.off('sync_voice_chat', handleVoiceSync);
-      socket.off('sync_global_mute', handleMuteSync);
-    };
-  }, [socket]);
-
-  const handleMovieChange = (e) => {
-    setMovieVol(e.target.value);
-    if (socket && isOwner) socket.emit('sync_media_gain', { roomCode, gain: e.target.value });
-  };
-
-  const handleVoiceChange = (e) => {
-    setVoiceVol(e.target.value);
-    if (socket && isOwner) socket.emit('sync_voice_chat', { roomCode, gain: e.target.value });
-  };
-
-  const handleMuteChange = (checked) => {
-    setBanText(checked);
-    if (socket && isOwner) socket.emit('sync_global_mute', { roomCode, mute: checked });
-  };
-
-  const CustomToggle = ({ checked, onChange, disabled }) => (
-    <button
-      onClick={() => { if (!disabled) onChange(!checked); }}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${checked ? 'bg-accent-gold shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-white/10'
-        }`}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-500 shadow-sm ${checked ? 'translate-x-6' : 'translate-x-1'
-          }`}
-      />
-    </button>
-  );
-
-  const handleReport = async () => {
-    try {
-      if (!auth.currentUser) throw new Error("Unauthenticated");
-      const token = await auth.currentUser.getIdToken();
-      const res = await fetch(`${API_URL}/api/feedback/report`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          roomCode: roomCode || 'unknown',
-          reason: 'Violation of Community Guidelines / Toxicity Flag',
-          reportedUser: 'Room Aggregate'
-        })
-      });
-      if (!res.ok) throw new Error("Failed to file report");
-      toast.success("Moderation report securely filed with WatchWave Management.", { icon: '🚩', style: { background: 'rgba(255,255,255,0.1)', color: '#fff', backdropFilter: 'blur(20px)' } });
-    } catch (err) {
-      toast.error("Network error filing moderation report.", { icon: '⚠️' });
-    }
-  };
-
-  return (
-    <div className="glass-card p-6 pb-8 shrink-0 flex flex-col border-white/10 relative overflow-hidden group">
-      <div className="absolute top-[-50%] left-[-50%] w-full h-full bg-white/5 blur-[80px] rounded-full pointer-events-none" />
-
-      <div className="flex items-center justify-between mb-8 select-none relative z-10">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl glass-card border-white/10 flex items-center justify-center text-white">
-            <Settings size={20} />
-          </div>
-          <h3 className="text-[10px] font-black text-white tracking-[0.3em] uppercase">Room Settings</h3>
-        </div>
-      </div>
-
-      <div className="space-y-8 relative z-10">
-        <div className="space-y-4">
-          <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">
-            <span>Movie Volume</span>
-            <span className="text-accent-gold">{movieVol}%</span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={movieVol}
-            onChange={handleMovieChange}
-            className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-white"
-            disabled={!isOwner}
-          />
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex justify-between text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">
-            <span>Voice Chat</span>
-            <span className="text-white">{voiceVol}%</span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={voiceVol}
-            onChange={handleVoiceChange}
-            className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-white"
-            disabled={!isOwner}
-          />
-        </div>
-
-        <div className="flex items-center justify-between pt-4 border-t border-white/5">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Mute</span>
-          <CustomToggle checked={banText} onChange={handleMuteChange} disabled={!isOwner} />
-        </div>
-      </div>
-
-      <button onClick={handleReport} className="mt-10 w-full flex items-center justify-center gap-3 py-4 rounded-xl glass-card border-white/5 hover:border-red-500/30 text-gray-400 hover:text-red-500 text-[10px] font-black tracking-[0.2em] transition-all uppercase relative z-10">
-        <Flag size={16} /> Clear Room
-      </button>
-    </div>
-  );
-};
 
 /* ====================================================
    MAIN WATCH ROOM COMPONENT
@@ -252,22 +138,20 @@ const WatchRoom = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const chatScrollContainerRef = useRef(null);
+  const { id: roomCode = 'lobby' } = useParams();
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [floatingReactions, setFloatingReactions] = useState([]);
+  const [currentParticipants, setCurrentParticipants] = useState([]);
 
-  // Mood / Content State
   const [currentMood, setCurrentMood] = useState(null);
   const [showMoodSelector, setShowMoodSelector] = useState(true);
   const [selectedContent, setSelectedContent] = useState(null);
-
-  const [selectedVibe, setSelectedVibe] = useState(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isWaitingInLobby, setIsWaitingInLobby] = useState(false);
-  const [isOwner, setIsOwner] = useState(true);
-  const [socket, setSocket] = useState(null);
+  const [isOwner, setIsOwner] = useState(location.state?.isOwner || false);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [localVol, setLocalVol] = useState(65);
   const [micActive, setMicActive] = useState(false);
@@ -285,7 +169,7 @@ const WatchRoom = () => {
     } else {
       video.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, selectedContent]);
 
   useEffect(() => {
     if (playerRef.current && playerRef.current.volume !== undefined) {
@@ -299,7 +183,7 @@ const WatchRoom = () => {
       if (currentUser) {
         unsubscribeDoc = onSnapshot(doc(db, 'users', currentUser.uid), snap => {
           if (snap.exists()) setCurrentUserData(snap.data());
-        });
+        }, (err) => {});
       } else {
         if (unsubscribeDoc) unsubscribeDoc();
       }
@@ -310,10 +194,6 @@ const WatchRoom = () => {
     };
   }, []);
 
-  const participants = [
-    { id: 1, name: currentUserData?.name || 'You', avatar: currentUserData?.avatar || auth.currentUser?.photoURL || 'https://i.pravatar.cc/150?u=3', isMuted: false, isHost: true, isSpeaking: false },
-  ];
-
   const reactions = [
     { icon: Heart, color: 'text-red-500', id: 'heart' },
     { icon: ThumbsUp, color: 'text-blue-500', id: 'thumbsup' },
@@ -322,54 +202,12 @@ const WatchRoom = () => {
   ];
 
   const moods = [
-    {
-      id: 'happy',
-      name: 'Happy',
-      icon: Smile,
-      color: 'bg-gradient-to-br from-yellow-400 to-orange-500',
-      description: 'Feel-good vibes',
-      keywords: ['Spider-Man', 'One Piece', 'Naruto', 'Loki']
-    },
-    {
-      id: 'sad',
-      name: 'Sad',
-      icon: Frown,
-      color: 'bg-gradient-to-br from-blue-500 to-indigo-600',
-      description: 'Emotional hits',
-      keywords: ['Interstellar', 'The Last of Us', 'Violet', 'Silent', 'Titanic']
-    },
-    {
-      id: 'relaxed',
-      name: 'Relaxed',
-      icon: Coffee,
-      color: 'bg-gradient-to-br from-green-400 to-emerald-600',
-      description: 'Chill mode',
-      keywords: ['Wednesday', 'Harry Potter', 'Friends', 'Office']
-    },
-    {
-      id: 'excited',
-      name: 'Excited',
-      icon: Zap,
-      color: 'bg-gradient-to-br from-purple-500 to-pink-500',
-      description: 'Hype Action',
-      keywords: ['Avengers', 'Jujutsu', 'Demon Slayer', 'Titan', 'Solo Leveling', 'The Boys', 'Gladiator', 'John Wick']
-    },
-    {
-      id: 'romantic',
-      name: 'Romantic',
-      icon: Heart,
-      color: 'bg-gradient-to-br from-red-400 to-rose-600',
-      description: 'Love stories',
-      keywords: ['Titanic', 'Notebook', 'La La Land', 'Your Name']
-    },
-    {
-      id: 'thriller',
-      name: 'Thriller',
-      icon: Skull,
-      color: 'bg-gradient-to-br from-gray-700 to-black',
-      description: 'Suspense',
-      keywords: ['Dark Knight', 'Breaking Bad', 'Death Note', 'Squid Game', 'Batman', 'Oppenheimer', 'Catalog']
-    },
+    { id: 'happy', name: 'Happy', icon: Smile, color: 'bg-gradient-to-br from-yellow-400 to-orange-500', description: 'Feel-good vibes', keywords: ['Spider-Man', 'One Piece', 'Naruto', 'Loki'] },
+    { id: 'sad', name: 'Sad', icon: Frown, color: 'bg-gradient-to-br from-blue-500 to-indigo-600', description: 'Emotional hits', keywords: ['Interstellar', 'The Last of Us', 'Violet', 'Silent', 'Titanic'] },
+    { id: 'relaxed', name: 'Relaxed', icon: Coffee, color: 'bg-gradient-to-br from-green-400 to-emerald-600', description: 'Chill mode', keywords: ['Wednesday', 'Harry Potter', 'Friends', 'Office'] },
+    { id: 'excited', name: 'Excited', icon: Zap, color: 'bg-gradient-to-br from-purple-500 to-pink-500', description: 'Hype Action', keywords: ['Avengers', 'Jujutsu', 'Demon Slayer', 'Titan', 'Solo Leveling', 'The Boys', 'Gladiator', 'John Wick'] },
+    { id: 'romantic', name: 'Romantic', icon: Heart, color: 'bg-gradient-to-br from-red-400 to-rose-600', description: 'Love stories', keywords: ['Titanic', 'Notebook', 'La La Land', 'Your Name'] },
+    { id: 'thriller', name: 'Thriller', icon: Skull, color: 'bg-gradient-to-br from-gray-700 to-black', description: 'Suspense', keywords: ['Dark Knight', 'Breaking Bad', 'Death Note', 'Squid Game', 'Batman', 'Oppenheimer'] },
   ];
 
   const allContent = [...movies, ...series, ...anime];
@@ -380,9 +218,7 @@ const WatchRoom = () => {
       mood.keywords.some(k => item.title.toLowerCase().includes(k.toLowerCase()))
     );
     if (results.length < 5) {
-      const remaining = allContent
-        .filter(item => !results.includes(item))
-        .sort(() => 0.5 - Math.random());
+      const remaining = allContent.filter(item => !results.includes(item)).sort(() => 0.5 - Math.random());
       results = [...results, ...remaining.slice(0, 5 - results.length)];
     }
     return results;
@@ -390,106 +226,38 @@ const WatchRoom = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const newSocket = io(SOCKET_URL);
-    setSocket(newSocket);
+    if (!roomCode || roomCode === 'lobby') return;
 
-    const currentRoomCode = location.pathname.split('/').pop() || 'lobby';
-    newSocket.emit('join_watch_room', {
-      roomCode: currentRoomCode,
-      userId: auth.currentUser?.uid || 'anon',
-      username: auth.currentUser?.displayName || 'Guest'
-    });
-
-    // Realtime Sync Listeners
-    newSocket.on('room_message', (message) => {
-      setMessages(prev => [...prev, message]);
-    });
-
-    newSocket.on('sync_play', ({ progress }) => {
-      setIsPlaying(true);
-      if (progress !== undefined && playerRef.current && typeof playerRef.current.seekTo === 'function') {
-        playerRef.current.seekTo(progress);
+    const unsubSync = listenToRoomSync(roomCode, (roomData) => {
+      if (!roomData) return;
+      if (roomData.syncState && !isOwner) {
+        const { playing, progress } = roomData.syncState;
+        setIsPlaying(playing);
+        if (progress !== undefined && playerRef.current && !seeking) {
+            if (playerRef.current.duration) {
+                const diff = Math.abs(playerRef.current.currentTime - (progress * playerRef.current.duration));
+                if (diff > 2) playerRef.current.currentTime = progress * playerRef.current.duration;
+            }
+        }
       }
-    });
-    newSocket.on('sync_pause', ({ progress }) => {
-      setIsPlaying(false);
-      if (progress !== undefined && playerRef.current && typeof playerRef.current.seekTo === 'function') {
-        playerRef.current.seekTo(progress);
+      if (roomData.currentContent && !isOwner) {
+        setSelectedContent(roomData.currentContent);
+        setShowMoodSelector(false);
       }
+      if (roomData.host_id === auth.currentUser?.uid) setIsOwner(true);
     });
 
-    newSocket.on('sync_content', ({ content }) => {
-      setSelectedContent(content);
-      setShowMoodSelector(false);
-      setIsPlaying(true);
-      toast(`Host switched playing to: ${content.title}`, {
-        icon: '🍿',
-        style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)' }
-      });
-    });
+    const unsubMessages = listenToRoomMessages(roomCode, (msgs) => setMessages(msgs));
+    const unsubReactions = listenToReactions(roomCode, (rs) => setFloatingReactions(rs));
+    const unsubParticipants = listenToRoomParticipants(roomCode, (data) => setCurrentParticipants(data));
 
-    newSocket.on('receive_reaction', (reaction) => {
-      const floatReaction = { ...reaction, id: Date.now() + Math.random() };
-      setFloatingReactions(prev => [...prev, floatReaction]);
-      setTimeout(() => {
-        setFloatingReactions(prev => prev.filter(r => r.id !== floatReaction.id));
-      }, 2000);
-    });
-
-    newSocket.on('receive-entry-request', (data) => {
-      if (isOwner) {
-        toast((t) => (
-          <div className="flex flex-col gap-3 w-full">
-            <span className="font-bold text-sm">A user wants to enter the room</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  newSocket.emit('entry-accepted', { socketId: data.socketId });
-                  toast.dismiss(t.id);
-                  toast.success("Entry Granted");
-                }}
-                className="bg-accent-gold text-black px-3 py-1.5 rounded text-xs font-bold shadow-[0_0_15px_rgba(255,215,0,0.5)]"
-              >
-                Accept
-              </button>
-              <button
-                onClick={() => {
-                  newSocket.emit('entry-declined', { socketId: data.socketId });
-                  toast.dismiss(t.id);
-                }}
-                className="bg-white/10 text-white px-3 py-1.5 rounded text-xs"
-              >
-                Decline
-              </button>
-            </div>
-          </div>
-        ), { duration: 10000, style: { background: '#141414', color: '#fff', border: '1px solid #333' } });
-      }
-    });
-
-    newSocket.on('entry-accepted', () => {
-      if (!isOwner) {
-        setIsWaitingInLobby(false);
-        toast.success("Room owner granted you entry!");
-      }
-    });
-
-    newSocket.on('sync_seek', ({ progress }) => {
-      if (!isOwner && playerRef.current && typeof playerRef.current.seekTo === 'function') {
-        playerRef.current.seekTo(progress);
-        setPlayed(progress);
-      }
-    });
-
-    newSocket.on('entry-declined', () => {
-      if (!isOwner) {
-        toast.error("The room owner declined your request.");
-        setTimeout(() => navigate('/party'), 2000);
-      }
-    });
-
-    return () => newSocket.disconnect();
-  }, [isOwner, navigate, location]);
+    return () => {
+      unsubSync();
+      unsubMessages();
+      unsubReactions();
+      unsubParticipants();
+    };
+  }, [roomCode, isOwner]);
 
   useEffect(() => {
     if (chatScrollContainerRef.current) {
@@ -500,27 +268,13 @@ const WatchRoom = () => {
   const handlePlayToggle = () => {
     const newState = !isPlaying;
     setIsPlaying(newState);
-    if (socket) {
-      const currentRoomCode = location.pathname.split('/').pop();
-      let currentProgress = 0;
-      if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function' && duration > 0) {
-        currentProgress = playerRef.current.getCurrentTime() / duration;
-      }
-      if (newState) {
-        socket.emit('sync_play', { roomCode: currentRoomCode, progress: currentProgress });
-      } else {
-        socket.emit('sync_pause', { roomCode: currentRoomCode, progress: currentProgress });
-      }
+    if (isOwner) {
+      const prog = playerRef.current && playerRef.current.duration ? playerRef.current.currentTime / playerRef.current.duration : 0;
+      updateRoomSync(roomCode, { playing: newState, progress: prog }).catch(console.error);
     }
   };
 
-  const handleProgress = (state) => {
-    if (!seeking) {
-      setPlayed(state.played);
-    }
-  };
-
-  const handleSeekMouseDown = () => {
+  const handleSeekMouseDown = (e) => {
     setSeeking(true);
   };
 
@@ -531,106 +285,55 @@ const WatchRoom = () => {
   const handleSeekMouseUp = (e) => {
     setSeeking(false);
     const newPlayed = parseFloat(e.target.value);
-    if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
-      playerRef.current.seekTo(newPlayed);
+    if (playerRef.current && playerRef.current.duration) {
+      playerRef.current.currentTime = newPlayed * playerRef.current.duration;
     }
-    if (socket && isOwner) {
-      const currentRoomCode = location.pathname.split('/').pop();
-      socket.emit('sync_seek', { roomCode: currentRoomCode, progress: newPlayed });
+    if (isOwner) {
+      updateRoomSync(roomCode, { playing: isPlaying, progress: newPlayed }).catch(console.error);
     }
   };
 
   const formatTime = (seconds) => {
+    if (isNaN(seconds)) return "00:00";
     const date = new Date(seconds * 1000);
     const hh = date.getUTCHours();
     const mm = date.getUTCMinutes();
     const ss = date.getUTCSeconds().toString().padStart(2, '0');
-    if (hh) {
-      return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
-    }
-    return `${mm}:${ss}`;
+    return hh ? `${hh}:${mm.toString().padStart(2, '0')}:${ss}` : `${mm}:${ss}`;
   };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-
     const msgData = {
-      id: Date.now(),
       user: currentUserData?.name || auth.currentUser?.displayName || 'You',
       text: input,
       avatar: currentUserData?.avatar || auth.currentUser?.photoURL || 'https://i.pravatar.cc/150?u=3',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: false
+      authorUid: auth.currentUser?.uid || 'anon',
     };
-
-    if (socket) {
-      const currentRoomCode = location.pathname.split('/').pop();
-      socket.emit('room_message', { roomCode: currentRoomCode, message: msgData });
-    }
-
-    setMessages([...messages, { ...msgData, user: 'You', isMe: true }]);
+    sendRoomMessage(roomCode, msgData).catch(console.error);
     setInput('');
   };
 
-  const triggerReaction = (ReactionIcon, color, reactionId) => {
-    const newReaction = {
-      id: Date.now() + Math.random(),
-      iconId: reactionId,
-      color: color,
-      x: Math.random() * 80 + 10,
-    };
-
-    setFloatingReactions(prev => [...prev, newReaction]);
-    setTimeout(() => {
-      setFloatingReactions(prev => prev.filter(r => r.id !== newReaction.id));
-    }, 2000);
-
-    if (socket) {
-      const currentRoomCode = location.pathname.split('/').pop();
-      socket.emit('send_reaction', { roomCode: currentRoomCode, reaction: { iconId: reactionId, color: color, x: newReaction.x } });
-    }
+  const triggerReaction = (reactionId, color) => {
+    sendReaction(roomCode, { iconId: reactionId, color, x: Math.random() * 80 + 10 }).catch(console.error);
   };
 
   const handleContentSelect = async (item) => {
     let enrichedItem = { ...item };
-
-    // If no local videoUrl, try Firestore
-    if (!enrichedItem.videoUrl) {
-      try {
-        const movieDocRef = doc(db, 'movies', item.id);
-        const movieSnap = await getDoc(movieDocRef);
-        if (movieSnap.exists() && movieSnap.data().videoUrl) {
-          enrichedItem.videoUrl = movieSnap.data().videoUrl;
-          console.log(`🎬 WatchRoom: Found Firestore video for ${item.title}`);
-        }
-      } catch (e) {
-        console.warn('WatchRoom Firestore fetch failed:', e.message);
-      }
-    }
-
-    // YouTube fallbacks removed as per request
-    if (!enrichedItem.videoUrl) {
-      enrichedItem.videoUrl = ''; // Clear to prevent attempts to play YT
-    }
+    if (!isOwner) return;
 
     setSelectedContent(enrichedItem);
     setShowMoodSelector(false);
     setIsPlaying(true);
-
-    if (socket) {
-      const currentRoomCode = location.pathname.split('/').pop();
-      socket.emit('sync_content', { roomCode: currentRoomCode, content: enrichedItem });
-    }
-
-    setMessages(prev => [...prev, {
-      id: Date.now(),
-      user: 'Bot',
-      text: `Now playing: ${item.title}`,
+    updateRoomContent(roomCode, enrichedItem).catch(console.error);
+    sendRoomMessage(roomCode, {
+      user: 'WatchWave', text: `🎬 Party has started! Watching: ${item.title}`,
       avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=WatchWave',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: false
-    }]);
+      authorUid: 'system'
+    });
   };
 
   const handleMicToggle = async () => {
@@ -638,14 +341,12 @@ const WatchRoom = () => {
       if (!micActive) {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setMicActive(true);
-        toast.success("Voice Chat Live", { icon: '🎙️', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+        toast.success("Voice Transmission Active", { icon: '🎙️', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
       } else {
         setMicActive(false);
-        toast("Voice Muted", { icon: '🔇', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+        toast("Microphone Muted", { icon: '🔇', style: { background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
       }
-    } catch (err) {
-      toast.error("Microphone access denied or unavailable.");
-    }
+    } catch (err) { toast.error("Hardware disconnected or access denied."); }
   };
 
   if (isWaitingInLobby) {
@@ -666,10 +367,10 @@ const WatchRoom = () => {
   const recommendations = currentMood ? getRecommendations(currentMood) : [];
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-4 overflow-hidden flex flex-col h-screen font-sans selection:bg-accent-gold selection:text-black">
+    <div className="min-h-screen text-white pt-16 pb-4 overflow-hidden flex flex-col h-screen font-sans selection:bg-accent-gold selection:text-black">
 
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative max-w-[1920px] mx-auto w-full px-6 gap-6 pb-6 mt-4">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative max-w-[1920px] mx-auto w-full px-6 gap-6 pb-6 mt-0">
 
         {/* =========================================
             LEFT COLUMN: MAIN STAGE (Cinema Screen)
@@ -763,9 +464,8 @@ const WatchRoom = () => {
           <div className="absolute top-0 w-full p-8 flex justify-between items-center z-10 bg-gradient-to-b from-black/60 via-black/20 to-transparent">
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-accent-gold animate-pulse shadow-[0_0_10px_#FFD700]" />
-              <h2 className="text-[10px] font-black text-gray-300 tracking-[0.4em] uppercase">
-                <span className="opacity-40">Now Playing:</span>
-                <span className="text-white ml-2">{selectedContent ? selectedContent.title : 'Waiting...'}</span>
+              <h2 className="text-[10px] font-black text-white tracking-[0.4em] uppercase">
+                {selectedContent ? selectedContent.title : 'Waiting...'}
               </h2>
             </div>
           </div>
@@ -825,15 +525,12 @@ const WatchRoom = () => {
               </>
             ) : (
               <div className="text-center z-10 p-8">
-                <div className="glass-card p-12 rounded-3xl border-white/10 shadow-2xl">
-                  <h3 className="text-sm font-medium text-gray-400 mb-6">Theater Screen Ready</h3>
                   <button
                     onClick={() => setShowMoodSelector(true)}
                     className="glass-pill-active px-8 py-3 text-sm font-semibold transition-all shadow-lg"
                   >
                     Select Stream
                   </button>
-                </div>
               </div>
             )}
 
@@ -921,7 +618,7 @@ const WatchRoom = () => {
                   {reactions.map((r) => (
                     <button
                       key={r.id}
-                      onClick={() => triggerReaction(r.icon, r.color, r.id)}
+                      onClick={() => triggerReaction(r.id, r.color)}
                       className="hover:scale-125 transition-transform active:scale-95 brightness-90 hover:brightness-110"
                     >
                       <r.icon size={20} className={r.color} />
@@ -939,7 +636,8 @@ const WatchRoom = () => {
                     {micActive ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button onClick={() => {
-                    if (socket) socket.emit('leave_watch_room', { roomCode: location.pathname.split('/').pop(), username: currentUserData?.name });
+                    // Cleanup logic here if needed (e.g. updating room participant list in Firestore)
+
                     navigate('/party');
                   }}
                     className="w-12 h-12 rounded-2xl glass-pill-active flex items-center justify-center bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl"
@@ -969,13 +667,13 @@ const WatchRoom = () => {
             </div>
 
             <div className="flex -space-x-2.5">
-              {participants.slice(0, 3).map((p) => (
+              {currentParticipants.slice(0, 3).map((p) => (
                 <div key={p.id} className="relative group shrink-0">
-                  <img src={p.avatar} alt={p.name} className={`w-9 h-9 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-accent-gold shadow-[0_0_10px_rgba(255,215,0,0.3)]' : 'border-[#050505]'}`} />
+                  <img src={p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=random`} alt={p.name} className={`w-9 h-9 rounded-full border-2 object-cover transition-all ${p.isHost ? 'border-accent-gold shadow-[0_0_10px_rgba(255,215,0,0.3)]' : 'border-[#050505]'}`} />
                 </div>
               ))}
-              {participants.length > 3 && (
-                <div className="w-9 h-9 rounded-full glass-card border-white/10 flex items-center justify-center text-[7px] font-black z-10 bg-black/40">+{participants.length - 3}</div>
+              {currentParticipants.length > 3 && (
+                <div className="w-9 h-9 rounded-full glass-card border-white/10 flex items-center justify-center text-[7px] font-black z-10 bg-black/40">+{currentParticipants.length - 3}</div>
               )}
             </div>
           </div>
@@ -1032,7 +730,7 @@ const WatchRoom = () => {
               </form>
             </div>
           </div>
-          <RoomSettings isOwner={isOwner} socket={socket} roomCode={location.pathname.split('/').pop() || 'lobby'} />
+
         </div>
       </div>
 

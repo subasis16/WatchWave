@@ -27,7 +27,7 @@ const Settings = () => {
       if (currentUser) {
          unsubscribeDoc = onSnapshot(doc(db, 'users', currentUser.uid), (docSnap) => {
             if (docSnap.exists()) setDbUser(docSnap.data());
-         });
+         }, (err) => {});
       } else {
          setDbUser(null);
          if (unsubscribeDoc) unsubscribeDoc();
@@ -47,7 +47,6 @@ const Settings = () => {
   const tabs = [
     { id: 'Account', icon: User },
     { id: 'Subscription', icon: CreditCard },
-    { id: 'Playback', icon: PlayCircle },
     { id: 'Accessibility', icon: Accessibility },
     { id: 'Language', icon: Globe }
   ];
@@ -190,28 +189,6 @@ const Settings = () => {
                     </div>
                   </div>
                 )}
-
-                {/* PLAYBACK TAB */}
-                {activeTab === 'Playback' && (
-                  <div className="glass-card p-8 md:p-16 border-white/5 space-y-10 md:space-y-12 shadow-3xl">
-                    <div className="flex items-center justify-between">
-                      <div className="pr-4 md:pr-10 space-y-2 md:space-y-3">
-                        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Auto-Play Next Episode</h2>
-                        <p className="text-[8px] md:text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Automatically play the next episode in a series.</p>
-                      </div>
-                      <CustomToggle checked={autoplay} onChange={() => toggleSetting('autoplay')} />
-                    </div>
-                    
-                    <div className="flex items-center justify-between border-t border-white/5 pt-12">
-                      <div className="pr-10 space-y-3">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Audio Description</h2>
-                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-loose">Audio description for visually impaired viewers.</p>
-                      </div>
-                      <CustomToggle checked={audioDesc} onChange={() => toggleSetting('audioDesc')} />
-                    </div>
-                  </div>
-                )}
-
 
 
 

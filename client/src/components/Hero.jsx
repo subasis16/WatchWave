@@ -115,19 +115,6 @@ const Hero = () => {
               transition={{ duration: 0.5 }}
               className="max-w-3xl"
             >
-              <div className="flex items-center gap-2 mb-4 md:mb-6">
-                <span className="glass-pill px-2.5 py-1 flex items-center gap-1.5 text-[8px] md:text-[10px] font-bold text-white uppercase tracking-widest bg-white/10">
-                  <span className="w-1 h-1 md:w-1.5 md:h-1.5 bg-accent-gold rounded-full animate-pulse"></span>
-                  {t('Trending Now')}
-                </span>
-                <div className="flex gap-2">
-                  {currentMovie.genres.slice(0, 2).map((genre, idx) => (
-                    <span key={idx} className="glass-pill px-2.5 py-1 text-[8px] md:text-[10px] font-bold bg-white/5 border-white/5 uppercase">
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              </div>
 
               <h1 className="text-4xl md:text-8xl font-black text-white mb-4 md:mb-6 tracking-tighter leading-none uppercase">
                 {currentMovie.title}

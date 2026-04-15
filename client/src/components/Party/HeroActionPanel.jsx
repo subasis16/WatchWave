@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Wand2, Users, Play, Radio, Shield } from 'lucide-react';
-import { API_URL } from '../../utils/api';
+import { createPartyRoom, joinPartyRoom } from '../../services/firebase-services';
+import { toast } from 'react-hot-toast';
 
 const HeroActionPanel = () => {
     const navigate = useNavigate();
@@ -29,27 +30,16 @@ const HeroActionPanel = () => {
         setIsCreating(true);
         setCreationError(null);
         try {
-            const payload = {
-                room_code: String(hostRoomId).trim(),
-                room_password: hostPassword ? String(hostPassword).trim() : '',
-                host_id: '84920156'
-            };
+            const result = await createPartyRoom(
+                String(hostRoomId).trim(),
+                hostPassword ? String(hostPassword).trim() : ''
+            );
 
-            const response = await fetch(`${API_URL}/api/party/create`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                navigate('/room');
-            } else {
-                setCreationError(data.error || data.message || "Server rejected the request");
+            if (result.success) {
+                navigate(`/room/${hostRoomId}`, { state: { isOwner: true } });
             }
         } catch (error) {
-            setCreationError("Network Error: " + error.message);
+            setCreationError(error.message || "Failed to create room");
         } finally {
             setIsCreating(false);
         }
@@ -58,10 +48,16 @@ const HeroActionPanel = () => {
     const handleJoinRoom = async () => {
         if (!joinRoomId) return;
         setIsJoining(true);
-        setTimeout(() => {
-            setIsJoining(false);
-            navigate('/room');
-        }, 800);
+        try {
+          const result = await joinPartyRoom(joinRoomId.trim(), joinPassword.trim());
+          if (result.success) {
+             navigate(`/room/${joinRoomId}`, { state: { isOwner: false } });
+          }
+        } catch (error) {
+          toast.error(error.message || "Room not found or access denied.");
+        } finally {
+          setIsJoining(false);
+        }
     };
 
     return (

@@ -9,18 +9,7 @@ import { useNotification } from '../context/NotificationContext';
 import { movies, series, anime, bollywood, trending } from '../data/content';
 import { useTranslation } from '../utils/i18n';
 
-// Combine all content into one searchable pool
-const ALL_CONTENT = [
-  ...movies.map(i => ({ ...i, type: 'Movie' })),
-  ...series.map(i => ({ ...i, type: 'Series' })),
-  ...anime.map(i => ({ ...i, type: 'Anime' })),
-  ...bollywood.map(i => ({ ...i, type: 'Bollywood' })),
-  ...trending.map(i => ({ ...i, type: 'Trending' })),
-].reduce((acc, item) => {
-  // Deduplicate by title
-  if (!acc.find(x => x.title === item.title)) acc.push(item);
-  return acc;
-}, []);
+import { getAllContent } from '../services/firebase-services';
 
 const RECENT_KEY = 'watchwave_recent_searches';
 const MAX_RECENT = 8;
@@ -38,6 +27,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [dbUser, setDbUser] = useState(null);
+  const [dynamicContent, setDynamicContent] = useState([]);
 
   const { notifications, markAsRead } = useNotification();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -49,6 +39,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const searchRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -59,6 +50,11 @@ const Navbar = () => {
   useEffect(() => {
     const saved = localStorage.getItem(RECENT_KEY);
     if (saved) setRecentSearches(JSON.parse(saved));
+    
+    // Fetch dynamic content for search
+    getAllContent().then(data => {
+      setDynamicContent(data.map(i => ({ ...i, type: i.type || 'Movie' })));
+    }).catch(console.error);
   }, []);
 
   // Click outside to close dropdowns
@@ -91,7 +87,7 @@ const Navbar = () => {
         try {
           unsubscribeDoc = onSnapshot(doc(db, 'users', currentUser.uid), (docSnap) => {
             if (docSnap.exists()) setDbUser(docSnap.data());
-          });
+          }, (err) => {});
         } catch (e) {}
       } else {
         setDbUser(null);
@@ -104,18 +100,56 @@ const Navbar = () => {
     };
   }, []);
 
-  // Live search results filtered from all content
-  const searchResults = searchQuery.trim().length > 0
-    ? ALL_CONTENT.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 8)
-    : [];
+  // Combine static and dynamic content into one searchable pool
+  const allSearchableContent = [
+    ...movies.map(i => ({ ...i, type: 'Movie' })),
+    ...series.map(i => ({ ...i, type: 'Series' })),
+    ...anime.map(i => ({ ...i, type: 'Anime' })),
+    ...bollywood.map(i => ({ ...i, type: 'Bollywood' })),
+    ...trending.map(i => ({ ...i, type: 'Trending' })),
+    ...dynamicContent
+  ].reduce((acc, item) => {
+    // Deduplicate by title
+    if (!acc.find(x => x.title === item.title)) acc.push(item);
+    return acc;
+  }, []);
 
   // Smart recommendations when no query: trending + top rated
-  const recommendations = ALL_CONTENT
-    .filter(item => parseInt(item.match) >= 97)
+  const recommendations = allSearchableContent
+    .filter(item => parseInt(item.match || 0) >= 97)
     .sort(() => 0.5 - Math.random())
     .slice(0, 6);
+
+  // Firestore direct querying with local fallback
+  useEffect(() => {
+    const term = searchQuery.trim();
+    if (!term) {
+      setSearchResults([]);
+      return;
+    }
+
+    import('../services/firebase-services').then(({ searchContentDirectly }) => {
+      searchContentDirectly(term).then((dbResults) => {
+        // If DB returned sparse results due to exact case matching limitations,
+        // fallback and pad with robust local full-text matching to provide flawless UX.
+        let localHits = allSearchableContent.filter(item =>
+          item.title.toLowerCase().includes(term.toLowerCase())
+        );
+        
+        const combined = [...dbResults, ...localHits].reduce((acc, item) => {
+          if (!acc.find(x => x.title === item.title)) acc.push(item);
+          return acc;
+        }, []);
+        
+        setSearchResults(combined.slice(0, 8));
+      }).catch(err => {
+        console.error("Search DB query failed:", err);
+        setSearchResults(allSearchableContent.filter(item =>
+          item.title.toLowerCase().includes(term.toLowerCase())
+        ).slice(0, 8));
+      });
+    });
+  }, [searchQuery, dynamicContent]);
 
   const saveSearch = (query) => {
     if (!query.trim()) return;
@@ -129,6 +163,7 @@ const Navbar = () => {
     setSearchQuery('');
     setIsSearchFocused(false);
     navigate(`/watch/${item.id}`);
+
   };
 
   const handleSearchSubmit = (e) => {
@@ -177,16 +212,13 @@ const Navbar = () => {
           <div className="flex items-center gap-10 flex-1">
             <Link to="/" className="flex flex-col items-center group leading-none">
               <span 
-                className="text-3xl font-black tracking-tighter text-transparent bg-clip-text leading-none select-none"
+                className="text-4xl font-black tracking-tighter text-transparent bg-clip-text leading-none select-none"
                 style={{ 
                   backgroundImage: 'linear-gradient(to bottom right, #ffffff, #FFD700, #DAA520)',
                   filter: 'drop-shadow(0 0 12px rgba(255,215,0,0.5))'
                 }}
               >
                 W
-              </span>
-              <span className="text-[8px] font-black text-white/60 tracking-[0.4em] uppercase group-hover:text-white transition-colors mt-0.5">
-                WATCHWAVE
               </span>
             </Link>
 

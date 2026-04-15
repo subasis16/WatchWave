@@ -12,6 +12,7 @@ import { useSettings } from '../context/SettingsContext';
 import { db, auth } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { addToRecentlyWatched } from '../services/firebase-services';
 import LoginOverlay from '../components/LoginOverlay';
 
 const ClipCreator = ({ isOpen, onClose, content }) => {
@@ -138,8 +139,8 @@ const ClipCreator = ({ isOpen, onClose, content }) => {
 const Player = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { volume, updateSetting, captions, toggleSetting, autoplay } = useSettings();
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { volume, updateSetting, captions, toggleSetting, autoplay, subtitles } = useSettings();
+  const [isPlaying, setIsPlaying] = useState(autoplay || false);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showClipCreator, setShowClipCreator] = useState(false);
@@ -259,8 +260,12 @@ const Player = () => {
   useEffect(() => {
     if (activeUrl) {
         console.log('🎥 Active Playback URL:', activeUrl);
+        if (user) {
+            const currentItem = allSiteContent.find(c => c.id === id) || movies[0];
+            addToRecentlyWatched({ ...currentItem, id });
+        }
     }
-  }, [activeUrl]);
+  }, [activeUrl, user, id]);
 
   if (authLoading) return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center font-sans">
@@ -379,7 +384,7 @@ const Player = () => {
             <video 
               ref={playerRef}
               src={activeUrl}
-              autoPlay={false}
+              autoPlay={autoplay}
               playsInline
               muted={volume === 0}
               className="w-full h-full object-cover"
@@ -412,23 +417,7 @@ const Player = () => {
             />
         </div>
         
-        {/* Cinematic Subtitle Overlay */}
-        <AnimatePresence>
-            {captions && isPlaying && false && (
-                <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute bottom-12 inset-x-0 flex justify-center z-20 pointer-events-none"
-                >
-                    <div className="bg-black/60 backdrop-blur-md px-10 py-5 rounded-2xl border border-white/10 shadow-2xl">
-                        <p className="text-xl font-medium text-white tracking-wide text-center drop-shadow-lg">
-                            "The world is changed by your example, not by your opinion."
-                        </p>
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+
         
         {!isPlaying && !showClipCreator && (
             <div className="absolute inset-0 flex items-center justify-center z-20">

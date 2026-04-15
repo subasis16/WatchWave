@@ -1,9 +1,25 @@
+import React, { useState, useEffect } from 'react';
 import ContentRow from '../components/ContentRow';
-import { movies, bollywood, trendingMovies, newReleases, bollywoodHits, hollywoodAction, Romantic, Crime, Comedy, Thriller, Horror } from '../data/content';
+import { bollywood, trendingMovies, newReleases, bollywoodHits, hollywoodAction, Romantic, Crime, Comedy, Thriller, Horror } from '../data/content';
 import { useTranslation } from '../utils/i18n';
+import { getContentByType } from '../services/firebase-services';
 
 const Movies = () => {
   const { t } = useTranslation();
+  const [dbMovies, setDbMovies] = useState([]);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const data = await getContentByType('movie');
+        setDbMovies(data);
+      } catch (err) {
+        console.error("Error fetching movies from Firestore:", err);
+      }
+    };
+    fetchContent();
+  }, []);
+
   return (
     <div className="min-h-screen bg-transparent selection:bg-accent-gold selection:text-black overflow-hidden">
       {/* Cinematic Background Field */}
@@ -30,6 +46,7 @@ const Movies = () => {
         </div>
 
         <div className="space-y-12 pb-12">
+          {dbMovies.length > 0 && <ContentRow title={t('Curated for You')} data={dbMovies} />}
           <ContentRow title={t('New Releases')} data={newReleases} />
           <ContentRow title={t('Hollywood Action')} data={hollywoodAction} />
           <ContentRow title={t('Bollywood Hits')} data={bollywoodHits} />

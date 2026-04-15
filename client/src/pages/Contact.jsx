@@ -1,6 +1,57 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, MapPin, Phone, Send, Film } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
+import toast from 'react-hot-toast';
+
+const ContactForm = () => {
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [sending, setSending] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+            toast.error('Please fill in all fields.');
+            return;
+        }
+        setSending(true);
+        try {
+            await addDoc(collection(db, 'contactMessages'), {
+                ...formData,
+                timestamp: new Date().toISOString()
+            });
+            toast.success('Message sent successfully!');
+            setFormData({ name: '', email: '', message: '' });
+        } catch (err) {
+            toast.error('Failed to send message. Please try again.');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    return (
+        <form className="space-y-8" onSubmit={handleSubmit}>
+            <div className="grid sm:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Your Name</label>
+                    <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700" placeholder="John Doe" required />
+                </div>
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Email</label>
+                    <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700" placeholder="john@example.com" required />
+                </div>
+            </div>
+            <div className="space-y-3">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Message</label>
+                <textarea rows="4" value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700 resize-none" placeholder="How can we help you?" required></textarea>
+            </div>
+            <button type="submit" disabled={sending} className="w-full glass-pill-active py-6 text-[11px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 group disabled:opacity-50">
+                {sending ? 'Sending...' : 'Send Message'} <Send size={18} className="group-hover:translate-x-2 transition-transform" />
+            </button>
+        </form>
+    );
+};
 
 const Contact = () => {
     useEffect(() => {
@@ -77,25 +128,7 @@ const Contact = () => {
                                 <div className="h-1 w-20 bg-accent-gold rounded-full" />
                             </div>
 
-                            <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-                                <div className="grid sm:grid-cols-2 gap-8">
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Your Name</label>
-                                        <input type="text" className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700" placeholder="John Doe" />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Email</label>
-                                        <input type="email" className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700" placeholder="john@example.com" />
-                                    </div>
-                                </div>
-                                <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Message</label>
-                                    <textarea rows="4" className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700 resize-none" placeholder="How can we help you?"></textarea>
-                                </div>
-                                <button className="w-full glass-pill-active py-6 text-[11px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 group">
-                                    Send Message <Send size={18} className="group-hover:translate-x-2 transition-transform" />
-                                </button>
-                            </form>
+                            <ContactForm />
                         </div>
                     </motion.div>
                 </div>

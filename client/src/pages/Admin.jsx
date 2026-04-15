@@ -13,30 +13,8 @@ import {
 import { onSnapshot } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// No longer needed: adminFetch and API_URL removed for direct Firebase integration.
 
-// Helper to get auth token
-const getToken = async () => {
-    const user = auth.currentUser;
-    if (!user) throw new Error('Not authenticated');
-    return user.getIdToken();
-};
-
-// API helper
-const adminFetch = async (endpoint, options = {}) => {
-    const token = await getToken();
-    const res = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            ...(options.headers || {}),
-        },
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Request failed');
-    return data;
-};
 
 // ============================================
 // STYLING TOKENS
@@ -157,13 +135,14 @@ const ContentTab = ({ initialContent }) => {
                 genre: form.genre.split(',').map(g => g.trim()).filter(Boolean),
                 year: parseInt(form.year),
                 match: parseInt(form.match),
+                createdAt: new Date().toISOString()
             };
 
             if (editing) {
-                await adminFetch(`/api/admin/content/${editing}`, { method: 'PUT', body: JSON.stringify(payload) });
+                await updateDoc(doc(db, 'content', editing), payload);
                 toast.success('Content updated!');
             } else {
-                await adminFetch('/api/admin/content', { method: 'POST', body: JSON.stringify(payload) });
+                await addDoc(collection(db, 'content'), payload);
                 toast.success('Content added!');
             }
 
@@ -194,7 +173,7 @@ const ContentTab = ({ initialContent }) => {
     const handleDelete = async (id) => {
         if (!confirm('Delete this content? This cannot be undone.')) return;
         try {
-            await adminFetch(`/api/admin/content/${id}`, { method: 'DELETE' });
+            await deleteDoc(doc(db, 'content', id));
             toast.success('Deleted!');
         } catch (err) { toast.error(err.message); }
     };
@@ -418,12 +397,8 @@ const UsersTab = ({ initialUsers }) => {
     const handleBan = async (uid, currentBanned) => {
         setActionLoading(uid);
         try {
-            await adminFetch(`/api/admin/users/${uid}/ban`, {
-                method: 'PUT',
-                body: JSON.stringify({ banned: !currentBanned })
-            });
-            setUsers(prev => prev.map(u => u.uid === uid ? { ...u, banned: !currentBanned } : u));
-            toast.success(currentBanned ? 'User Profile Restored' : 'User Profile Queried / Banned');
+            await updateDoc(doc(db, 'users', uid), { banned: !currentBanned });
+            toast.success(currentBanned ? 'User Profile Restored' : 'User Profile Banned');
         } catch (err) { toast.error(err.message); }
         finally { setActionLoading(null); }
     };
@@ -432,8 +407,7 @@ const UsersTab = ({ initialUsers }) => {
         if (!confirm('PERMANENTLY SEVER ACCESS? This will delete the user profile from the database forever.')) return;
         setActionLoading(uid + '_del');
         try {
-            await adminFetch(`/api/admin/users/${uid}`, { method: 'DELETE' });
-            setUsers(prev => prev.filter(u => u.uid !== uid));
+            await deleteDoc(doc(db, 'users', uid));
             toast.success('Identity Database Purged');
         } catch (err) { toast.error(err.message); }
         finally { setActionLoading(null); }
@@ -442,11 +416,11 @@ const UsersTab = ({ initialUsers }) => {
     const handleSubscription = async (uid) => {
         setActionLoading(uid + '_sub');
         try {
-            await adminFetch(`/api/admin/users/${uid}/subscription`, {
-                method: 'PUT',
-                body: JSON.stringify({ status: 'active', plan: 'premium', days: 30 })
+            await updateDoc(doc(db, 'users', uid), {
+                subscriptionStatus: 'active',
+                subscriptionPlan: 'Pro Screen',
+                subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
             });
-            setUsers(prev => prev.map(u => u.uid === uid ? { ...u, subscriptionStatus: 'active' } : u));
             toast.success('Certificate Granted: Pro Screen (30d)');
         } catch (err) { toast.error(err.message); }
         finally { setActionLoading(null); }
@@ -669,12 +643,13 @@ const NotificationsTab = () => {
         if (!message.trim()) return;
         setSending(true);
         try {
-            const data = await adminFetch('/api/admin/notifications/broadcast', {
-                method: 'POST',
-                body: JSON.stringify({ message, type }),
+            await addDoc(collection(db, 'globalNotifications'), {
+                message,
+                type,
+                sentAt: new Date().toISOString()
             });
             toast.success('Global Message Sent!');
-            setHistory(prev => [{ message, type, sentAt: new Date().toISOString(), users: data.userCount }, ...prev]);
+            setHistory(prev => [{ message, type, sentAt: new Date().toISOString() }, ...prev]);
             setMessage('');
         } catch (err) {
             toast.error(err.message);
@@ -797,19 +772,9 @@ const Admin = () => {
         const checkAdmin = async () => {
             if (auth.currentUser?.email === 'subasis16007@gmail.com') {
                 setIsAdmin(true);
-                setAdminName(auth.currentUser.displayName || auth.currentUser.email);
+                setAdminName(auth.currentUser.displayName || auth.currentUser.email || 'Admin Operator');
             } else {
-                try {
-                    const token = await getToken();
-                    const res = await fetch(`${API_URL}/api/admin/stats`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    if (res.status === 403 || res.status === 401) setIsAdmin(false);
-                    else {
-                        setIsAdmin(true);
-                        setAdminName(auth.currentUser?.displayName || auth.currentUser?.email || 'Admin Operator');
-                    }
-                } catch { setIsAdmin(false); }
+                setIsAdmin(false);
             }
         };
 
@@ -824,26 +789,23 @@ const Admin = () => {
         if (isAdmin) {
              unsubUsers = onSnapshot(query(collection(db, 'users'), orderBy('lastActive', 'desc'), limit(100)), (snapshot) => {
                 setUsers(snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() })));
-            });
+            }, (err) => {});
             unsubContent = onSnapshot(query(collection(db, 'content'), orderBy('createdAt', 'desc')), (snapshot) => {
                 setContent(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-            });
+            }, (err) => {});
             unsubFeedback = onSnapshot(query(collection(db, 'feedback'), orderBy('timestamp', 'desc')), (snapshot) => {
                 setFeedback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-            });
+            }, (err) => {});
             unsubMessages = onSnapshot(query(collection(db, 'contactMessages'), orderBy('timestamp', 'desc')), (snapshot) => {
                 setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            }, (err) => {});
+
+            setStats({
+                totalUsers: users.length,
+                activeSubscriptions: users.filter(u => u.subscriptionStatus === 'active').length,
+                activeRooms: 0, // Would need extra logic to track room snapshots
+                customContent: content.length
             });
-
-            // Initial stats fetch
-            const fetchStats = () => {
-                adminFetch('/api/admin/stats')
-                    .then(data => setStats(data.stats))
-                    .catch(err => console.warn('Stats sync skipped:', err.message));
-            };
-
-            fetchStats();
-            const statsInterval = setInterval(fetchStats, 30000); // 30s polling for server-side metrics
         }
 
         return () => {

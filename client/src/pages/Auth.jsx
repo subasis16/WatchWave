@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, ShieldCheck, User, Eye, EyeOff, Crown, ArrowRight, Film, LockKeyhole } from 'lucide-react';
+import { Mail, User, Eye, EyeOff, ArrowRight, Film, LockKeyhole } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -55,8 +55,10 @@ const Auth = () => {
                     name: formData.name,
                     email: formData.email,
                     createdAt: new Date().toISOString(),
+                    lastActive: new Date().toISOString(),
                     bio: 'Lover of great movies.',
                     isOnline: true,
+                    subscriptionStatus: 'free',
                     badges: ['b1']
                 });
                 navigate('/profile');

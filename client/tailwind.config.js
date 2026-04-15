@@ -18,7 +18,7 @@ export default {
         'card-gradient': 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // Assuming we might add Inter font, or use default system
+        sans: ['Oswald', 'sans-serif'], // Cinematic condensed font
       },
       animation: {
         'fade-in': 'fadeIn 1s ease-out forwards',

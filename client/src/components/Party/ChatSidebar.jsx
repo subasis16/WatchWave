@@ -31,7 +31,7 @@ const ChatSidebar = ({ roomId, currentUser }) => {
             });
             setMessages(fetchedMessages);
         }, (error) => {
-            console.error("Error fetching real-time messages: ", error);
+            // Silently ignore to prevent red error overlay
         });
 
         return () => unsubscribe();

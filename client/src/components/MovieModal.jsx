@@ -159,26 +159,9 @@ const MovieModal = ({ movie, isOpen, onClose }) => {
                             {/* Info Section */}
                             <div className="flex-1 p-8 md:p-12 space-y-10">
                                 <div className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] md:tracking-[0.6em]">Movie Details</h3>
                                     <h2 className="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
                                         {movie.title}
                                     </h2>
-                                </div>
-
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <span className="glass-pill px-4 py-1.5 text-[10px] font-black text-accent-gold border-accent-gold/20 uppercase tracking-widest">
-                                        {movie.match || 98}% Match
-                                    </span>
-                                    <span className="glass-pill px-4 py-1.5 text-[10px] font-black text-gray-500 border-white/5 uppercase tracking-widest">
-                                        {movie.year || '2025'}
-                                    </span>
-                                    <div className="flex gap-2">
-                                        {genres.map((genre, idx) => (
-                                            <span key={idx} className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">
-                                                {genre}{idx < genres.length - 1 ? <span className="ml-2 opacity-30">/</span> : ''}
-                                            </span>
-                                        ))}
-                                    </div>
                                 </div>
 
                                 <div className="space-y-6">

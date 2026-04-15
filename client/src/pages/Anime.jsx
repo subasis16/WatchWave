@@ -1,9 +1,25 @@
+import React, { useState, useEffect } from 'react';
 import ContentRow from '../components/ContentRow';
 import { anime, actionAnime, romanticAnime, sciFiAnime, sportAnime, superPowerAnime, psychologicalAnime, adventureAnime, dramaAnime } from '../data/content';
 import { useTranslation } from '../utils/i18n';
+import { getContentByType } from '../services/firebase-services';
 
 const Anime = () => {
   const { t } = useTranslation();
+  const [dbAnime, setDbAnime] = useState([]);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const data = await getContentByType('anime');
+        setDbAnime(data);
+      } catch (err) {
+        console.error("Error fetching anime from Firestore:", err);
+      }
+    };
+    fetchContent();
+  }, []);
+
   return (
     <div className="min-h-screen bg-transparent selection:bg-accent-gold selection:text-black overflow-hidden">
       {/* Cinematic Background Field */}
@@ -30,6 +46,7 @@ const Anime = () => {
         </div>
 
         <div className="space-y-12 pb-12">
+          {dbAnime.length > 0 && <ContentRow title={t('Universal Originals')} data={dbAnime} />}
           <ContentRow title={t('High-Octane Action')} data={actionAnime} />
           <ContentRow title={t('Psychological Thrillers')} data={psychologicalAnime} />
           <ContentRow title={t('Super Power Sagas')} data={superPowerAnime} />

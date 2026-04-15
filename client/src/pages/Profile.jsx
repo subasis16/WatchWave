@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  User, Upload, Sparkles, Hash, Copy, Pencil, Check, Award, ShieldAlert, 
-  Lock, Eye, EyeOff, Star, Crown, Zap, Shield, Heart, Gem, LogOut, 
-  Globe, Subtitles, Play, Users, Scissors, ChevronDown 
+  User, Upload, LogOut, Globe, Play
 } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
@@ -18,60 +16,62 @@ const Profile = () => {
     email: '',
     avatar: null,
     uid: '',
-    bio: '',
     isOnline: true,
     language: 'English',
     subtitles: 'English',
+    recentlyWatched: []
   });
 
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [tempBio, setTempBio] = useState('');
-
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubDoc;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         try {
           const docRef = doc(db, 'users', user.uid);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            const loadedData = {
-              name: data.name || user.displayName || 'Cinema Fanatic',
-              email: user.email,
-              avatar: data.avatar || user.photoURL || null,
-              uid: user.uid,
-              bio: data.bio || 'New explorer in the cinematic world.',
-              isOnline: data.isOnline ?? true,
-              language: data.language || 'English',
-              subtitles: data.subtitles || 'English',
-            };
-            setProfileData(loadedData);
-            setTempBio(loadedData.bio);
-          } else {
-            const fallbackData = {
-              name: user.displayName || 'Cinema Fanatic',
-              email: user.email,
-              avatar: user.photoURL || null,
-              uid: user.uid,
-              bio: 'New explorer in the cinematic world.',
-              isOnline: true,
-              language: 'English',
-              subtitles: 'English',
-            };
-            setProfileData(fallbackData);
-            setTempBio(fallbackData.bio);
-          }
+          unsubDoc = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              setProfileData({
+                name: data.name || user.displayName || 'Cinema Fanatic',
+                email: user.email,
+                avatar: data.avatar || user.photoURL || null,
+                uid: user.uid,
+                isOnline: data.isOnline ?? true,
+                language: data.language || 'English',
+                subtitles: data.subtitles || 'English',
+                recentlyWatched: data.recentlyWatched || [],
+              });
+            } else {
+              setProfileData({
+                name: user.displayName || 'Cinema Fanatic',
+                email: user.email,
+                avatar: user.photoURL || null,
+                uid: user.uid,
+                isOnline: true,
+                language: 'English',
+                subtitles: 'English',
+                recentlyWatched: [],
+              });
+            }
+            setLoading(false);
+          }, (err) => {
+             console.error("Error fetching user data:", err);
+             setLoading(false);
+          });
         } catch (err) {
-          console.error("Error fetching user data:", err);
+          console.error("Error setting up snapshot:", err);
+          setLoading(false);
         }
       } else {
         navigate('/auth');
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+        unsubscribe();
+        if (unsubDoc) unsubDoc();
+    }
   }, [navigate]);
 
 
@@ -129,22 +129,6 @@ const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  const handleSaveBio = async () => {
-    try {
-      if (auth.currentUser) {
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        await updateDoc(userRef, { bio: tempBio });
-        setProfileData({ ...profileData, bio: tempBio });
-        setIsEditingBio(false);
-        toast.success("Bio updated successfully.");
-      }
-    } catch (err) {
-      console.error("Error saving bio:", err);
-      toast.error("Failed to update bio.");
-    }
-  };
-
 
 
   const handleLogout = async () => {
@@ -205,39 +189,38 @@ const Profile = () => {
           <div className="flex flex-col items-center gap-3 w-full">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
               <h1 className="text-3xl md:text-6xl font-black tracking-tighter text-white uppercase text-center">{profileData.name}</h1>
-              <div className="glass-pill border-accent-gold/20 text-accent-gold px-4 py-1.5 text-[7px] md:text-[8px] font-black tracking-[0.2em] flex items-center gap-2">
-                <Crown size={12} /> PRO Member
-              </div>
-            </div>
-            <div className="flex items-center gap-6">
-            </div>
-
-            <div className="flex items-center justify-center gap-4 w-full max-w-xl mx-auto pt-4">
-              {isEditingBio ? (
-                <div className="flex w-full items-center gap-3 glass-card p-2 border-white/10 rounded-2xl md:rounded-[1.5rem] shadow-2xl">
-                  <input
-                    type="text"
-                    value={tempBio}
-                    onChange={(e) => setTempBio(e.target.value)}
-                    maxLength={150}
-                    className="flex-1 bg-transparent px-3 md:px-4 py-2 md:py-3 text-[11px] md:text-[13px] text-white focus:outline-none placeholder:text-gray-700 font-medium"
-                    autoFocus
-                  />
-                  <button onClick={handleSaveBio} className="w-8 h-8 md:w-10 md:h-10 glass-pill-active rounded-lg md:rounded-xl transition-all shadow-xl flex items-center justify-center shrink-0">
-                    <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                  </button>
-                </div>
-              ) : (
-                <div 
-                    onClick={() => setIsEditingBio(true)}
-                    className="group glass-card px-4 md:px-10 py-3 md:py-4 border-white/5 cursor-pointer hover:border-white/20 transition-all flex items-center gap-4 md:gap-5 shadow-2xl max-w-full overflow-hidden"
-                >
-                  <p className="text-white/60 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] truncate group-hover:text-white transition-all">{profileData.bio}</p>
-                  <Pencil className="w-3.5 h-3.5 md:w-4 md:h-4 text-white opacity-20 group-hover:opacity-100 transition-all shrink-0" />
-                </div>
-              )}
             </div>
           </div>
+        </div>
+
+        {/* Recently Watched */}
+        <div className="max-w-4xl mx-auto w-full pt-8">
+            <h2 className="text-[12px] font-black text-gray-500 uppercase tracking-widest mb-6 px-4">Recently Watched</h2>
+            {profileData.recentlyWatched && profileData.recentlyWatched.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
+                    {profileData.recentlyWatched.map((item, idx) => (
+                        <div key={idx} onClick={() => navigate(`/watch/${item.id || item.title}`)} className="relative aspect-[2/3] group cursor-pointer overflow-hidden rounded-xl border border-white/5 shadow-2xl">
+                            <img src={item.poster || item.image || 'https://via.placeholder.com/200x300'} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
+                                <h3 className="text-[10px] md:text-xs font-bold text-white uppercase truncate shadow-black">{item.title}</h3>
+                            </div>
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-black/40 backdrop-blur-sm">
+                                <div className="w-10 h-10 rounded-full bg-accent-gold flex items-center justify-center">
+                                    <Play size={16} fill="black" className="text-black ml-1" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="px-4">
+                    <div className="w-full py-12 glass-card rounded-2xl flex flex-col items-center justify-center border-white/5">
+                        <Play className="w-8 h-8 text-white/20 mb-3" />
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">No movies watched yet.</p>
+                        <button onClick={() => navigate('/movies')} className="mt-4 px-6 py-2 text-[9px] uppercase font-black text-white border border-white/20 rounded-full hover:bg-white/10 transition-all">Explore Movies</button>
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* Account Actions */}

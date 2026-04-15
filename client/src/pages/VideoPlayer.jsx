@@ -7,6 +7,7 @@ import ReactPlayer from 'react-player';
 import { useSettings } from '../context/SettingsContext';
 import { auth } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { addToRecentlyWatched } from '../services/firebase-services';
 import LoginOverlay from '../components/LoginOverlay';
 
 const VideoPlayer = () => {
@@ -15,9 +16,9 @@ const VideoPlayer = () => {
     const [user, setUser] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
 
-    const { volume, updateSetting, captions, toggleSetting } = useSettings();
+    const { volume, updateSetting, captions, toggleSetting, autoplay, subtitles } = useSettings();
     const [isIdle, setIsIdle] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(true);
+    const [isPlaying, setIsPlaying] = useState(autoplay !== false);
     const [progress, setProgress] = useState(0);
     const playerRef = React.useRef(null);
     const containerRef = React.useRef(null);
@@ -55,6 +56,12 @@ const VideoPlayer = () => {
     // Find the item by ID in all data arrays
     const allContent = [...trending, ...anime, ...movies, ...bollywood, ...series];
     const item = allContent.find(c => c.id === id);
+
+    useEffect(() => {
+        if (user && item) {
+            addToRecentlyWatched(item);
+        }
+    }, [user, item]);
 
     const trailerUrl = item?.trailerUrl || "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ";
 
@@ -110,13 +117,13 @@ const VideoPlayer = () => {
                         config={{
                             youtube: {
                                 playerVars: { 
-                                    autoplay: 1, 
+                                    autoplay: autoplay !== false ? 1 : 0, 
                                     controls: 0, 
                                     modestbranding: 1, 
                                     rel: 0, 
                                     showinfo: 0, 
                                     disablekb: 1,
-                                    cc_load_policy: captions ? 1 : 0 
+                                    cc_load_policy: (captions || subtitles !== 'Off') ? 1 : 0 
                                 }
                             }
                         }}

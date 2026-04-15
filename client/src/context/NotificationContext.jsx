@@ -1,41 +1,55 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import io from 'socket.io-client';
 import toast from 'react-hot-toast';
-import { API_URL } from '../utils/api';
+import { auth } from '../firebase';
+import { listenToNotifications } from '../services/firebase-services';
+import { useSettings } from './SettingsContext';
 
 const NotificationContext = createContext();
 
 export const useNotification = () => useContext(NotificationContext);
 
-const socket = io(API_URL);
-
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
+    const { isIntroFinished } = useSettings();
 
     useEffect(() => {
-        socket.on('receive-notification', (newNotification) => {
-            const notifWithId = { ...newNotification, id: Date.now() + Math.random() };
+        let unsubscribe = null;
 
-            setNotifications((prev) => [notifWithId, ...prev]);
-
-            toast(notifWithId.message, {
-                icon: '🔔',
-                style: {
-                    borderRadius: '12px',
-                    background: '#1C1D21',
-                    color: '#fff',
-                    border: '1px solid #E50914',
-                    boxShadow: '0 4px 15px rgba(229, 9, 20, 0.3)',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                },
-            });
+        const authUnsub = auth.onAuthStateChanged((user) => {
+            if (user) {
+                unsubscribe = listenToNotifications(user.uid, (notifs) => {
+                    setNotifications(notifs);
+                    
+                    // Show toast for any unread notifications only if intro is finished
+                    if (isIntroFinished) {
+                        notifs.filter(n => !n.read).slice(0, 1).forEach(n => {
+                            toast(n.message, {
+                                icon: '🔔',
+                                id: n.id, // prevent duplicates
+                                style: {
+                                    borderRadius: '12px',
+                                    background: '#1C1D21',
+                                    color: '#fff',
+                                    border: '1px solid #E50914',
+                                    boxShadow: '0 4px 15px rgba(229, 9, 20, 0.3)',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                },
+                            });
+                        });
+                    }
+                });
+            } else {
+                if (unsubscribe) unsubscribe();
+                setNotifications([]);
+            }
         });
 
         return () => {
-            socket.off('receive-notification');
+            authUnsub();
+            if (unsubscribe) unsubscribe();
         };
-    }, []);
+    }, [isIntroFinished]);
 
     const markAsRead = (id) => {
         setNotifications((prev) =>

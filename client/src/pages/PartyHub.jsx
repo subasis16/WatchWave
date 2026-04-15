@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { API_URL } from '../utils/api';
+import { createPartyRoom } from '../services/firebase-services';
 
 const PartyHub = () => {
     const [isLive, setIsLive] = useState(false);
@@ -36,7 +36,7 @@ const PartyHub = () => {
                         });
                     }
                 } catch (err) {
-                    console.error("Error fetching user data for PartyHub:", err);
+                    // Silently ignore to prevent red error overlay
                 }
             }
         });
@@ -48,30 +48,21 @@ const PartyHub = () => {
             if (!auth.currentUser) return toast.error("Must be logged in to host.");
             setIsLoading(true);
             const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const token = await auth.currentUser.getIdToken();
-            const res = await fetch(`${API_URL}/api/party/create`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ room_code: code, room_password: '' })
-            });
-            const data = await res.json();
+            
+            const result = await createPartyRoom(code, '');
+            
             setIsLoading(false);
-            if (data.success) {
+            if (result.success) {
                 setRoomCode(code);
                 setIsLive(true);
                 toast.success(`Party Room Created: ${code}`, {
                     icon: '🎬',
                     style: { background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }
                 });
-            } else {
-                toast.error(data.error || "Failed to create room.");
             }
         } catch (err) {
             setIsLoading(false);
-            toast.error("Connection failed. WatchWave server is busy.");
+            toast.error(err.message || "Failed to create room.");
         }
     };
 
@@ -135,25 +126,9 @@ const PartyHub = () => {
                                     </div>
 
                                     <div className="space-y-6 flex-1 text-center md:text-left">
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-center md:justify-start gap-3">
-                                                <div className="h-[1px] w-8 bg-accent-gold shadow-[0_0_10px_rgba(255,215,0,0.5)]" />
-                                                <h2 className="text-[13px] font-medium text-accent-gold drop-shadow-lg">WatchWave Studios Presents</h2>
-                                            </div>
                                             <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white drop-shadow-xl">
                                                 {userProfile.name.split(' ')[0]} Theater
                                             </h3>
-                                            <div className="flex items-center justify-center md:justify-start gap-6 pt-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Users className="w-4 h-4 text-accent-gold" />
-                                                    <span className="text-sm font-medium text-gray-400">Join the Audience</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full bg-accent-gold shadow-[0_0_10px_#FFD700] animate-pulse" />
-                                                    <span className="text-sm font-medium text-gray-400">Premium Lounge</span>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         {!isLive ? (
                                             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleGoLive} disabled={isLoading} className="glass-pill-active py-3 px-8 flex items-center justify-center gap-3 transition-all duration-300 shadow-lg text-sm font-semibold relative overflow-hidden group/btn disabled:opacity-50 mt-2">
@@ -161,10 +136,7 @@ const PartyHub = () => {
                                             </motion.button>
                                         ) : (
                                             <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-2">
-                                                <div className="glass-pill border-accent-gold/20 text-white font-medium py-3 px-6 flex items-center gap-3 shadow-lg text-sm">
-                                                    <div className="w-2.5 h-2.5 bg-accent-gold rounded-full animate-ping opacity-75 shadow-[0_0_10px_rgba(255,215,0,0.8)]" />
-                                                    Auditorium Live
-                                                </div>
+
                                                 <button onClick={() => navigate(`/room/${roomCode}`, { state: { roomCode } })} className="glass-pill-active py-3 px-8 flex items-center gap-3 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm font-semibold">
                                                     <Play size={16} fill="white" /> Join Party
                                                 </button>

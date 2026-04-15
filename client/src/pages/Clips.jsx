@@ -1,32 +1,71 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scissors, Play, Heart, Share2, MessageCircle,
   X, Clock, Type, Music, Sliders, Zap, Pause
 } from 'lucide-react';
 import ReactPlayer from 'react-player';
+import { getClips, saveClip } from '../services/firebase-services';
+import { toast } from 'react-hot-toast';
 
 const Clips = () => {
+  const [clips, setClips] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [trimRange, setTrimRange] = useState([10, 40]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState('trim');
-
-  const initialClips = [
-    { id: 1, title: "Iron Man Snap", user: "MarvelFan99", views: "1.2M", likes: "45K", image: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg", duration: "0:58" },
-    { id: 2, title: "Luffy Gear 5", user: "PirateKing", views: "850K", likes: "92K", image: "https://image.tmdb.org/t/p/w500/fcid96gh99oYp9fM9S1A7K92z7t.jpg", duration: "0:30" },
-    { id: 3, title: "Wednesday Dance", user: "GothGirl", views: "3.4M", likes: "150K", image: "https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg", duration: "0:45" },
-    { id: 4, title: "Walter White Laugh", user: "Heisenberg", views: "500K", likes: "22K", image: "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg", duration: "0:35" },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
 
   const sourceVideos = [
     { id: 'v1', title: 'Spider-Man: ATSV', image: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', url: 'https://www.youtube.com/watch?v=shwG742_f8s' },
     { id: 'v2', title: 'The Dark Knight', image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', url: 'https://www.youtube.com/watch?v=EXeTwQWrcwY' },
   ];
 
+  useEffect(() => {
+    const fetchClips = async () => {
+      try {
+        const data = await getClips();
+        setClips(data);
+      } catch (err) {
+        console.error("Error fetching clips:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchClips();
+  }, []);
+
   const handleCreateOpen = () => {
     setIsCreating(true);
     setSelectedVideo(sourceVideos[0]);
+  };
+
+  const handlePostClip = async () => {
+    setIsProcessing(true);
+    try {
+        const clipData = {
+            title: `Clip from ${selectedVideo.title}`,
+            image: selectedVideo.image,
+            videoUrl: selectedVideo.url,
+            startTime: trimRange[0],
+            endTime: trimRange[1],
+            duration: `${Math.floor((trimRange[1] - trimRange[0]) / 60)}:${(trimRange[1] - trimRange[0]) % 60}`
+        };
+        await saveClip(clipData);
+        toast.success("Clip shared with the community!", {
+          style: { background: 'rgba(255,255,255,0.05)', color: '#fff', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }
+        });
+        setIsCreating(false);
+        // Refresh clips
+        const data = await getClips();
+        setClips(data);
+    } catch (err) {
+        toast.error(err.message || "Failed to save clip.");
+    } finally {
+        setIsProcessing(false);
+    }
   };
 
   return (
@@ -60,54 +99,62 @@ const Clips = () => {
 
         {/* Clips Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {initialClips.map((clip, index) => (
-            <motion.div
-              key={clip.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 1, ease: "circOut" }}
-              className="group relative aspect-[9/16] rounded-[2.5rem] overflow-hidden glass-card border-white/5 shadow-3xl transition-all duration-1000 hover:border-white/10"
-            >
-              <img
-                src={clip.image}
-                alt={clip.title}
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
+          {isLoading ? (
+            [1, 2, 3, 4].map(i => <div key={i} className="aspect-[9/16] rounded-[2.5rem] glass-card border-white/5 animate-pulse" />)
+          ) : clips.length > 0 ? (
+            clips.map((clip, index) => (
+              <motion.div
+                key={clip.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 1, ease: "circOut" }}
+                className="group relative aspect-[9/16] rounded-[2.5rem] overflow-hidden glass-card border-white/5 shadow-3xl transition-all duration-1000 hover:border-white/10"
+              >
+                <img
+                  src={clip.image}
+                  alt={clip.title}
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
 
-              {/* Interaction Overlay */}
-              <div className="absolute inset-x-0 bottom-0 p-8 space-y-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-1000">
-                <div className="space-y-2">
-                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[8px] font-black">
-                        {clip.user.charAt(0)}
+                {/* Interaction Overlay */}
+                <div className="absolute inset-x-0 bottom-0 p-8 space-y-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-1000">
+                  <div className="space-y-2">
+                     <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[8px] font-black">
+                          {clip.userName?.charAt(0) || 'U'}
+                      </div>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">@{clip.userName}</span>
                     </div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">@{clip.user}</span>
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter line-clamp-2">{clip.title}</h3>
                   </div>
-                  <h3 className="text-2xl font-black text-white uppercase tracking-tighter line-clamp-2">{clip.title}</h3>
+
+                  <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-100">
+                     <div className="flex items-center gap-6">
+                      <button className="text-gray-400 hover:text-red-500 transition-colors flex items-center gap-2">
+                          <Heart size={18} /> <span className="text-[10px] font-black">{clip.likes || 0}</span>
+                      </button>
+                      <button className="text-gray-400 hover:text-accent-gold transition-colors flex items-center gap-2">
+                          <Zap size={18} /> <span className="text-[10px] font-black">{clip.views || 0}</span>
+                      </button>
+                    </div>
+                    <button className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition-all">
+                      <Share2 size={16} />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-100">
-                   <div className="flex items-center gap-6">
-                    <button className="text-gray-400 hover:text-red-500 transition-colors flex items-center gap-2">
-                        <Heart size={18} /> <span className="text-[10px] font-black">{clip.likes}</span>
-                    </button>
-                    <button className="text-gray-400 hover:text-accent-gold transition-colors flex items-center gap-2">
-                        <Zap size={18} /> <span className="text-[10px] font-black">{clip.views}</span>
-                    </button>
-                  </div>
-                  <button className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/10 transition-all">
-                    <Share2 size={16} />
-                  </button>
+                {/* Duration Badge */}
+                <div className="absolute top-6 right-6 glass-pill px-4 py-1.5 text-[9px] font-black text-accent-gold border-accent-gold/20 shadow-2xl">
+                  {clip.duration}
                 </div>
-              </div>
-
-              {/* Duration Badge */}
-              <div className="absolute top-6 right-6 glass-pill px-4 py-1.5 text-[9px] font-black text-accent-gold border-accent-gold/20 shadow-2xl">
-                {clip.duration}
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center glass-card border-white/5 border-dashed">
+              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest leading-relaxed">No community clips yet. Be the first!</p>
+            </div>
+          )}
 
           {/* Create Placeholder */}
           <motion.button
@@ -142,7 +189,7 @@ const Clips = () => {
                {/* Preview */}
                <div className="lg:col-span-3 bg-black relative flex items-center justify-center overflow-hidden group">
                 <ReactPlayer 
-                    src={selectedVideo?.url}
+                    url={selectedVideo?.url}
                     playing={isPlaying}
                     width="100%"
                     height="100%"
@@ -251,13 +298,7 @@ const Clips = () => {
                 </div>
 
                 <button 
-                    onClick={() => {
-                        setIsProcessing(true);
-                        setTimeout(() => {
-                            setIsProcessing(false);
-                            setIsCreating(false);
-                        }, 2000);
-                    }}
+                    onClick={handlePostClip}
                     className="w-full glass-pill-active py-5 text-[11px] font-black uppercase tracking-[0.4em] relative overflow-hidden group shadow-3xl"
                 >
                     {isProcessing ? (

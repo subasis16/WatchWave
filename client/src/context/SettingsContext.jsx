@@ -34,7 +34,7 @@ export const SettingsProvider = ({ children }) => {
                     setSettings(prev => ({ ...prev, ...userDoc.data().settings }));
                 }
             } catch (err) {
-                console.error("Failed to load cloud settings", err);
+                // Silently skip if permission denied to prevent UI red screen
             }
         }
     });
@@ -48,6 +48,10 @@ export const SettingsProvider = ({ children }) => {
             .catch(err => console.error("Cloud settings sync failed:", err));
     }
   }, [settings]);
+
+  const [isIntroFinished, setIsIntroFinished] = useState(() => {
+    return !!sessionStorage.getItem('watchwave_has_seen_intro');
+  });
 
   const updateSetting = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -64,6 +68,8 @@ export const SettingsProvider = ({ children }) => {
   return (
     <SettingsContext.Provider value={{
       ...settings,
+      isIntroFinished,
+      setIsIntroFinished,
       updateSetting,
       toggleSetting,
       resetSettings

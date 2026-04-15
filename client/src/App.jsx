@@ -24,10 +24,17 @@ import Downloads from './pages/Downloads';
 import OfflinePlayer from './pages/OfflinePlayer';
 import Admin from './pages/Admin';
 import CtaBanner from './components/CtaBanner';
+import { Facebook, Twitter, Instagram } from 'lucide-react';
+
+import { useSettings } from './context/SettingsContext';
 
 const App = () => {
   const { pathname } = useLocation();
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    // Only show intro if it hasn't been seen in this session
+    return !sessionStorage.getItem('watchwave_has_seen_intro');
+  });
+  const { setIsIntroFinished } = useSettings();
 
   // Check if we are on the video player page, party hub, or watch room to adjust layout
   const isWatchPage = pathname.startsWith('/watch');
@@ -51,7 +58,11 @@ const App = () => {
   return (
     <div className={`selection:bg-white selection:text-black ${!hidePadding ? 'pb-10' : ''} overflow-x-hidden w-full relative`}>
       <Toaster position="top-right" reverseOrder={false} />
-      {showIntro && <OpeningAnimation onComplete={() => setShowIntro(false)} />}
+      {showIntro && <OpeningAnimation onComplete={() => {
+          sessionStorage.setItem('watchwave_has_seen_intro', 'true');
+          setShowIntro(false);
+          setIsIntroFinished(true);
+      }} />}
 
       {!hideNavbar && !showIntro && <Navbar />}
 
@@ -97,22 +108,19 @@ const App = () => {
                     >
                       W
                     </span>
-                    <span className="text-[10px] md:text-[12px] font-black text-white/50 tracking-[0.6em] uppercase group-hover:text-white transition-colors mt-1">
-                      WATCHWAVE
-                    </span>
                   </Link>
                   <p className="mt-4 text-sm md:text-base text-gray-400 font-medium leading-relaxed">
                     Experience the magic of cinema with our streaming platform. Theater-grade quality, anywhere you are.
                   </p>
                   <div className="flex gap-4 mt-6 md:mt-8">
                     <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
-                      <span className="font-bold text-xs">FB</span>
+                      <Facebook size={18} />
                     </div>
                     <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
-                      <span className="font-bold text-xs">X</span>
+                      <Twitter size={18} />
                     </div>
                     <div className="w-10 h-10 glass-pill flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer">
-                      <span className="font-bold text-xs">IG</span>
+                      <Instagram size={18} />
                     </div>
                   </div>
                 </div>
@@ -123,12 +131,15 @@ const App = () => {
                     <Link to="/" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Home</Link>
                     <Link to="/movies" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Movies</Link>
                     <Link to="/party" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Parties</Link>
+                    <Link to="/about" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">About</Link>
+                    <Link to="/clips" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Clips</Link>
                   </div>
                   <div className="flex flex-col gap-3 md:gap-4">
                     <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Experience</h4>
                     <Link to="/plans" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Pricing</Link>
                     <Link to="/downloads" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Off-line</Link>
                     <Link to="/contact" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Contact</Link>
+                    <Link to="/series" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Series</Link>
                   </div>
                   <div className="flex flex-col gap-3 md:gap-4">
                     <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Legal</h4>

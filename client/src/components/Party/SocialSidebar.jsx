@@ -2,12 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Search, UserPlus, ArrowLeft, Send, Share2, Users, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
 import { toast } from 'react-hot-toast';
-import { auth } from '../../firebase';
-import { API_URL } from '../../utils/api';
-
-const socket = io.connect(API_URL);
+import { auth, db } from '../../firebase';
+import { collection, doc, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { getFriendsList, getAllUsers, sendFriendRequest } from '../../services/firebase-services';
 
 const SocialSidebar = () => {
     const [activeTab, setActiveTab] = useState('friends');
@@ -22,6 +20,7 @@ const SocialSidebar = () => {
     
     const messagesEndRef = useRef(null);
     const navigate = useNavigate();
+    let chatUnsubscribe = useRef(null);
 
     const fetchSocialData = async () => {
         try {
@@ -29,37 +28,22 @@ const SocialSidebar = () => {
             const user = auth.currentUser;
             if (!user) return;
             
-            const token = await user.getIdToken();
-            
             // Fetch Friends
-            const friendsRes = await fetch(`${API_URL}/api/friends`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const friendsData = await friendsRes.json();
+            const friendsData = await getFriendsList();
+            setFriends(friendsData.map(f => ({
+                id: f.friendUid,
+                name: f.name,
+                avatar: f.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name)}&background=random`,
+                status: f.isOnline ? 'Watching Live' : 'Offline',
+                isOnline: f.isOnline || false
+            })));
             
             // Fetch All Users for Suggestions
-            const usersRes = await fetch(`${API_URL}/api/users/all/profiles`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const usersData = await usersRes.json();
-            
-            if (friendsData.success) {
-                setFriends(friendsData.friends.map(f => ({
-                    id: f.friendUid,
-                    name: f.name,
-                    avatar: f.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name)}&background=random`,
-                    status: f.isOnline ? 'Watching Live' : 'Offline',
-                    isOnline: f.isOnline || false
-                })));
-            }
-            
-            if (usersData.success) {
-                const friendIds = new Set(friendsData.friends?.map(f => f.friendUid) || []);
-                setSuggestedUsers(usersData.users.filter(u => !friendIds.has(u.id)).slice(0, 10));
-            }
+            const usersData = await getAllUsers();
+            const friendIds = new Set(friendsData.map(f => f.friendUid));
+            setSuggestedUsers(usersData.filter(u => !friendIds.has(u.id)).slice(0, 10));
         } catch (error) {
-            console.error("Error fetching social data:", error);
-            toast.error("Failed to load connections");
+            // Silently ignore to prevent red error overlay
         } finally {
             setLoading(false);
         }
@@ -72,13 +56,9 @@ const SocialSidebar = () => {
             }
         });
 
-        socket.on("receive_message", (data) => {
-            setMessages((prevList) => [...prevList, data]);
-        });
-
         return () => {
             unsubscribe();
-            socket.off("receive_message");
+            if (chatUnsubscribe.current) chatUnsubscribe.current();
         };
     }, []);
 
@@ -90,11 +70,27 @@ const SocialSidebar = () => {
         setActiveChatUser(friend);
         setActiveTab('chat');
         setMessages([]);
+        
+        // Listen to Firestore chat collection
         const myUid = auth.currentUser?.uid;
         const friendUid = friend.id;
-        // Deterministic roomId by sorting UIDs
         const roomId = [myUid, friendUid].sort().join('_');
-        socket.emit("join_chat", `room_${roomId}`);
+        
+        if (chatUnsubscribe.current) chatUnsubscribe.current();
+        
+        const q = query(
+            collection(db, 'chats', roomId, 'messages'),
+            orderBy('timestamp', 'asc')
+        );
+        chatUnsubscribe.current = onSnapshot(q, (snap) => {
+            const msgs = snap.docs.map(d => ({
+                ...d.data(),
+                isMe: d.data().authorUid === myUid
+            }));
+            setMessages(msgs);
+        }, (err) => {
+            // Silently ignore onSnapshot permission errors
+        });
     };
 
     const sendMessage = async () => {
@@ -104,14 +100,14 @@ const SocialSidebar = () => {
             const roomId = [myUid, friendUid].sort().join('_');
             
             const messageData = {
-                room: `room_${roomId}`,
+                authorUid: myUid,
                 author: "Me",
                 text: currentMessage,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                timestamp: new Date().toISOString(),
             };
 
-            await socket.emit("send_message", messageData);
-            setMessages((prevList) => [...prevList, messageData]);
+            await addDoc(collection(db, 'chats', roomId, 'messages'), messageData);
             setCurrentMessage("");
         }
     };
@@ -122,29 +118,13 @@ const SocialSidebar = () => {
         }
     };
 
-    const sendFriendRequest = async (targetUid, targetName) => {
+    const handleSendFriendRequest = async (targetUid, targetName) => {
         try {
-            const user = auth.currentUser;
-            const token = await user.getIdToken();
-            
-            const res = await fetch(`${API_URL}/api/friends/request`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify({ targetUid })
-            });
-            
-            const data = await res.json();
-            if (data.success) {
-                toast.success(`Request sent to ${targetName}`);
-                fetchSocialData();
-            } else {
-                toast.error(data.error || "Failed to send request");
-            }
+            await sendFriendRequest(targetUid);
+            toast.success(`Request sent to ${targetName}`);
+            fetchSocialData();
         } catch (error) {
-            toast.error("Error sending friend request");
+            toast.error(error.message || "Error sending friend request");
         }
     };
 
@@ -323,7 +303,7 @@ const SocialSidebar = () => {
                                             </div>
                                             <motion.button 
                                                 whileHover={{ scale: 1.05 }}
-                                                onClick={() => sendFriendRequest(user.id, user.name)}
+                                                onClick={() => handleSendFriendRequest(user.id, user.name)}
                                                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white/50 hover:bg-white hover:text-black transition-colors"
                                             >
                                                 <UserPlus size={14} />
@@ -352,7 +332,7 @@ const SocialSidebar = () => {
                             <div className="flex items-center gap-4 bg-white/[0.04] p-4 rounded-3xl border border-white/10 mb-6 shadow-xl shrink-0 backdrop-blur-3xl relative overflow-hidden group">
                                 <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-accent-gold/40 to-transparent" />
                                 <button
-                                    onClick={() => setActiveTab('friends')}
+                                    onClick={() => { setActiveTab('friends'); if (chatUnsubscribe.current) chatUnsubscribe.current(); }}
                                     className="text-gray-500 hover:text-white transition-all glass-card p-2.5 rounded-xl border-white/10 hover:border-white/20 relative z-10 shadow-sm"
                                 >
                                     <ArrowLeft size={18} />
@@ -380,7 +360,7 @@ const SocialSidebar = () => {
                                 </div>
 
                                 {messages.map((msg, index) => {
-                                    const isMe = msg.author === "Me";
+                                    const isMe = msg.isMe;
                                     return (
                                             <motion.div 
                                                 key={index}
