@@ -64,7 +64,7 @@ const App = () => {
           setIsIntroFinished(true);
       }} />}
 
-      {!hideNavbar && !showIntro && <Navbar />}
+      {!hideNavbar && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -125,8 +125,8 @@ const App = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-20 w-full mt-8 md:mt-0">
-                  <div className="flex flex-col gap-3 md:gap-4">
+                <div className="flex justify-start md:justify-end gap-12 md:gap-24 w-full mt-8 md:mt-0">
+                  <div className="flex flex-col gap-3 md:gap-4 w-24">
                     <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Discover</h4>
                     <Link to="/" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Home</Link>
                     <Link to="/movies" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Movies</Link>
@@ -134,17 +134,12 @@ const App = () => {
                     <Link to="/about" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">About</Link>
                     <Link to="/clips" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Clips</Link>
                   </div>
-                  <div className="flex flex-col gap-3 md:gap-4">
+                  <div className="flex flex-col gap-3 md:gap-4 w-24">
                     <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Experience</h4>
                     <Link to="/plans" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Pricing</Link>
                     <Link to="/downloads" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Off-line</Link>
                     <Link to="/contact" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Contact</Link>
                     <Link to="/series" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Series</Link>
-                  </div>
-                  <div className="flex flex-col gap-3 md:gap-4">
-                    <h4 className="text-white font-black text-[10px] md:text-xs uppercase tracking-widest">Legal</h4>
-                    <Link to="/terms" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Terms</Link>
-                    <Link to="/data-privileges" className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors">Privacy</Link>
                   </div>
                 </div>
               </div>
@@ -152,6 +147,7 @@ const App = () => {
               <div className="mt-12 md:mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest gap-4">
                 <p>&copy; 2026 WatchWave. All rights reserved.</p>
                 <div className="flex gap-8">
+                  <Link to="/about" className="hover:text-white transition-colors">About</Link>
                   <Link to="/data-privileges" className="hover:text-white transition-colors">Privacy</Link>
                   <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
                 </div>

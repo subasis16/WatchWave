@@ -1,80 +1,137 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PlayCircle, Users, Box, Film } from 'lucide-react';
+import { Target, Star, Disc } from 'lucide-react';
 
 const About = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
+    const builders = [
+        {
+            name: "Himanshu Shekhar Das",
+            role: "Backend Head",
+            bio: "Driving the core architecture and infrastructure behind WatchWave. Himanshu focuses on building scalable real-time systems, handling concurrent streams, and ensuring our backend services remain robust and lightning-fast."
+        },
+        {
+            name: "Subasis Panigrahi",
+            role: "Frontend Lead",
+            bio: "Architecting the visual experience and user interface of WatchWave. Subasis is passionate about creating immersive, cinematic layouts where every animation and interaction feels premium and intentional."
+        },
+        {
+            name: "Sumit Kumar Sahoo",
+            role: "Frontend Developer",
+            bio: "Bridging the gap between complex functionality and seamless design. Sumit ensures the player controls, party rooms, and navigation paths are intuitive, responsive, and visually cohesive."
+        },
+        {
+            name: "Shoib Khan",
+            role: "Backend Developer",
+            bio: "Optimizing the server-side logic and database queries holding WatchWave together. Shoib specializes in crafting real-time synchronization features so watch parties stay perfectly in sync across the globe."
+        }
+    ];
+
     return (
-        <div className="min-h-screen pt-40 pb-24 px-8 md:px-16 lg:px-24 bg-transparent text-white selection:bg-accent-gold selection:text-black relative overflow-hidden">
-            
-            {/* Cinematic Background Field */}
-            <div className="fixed inset-0 z-0">
-                <div className="absolute top-[30%] left-[-10%] w-[40%] h-[40%] bg-accent-gold/[0.04] blur-[180px] rounded-full" />
+        <div className="min-h-screen pt-32 pb-24 px-6 md:px-12 text-white selection:bg-brand-red selection:text-white relative overflow-hidden">
+            {/* Cinematic Background Field - Keeping WatchWave's style */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[30%] left-[-10%] w-[40%] h-[40%] bg-brand-red/[0.04] blur-[180px] rounded-full" />
                 <div className="absolute top-[10%] right-[-5%] w-[50%] h-[50%] bg-white/[0.02] blur-[150px] rounded-full" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[length:60px_60px]" />
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-24 gap-12">
-                    <div className="space-y-6">
-                        <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.6em]">About / WatchWave</h3>
-                        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-[0.8]">
-                            Beyond <br/> Streaming
-                        </h1>
-                    </div>
-                </div>
-
-                <div className="grid lg:grid-cols-2 gap-24 items-center">
-                    <motion.div 
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="space-y-12"
-                    >
-                        <p className="text-2xl font-black text-gray-400 uppercase tracking-tighter leading-snug">
-                            WatchWave is the ultimate premium streaming destination, designed to bring a high-end, cinematic viewing experience straight to your modern devices.
-                        </p>
-                        <p className="text-[12px] font-bold text-gray-500 uppercase tracking-[0.4em] leading-[2.2]">
-                            Founded on the principle that modern streaming should be a premium, shared experience, WatchWave offers a pristine theater-styled UI fused with seamless movie-sharing features like <span className="text-white">Watch Party Rooms</span>, enabling you to enjoy movies together with friends worldwide.
-                        </p>
-                    </motion.div>
-
-                    <div className="grid sm:grid-cols-2 gap-8">
-                        {[
-                            { icon: PlayCircle, title: 'Cinema UI', desc: 'Clean, immersive viewing experience.' },
-                            { icon: Users, title: 'Watch Together', desc: 'Real-time watch parties with friends.' },
-                            { icon: Box, title: 'Downloads', desc: 'Save movies & shows for offline viewing.' },
-                            { icon: Film, title: 'Curated Picks', desc: 'Personalized movie recommendations for you.' }
-                        ].map((item, i) => (
-                            <motion.div 
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.1 }}
-                                className="glass-card p-10 border-white/5 hover:border-white/10 transition-all duration-700"
-                            >
-                                <item.icon size={28} className="text-gray-400 mb-6" />
-                                <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-2">{item.title}</h3>
-                                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-relaxed">{item.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
+            <div className="relative z-10 max-w-4xl mx-auto">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-16"
+                >
+                    <h1 className="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tight">About WatchWave</h1>
+                    <p className="text-lg md:text-xl text-gray-400 font-medium tracking-wide">
+                        We are building the ultimate cinematic experience for the next generation of movie lovers.
+                    </p>
+                </motion.div>
 
                 <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-32 glass-card p-10 md:p-24 border-white/5 relative overflow-hidden group"
+                    transition={{ delay: 0.1 }}
+                    className="mb-12"
                 >
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-accent-gold/[0.04] blur-[100px] rounded-full group-hover:scale-110 transition-transform duration-1000" />
-                    <div className="relative z-10 max-w-2xl">
-                        <h2 className="text-[10px] font-black text-accent-gold uppercase tracking-[0.6em] mb-6">Our Mission</h2>
-                        <h3 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none mb-8">
-                            To bring the magic of the movie theater straight to your living room.
+                    <div className="flex items-center gap-3 mb-4">
+                        <Disc className="text-brand-red w-6 h-6" />
+                        <h2 className="text-2xl font-black uppercase tracking-tight">Our Mission</h2>
+                    </div>
+                    <p className="text-gray-400 text-base md:text-lg leading-relaxed tracking-wide">
+                        WatchWave was born from a simple idea: watching movies shouldn't be limited by distance. In a world of increasing physical separation, we believe that shared experiences are the only way forward. We're building tools that empower viewers to share not just screens, but emotions.
+                    </p>
+                </motion.div>
+
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mb-16"
+                >
+                    <div className="flex items-center gap-3 mb-6">
+                        <Star className="text-brand-red w-6 h-6 outline-none fill-brand-red/10" />
+                        <h2 className="text-2xl font-black uppercase tracking-tight">Our Values</h2>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 className="text-lg font-bold mb-2 uppercase tracking-wide">Premium by Default</h3>
+                            <p className="text-gray-400 text-sm md:text-base leading-relaxed tracking-wide">
+                                Quality matters when it's shared. We optimize for high-fidelity streaming and an immersive, theater-like atmosphere.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold mb-2 uppercase tracking-wide">Viewer First</h3>
+                            <p className="text-gray-400 text-sm md:text-base leading-relaxed tracking-wide">
+                                No clutter, no distractions. Just pure cinematic immersion for those who love movies.
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
+
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mb-16"
+                >
+                    <h2 className="text-2xl font-black mb-6 uppercase tracking-tight">Project Guide</h2>
+                    <div className="bg-rich-gray/60 border border-white/5 rounded-xl p-6 md:p-8 hover:border-white/10 transition-colors">
+                        <h3 className="text-lg font-bold mb-2 tracking-wide uppercase">
+                            Prof. Biswaranjan Sarangi <span className="text-[#a855f7] text-sm font-bold ml-3 tracking-normal normal-case">Mentor & Guide</span>
                         </h3>
-                        <div className="h-1 w-24 bg-white/20 rounded-full" />
+                        <p className="text-gray-400 text-sm md:text-base leading-relaxed tracking-wide">
+                            Providing valuable mentorship, academic guidance, and direction for the successful development of the WatchWave project.
+                        </p>
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                >
+                    <h2 className="text-3xl font-black mb-8 uppercase tracking-tight">Meet the Builders</h2>
+                    <div className="flex flex-col gap-4 md:gap-6">
+                        {builders.map((builder, idx) => (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 + (idx * 0.1) }}
+                                key={builder.name} 
+                                className="bg-rich-gray/60 border border-white/5 rounded-xl p-6 md:p-8 hover:border-white/10 transition-colors group"
+                            >
+                                <h3 className="text-xl font-bold mb-3 tracking-wide uppercase">
+                                    {builder.name} <span className="text-[#3b82f6] text-sm font-bold ml-3 tracking-normal normal-case">{builder.role}</span>
+                                </h3>
+                                <p className="text-gray-400 text-sm md:text-base leading-relaxed tracking-wide">
+                                    {builder.bio}
+                                </p>
+                            </motion.div>
+                        ))}
                     </div>
                 </motion.div>
             </div>
