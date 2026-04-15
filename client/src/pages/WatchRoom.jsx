@@ -281,7 +281,7 @@ const WatchRoom = () => {
     if (!video || !video.play) return;
     if (isPlaying) {
       const p = video.play();
-      if (p !== undefined) p.catch(() => {});
+      if (p !== undefined) p.catch(() => { });
     } else {
       video.pause();
     }
@@ -689,7 +689,7 @@ const WatchRoom = () => {
                   <div className="text-center w-full max-w-4xl">
                     <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-12">
                       <h3 className="text-sm font-semibold text-accent-gold mb-2">Pick Your Mood</h3>
-                      <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight drop-shadow-lg">Set the Party<br/>Vibe</h2>
+                      <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight drop-shadow-lg">Set the Party<br />Vibe</h2>
                     </motion.div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -779,13 +779,13 @@ const WatchRoom = () => {
                   <div className="absolute inset-0 w-full h-full bg-black">
                     <video
                       ref={(el) => {
-                         if (el) {
-                           el.seekTo = (fraction) => { 
-                             if (el.duration) el.currentTime = fraction * el.duration; 
-                           };
-                           el.getCurrentTime = () => el.currentTime;
-                         }
-                         playerRef.current = el;
+                        if (el) {
+                          el.seekTo = (fraction) => {
+                            if (el.duration) el.currentTime = fraction * el.duration;
+                          };
+                          el.getCurrentTime = () => el.currentTime;
+                        }
+                        playerRef.current = el;
                       }}
                       src={selectedContent.videoUrl}
                       className="w-full h-full object-cover"
@@ -882,14 +882,14 @@ const WatchRoom = () => {
                   disabled={!isOwner}
                 />
                 <div className="absolute inset-0 bg-white/5 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     className="h-full bg-accent-gold shadow-[0_0_15px_rgba(255,215,0,0.5)]"
                     style={{ width: `${played * 100}%` }}
                     transition={{ type: "spring", damping: 20, stiffness: 100 }}
                   />
                 </div>
                 {isOwner && (
-                  <div 
+                  <div
                     className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                     style={{ left: `calc(${played * 100}% - 6px)` }}
                   />

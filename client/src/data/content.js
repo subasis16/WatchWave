@@ -3,7 +3,7 @@ import dangalImg from '../assets/Screenshot 2026-03-29 231154.png';
 import slamDunkImg from '../assets/Screenshot 2026-03-29 231226.png';
 
 export const trending = [
-  { id: 't1', title: 'Stranger Things', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F595%2F1489169.jpg', year: '2022', match: '99', age: '16+',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774338448/Stranger_Things_5___Official_Trailer___Netflix_2K_HD_dxdrjv.webm' },
+  { id: 't1', title: 'Stranger Things', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F595%2F1489169.jpg', year: '2022', match: '99', age: '16+',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184127/Stranger_Things_5___Official_Trailer___Netflix_2K_HD_hphbg7.webm' },
   { id: 't2', title: 'Avengers: Endgame', image: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', year: '2019', match: '98', age: '13+', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336778/The_Dark_Knight_2008_Official_Trailer__1_-_Christopher_Nolan_Movie_HD_720P_HD_cwze2e.mp4' },
   { id: 't3', title: 'One Piece', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F617%2F1543011.jpg', year: '2024', match: '98', age: '14+',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336485/ONE_PIECE__Season_2___Official_Trailer___Netflix_1080P_HD_ee4vjb.mp4' },
   { id: 't4', title: 'Oppenheimer', image: 'https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtZjg3YS00NmFiLWIyZmQtZTJmNTM5MjVmYTQ4XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '97', age: '18+', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336778/The_Dark_Knight_2008_Official_Trailer__1_-_Christopher_Nolan_Movie_HD_720P_HD_cwze2e.mp4' },
@@ -12,9 +12,9 @@ export const trending = [
 
 export const anime = [
   { id: 'a1', title: 'One Piece', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F617%2F1543011.jpg', year: '1999', match: '99', age: 'TV-14', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336485/ONE_PIECE__Season_2___Official_Trailer___Netflix_1080P_HD_ee4vjb.mp4' },
-  { id: 'a3', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg', year: '2019', match: '99', age: 'TV-MA' },
+  { id: 'a3', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg', year: '2019', match: '99', age: 'TV-MA', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215089/Demon_Slayer__Kimetsu_no_Yaiba_Infinity_Castle___MAIN_TRAILER_1080P_HD_qrnzdv.mp4' },
   { id: 'a4', title: 'Jujutsu Kaisen', image: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg', year: '2020', match: '98', age: 'TV-MA' },
-  { id: 'a5', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg', year: '2013', match: '99', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336292/Attack_on_Titan_Season_1_Trailer_1080P_HD_qolejg.mp4' },
+  { id: 'a5', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg', year: '2013', match: '99', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184122/Attack_on_Titan_Season_1_Trailer_1080P_HD_u4uhi4.mp4' },
   { id: 'a10', title: 'Death Note', image: 'https://cdn.myanimelist.net/images/anime/1079/138100l.jpg', year: '2006', match: '99', age: 'TV-14' }
 ];
 
@@ -49,10 +49,10 @@ export const trendingMovies = [
 export const newReleases = trendingMovies;
 
 export const bollywoodHits = [
-  { id: 'bh1', title: 'Animal', image: 'https://m.media-amazon.com/images/M/MV5BZThmNDg1NjUtNWJhMC00YjA3LWJiMjItNmM4ZDQ5ZGZiN2Y2XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '98', age: 'PG-13' },
+  { id: 'bh1', title: 'Animal', image: 'https://m.media-amazon.com/images/M/MV5BZThmNDg1NjUtNWJhMC00YjA3LWJiMjItNmM4ZDQ5ZGZiN2Y2XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '98', age: 'PG-13', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215093/ANIMAL_OFFICIAL_TRAILER___Ranbir_Kapoor___Rashmika_M__Anil_K__Bobby_D___Sandeep_Vanga___Bhushan_K_1080P_HD_lu8h2f.mp4' },
   { id: 'bh2', title: 'Pathaan', image: 'https://m.media-amazon.com/images/M/MV5BNDdkNTY1MDQtY2I5MC00OTFlLTg5OWQtZWE2YzE5NWFiMDgzXkEyXkFqcGc@._V1_SX300.jpg', year: '2022', match: '99', age: 'R' },
   { id: 'bh3', title: 'KGF: Chapter 2', image: 'https://wsrv.nl/?url=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fen%2Fd%2Fd0%2FK.G.F_Chapter_2.jpg', year: '2016', match: '98', age: 'PG-13' },
-  { id: 'bh4', title: 'Dangal', image: dangalImg, year: '2016', match: '99', age: 'PG' },
+  { id: 'bh4', title: 'Dangal', image: dangalImg, year: '2016', match: '99', age: 'PG', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215095/Dangal___Main_Trailer___Netflix_1080P_HD_aztdha.mp4' },
   { id: 'bh5', title: 'Kantara', image: 'https://m.media-amazon.com/images/M/MV5BY2VkZjk5ZjMtM2ExOS00ZDA1LTg1ZDEtYTliNGZiYTc4ZWZiXkEyXkFqcGc@._V1_SX300.jpg', year: '2014', match: '97', age: 'PG-13' }
 ];
 
@@ -61,7 +61,7 @@ export const hollywoodAction = [
   { id: 'ha2', title: 'Mad Max: Fury Road', image: 'https://m.media-amazon.com/images/M/MV5BZDRkODJhOTgtOTc1OC00NTgzLTk4NjItNDgxZDY4YjlmNDY2XkEyXkFqcGc@._V1_SX300.jpg', year: '2015', match: '99', age: 'R' },
   { id: 'ha3', title: 'Mission: Impossible - Dead Reckoning', image: 'https://m.media-amazon.com/images/M/MV5BN2U4OTdmM2QtZTkxYy00ZmQyLTg2N2UtMDdmMGJmNDhlZDU1XkEyXkFqcGc@._V1_SX300.jpg', year: '2023', match: '97', age: 'PG-13' },
   { id: 'ha4', title: 'Gladiator', image: 'https://m.media-amazon.com/images/M/MV5BYWQ4YmNjYjEtOWE1Zi00Y2U4LWI4NTAtMTU0MjkxNWQ1ZmJiXkEyXkFqcGc@._V1_SX300.jpg', year: '2000', match: '98', age: 'R' },
-  { id: 'ha5', title: 'Top Gun: Maverick', image: 'https://m.media-amazon.com/images/M/MV5BMDBkZDNjMWEtOTdmMi00NmExLTg5MmMtNTFlYTJlNWY5YTdmXkEyXkFqcGc@._V1_SX300.jpg', year: '2022', match: '99', age: 'PG-13' }
+  { id: 'ha5', title: 'Top Gun: Maverick', image: 'https://m.media-amazon.com/images/M/MV5BMDBkZDNjMWEtOTdmMi00NmExLTg5MmMtNTFlYTJlNWY5YTdmXkEyXkFqcGc@._V1_SX300.jpg', year: '2022', match: '99', age: 'PG-13', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215074/Top_Gun__Maverick_-_Official_Trailer_2022_-_Paramount_Pictures_1080P_HD_swejhq.mp4' }
 ];
 
 export const Crime = [
@@ -110,7 +110,7 @@ export const trendingSeries = [
   { id: 'ts2', title: 'The Last of Us', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F563%2F1409008.jpg', year: '2023', match: '98', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774337981/The_Last_of_Us___Official_Trailer___Max_1080P_HD_cah7nd.mp4' },
   { id: 'ts3', title: 'Fallout', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F599%2F1499142.jpg', year: '2024', match: '97', age: 'TV-MA' },
   { id: 'ts4', title: 'Game of Thrones', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F498%2F1245274.jpg', year: '2011', match: '98', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336453/Game_of_Thrones___Official_Series_Trailer_HBO_1080P_HD_tfacgt.mp4' },
-  { id: 'ts5', title: 'Succession', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F469%2F1174900.jpg', year: '2018', match: '97', age: 'TV-MA' }
+  { id: 'ts5', title: 'Succession', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F469%2F1174900.jpg', year: '2018', match: '97', age: 'TV-MA', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184110/Succession_-_Own_the_Complete_Series_Today____Official_Trailer___Warner_Bros._Entertainment_1080P_HD_oxur3z.mp4' }
 ];
 export const newReleaseSeries = trendingSeries;
 
@@ -118,8 +118,8 @@ export const indianSeries = [
   { id: 'is1', title: 'The Family Man', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F599%2F1498893.jpg', year: '2019', match: '97', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774338088/The_Family_Man_S3_-_Official_Trailer___Raj___DK___Manoj_Bajpayee__Jaideep_Ahlawat___Prime_Video_IN_1080P_HD_k0ehea.mp4' },
   { id: 'is2', title: 'Sacred Games', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F204%2F511629.jpg', year: '2018', match: '95', age: 'TV-MA' },
   { id: 'is3', title: 'Mirzapur', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F523%2F1308189.jpg', year: '2018', match: '96', age: 'TV-MA' },
-  { id: 'is4', title: 'Panchayat', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F517%2F1293627.jpg', year: '2020', match: '98', age: 'TV-14' },
-  { id: 'is5', title: 'Scam 1992', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F277%2F693891.jpg', year: '2020', match: '99', age: 'TV-14' }
+  { id: 'is4', title: 'Panchayat', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F517%2F1293627.jpg', year: '2020', match: '98', age: 'TV-14', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184117/Panchayat_Season_4_-_Official_Trailer___Jitendra_Kumar__Neena_Gupta__Raghubir_Yadav___Prime_Video_IN_1080P_HD_nkxdmq.mp4' },
+  { id: 'is5', title: 'Scam 1992', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F277%2F693891.jpg', year: '2020', match: '99', age: 'TV-14', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184137/Scam_1992_The_Harshad_Mehta_Story___Official_Trailer___Streaming_from_09-10-2020_1080P_HD_expkco.mp4' }
 ];
 
 export const hollywoodActionSeries = [
@@ -127,11 +127,11 @@ export const hollywoodActionSeries = [
   { id: 'as2', title: 'Breaking Bad', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F501%2F1253519.jpg', year: '2008', match: '99', age: 'TV-MA' },
   { id: 'as3', title: 'Peaky Blinders', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F48%2F122213.jpg', year: '2013', match: '97', age: 'TV-MA' },
   { id: 'as4', title: 'Daredevil', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F171%2F429391.jpg', year: '2015', match: '96', age: 'TV-MA' },
-  { id: 'as5', title: 'The Witcher', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F465%2F1163459.jpg', year: '2019', match: '95', age: 'TV-MA' }
+  { id: 'as5', title: 'The Witcher', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F465%2F1163459.jpg', year: '2019', match: '95', age: 'TV-MA', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184120/The_Witcher___Season_4___Official_Hindi_Trailer___Netflix_Original_Series_1080P_HD_x6n8xx.mp4' }
 ];
 
 export const hollywoodCrimeSeries = [
-  { id: 'cs1', title: 'Stranger Things', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F595%2F1489169.jpg', year: '2016', match: '98', age: 'TV-14' },
+  { id: 'cs1', title: 'Stranger Things', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F595%2F1489169.jpg', year: '2016', match: '98', age: 'TV-14', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184127/Stranger_Things_5___Official_Trailer___Netflix_2K_HD_hphbg7.webm' },
   { id: 'cs2', title: 'Black Mirror', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F564%2F1411764.jpg', year: '2011', match: '97', age: 'TV-MA' },
   { id: 'cs3', title: 'True Detective', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F490%2F1226764.jpg', year: '2014', match: '99', age: 'TV-MA' },
   { id: 'cs4', title: 'Severance', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F548%2F1371406.jpg', year: '2022', match: '98', age: 'TV-MA' },
@@ -148,9 +148,9 @@ export const tvComedy = [
 
 export const actionAnime = [
   { id: 'aa1', title: 'Jujutsu Kaisen', image: 'https://cdn.myanimelist.net/images/anime/1171/109222.jpg', year: '2020', match: '99', age: 'TV-MA' },
-  { id: 'aa2', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg', year: '2019', match: '98', age: 'TV-MA' },
-  { id: 'aa3', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg', year: '2013', match: '99', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336292/Attack_on_Titan_Season_1_Trailer_1080P_HD_qolejg.mp4' },
-  { id: 'aa4', title: 'Chainsaw Man', image: 'https://cdn.myanimelist.net/images/anime/1806/126216.jpg', year: '2022', match: '97', age: 'TV-MA' },
+  { id: 'aa2', title: 'Demon Slayer', image: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg', year: '2019', match: '98', age: 'TV-MA', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215089/Demon_Slayer__Kimetsu_no_Yaiba_Infinity_Castle___MAIN_TRAILER_1080P_HD_qrnzdv.mp4' },
+  { id: 'aa3', title: 'Attack on Titan', image: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg', year: '2013', match: '99', age: 'TV-MA',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184122/Attack_on_Titan_Season_1_Trailer_1080P_HD_u4uhi4.mp4' },
+  { id: 'aa4', title: 'Chainsaw Man', image: 'https://cdn.myanimelist.net/images/anime/1806/126216.jpg', year: '2022', match: '97', age: 'TV-MA', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215070/CHAINSAW_MAN_THE_MOVIE__REZE_ARC_-_New_Trailer___SUB_HD_1080P_HD_mfh2se.mp4' },
   { id: 'aa5', title: 'Bleach', image: 'https://cdn.myanimelist.net/images/anime/3/40451.jpg', year: '2004', match: '96', age: 'TV-14' }
 ];
 export const adventureAnime = actionAnime;
@@ -164,7 +164,7 @@ export const sportAnime = [
 ];
 
 export const sciFiAnime = [
-  { id: 'sf1', title: 'Steins;Gate', image: 'https://cdn.myanimelist.net/images/anime/1935/127974.jpg', year: '2011', match: '99', age: 'TV-14',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774337566/Steins_Gate___Anime_Trailer_HD___2011_1080P_HD_dtudag.mp4' },
+  { id: 'sf1', title: 'Steins;Gate', image: 'https://cdn.myanimelist.net/images/anime/1935/127974.jpg', year: '2011', match: '99', age: 'TV-14',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184051/Steins_Gate___Anime_Trailer_HD___2011_1080P_HD_s9d1cr.mp4' },
   { id: 'sf2', title: 'Death Note', image: 'https://cdn.myanimelist.net/images/anime/9/9453.jpg', year: '2006', match: '98', age: 'TV-14' },
   { id: 'sf3', title: 'Cyberpunk: Edgerunners', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F498%2F1246519.jpg', year: '2022', match: '98', age: 'TV-MA' },
   { id: 'sf4', title: 'Neon Genesis Evangelion', image: 'https://cdn.myanimelist.net/images/anime/1314/108941.jpg', year: '1995', match: '99', age: 'TV-MA' },
@@ -177,14 +177,14 @@ export const superPowerAnime = [
   { id: 'pw2', title: 'Hunter x Hunter', image: 'https://cdn.myanimelist.net/images/anime/1337/99013.jpg', year: '2011', match: '99', age: 'TV-MA' },
   { id: 'pw3', title: 'My Hero Academia', image: 'https://cdn.myanimelist.net/images/anime/10/78745.jpg', year: '2016', match: '95', age: 'TV-14' },
   { id: 'pw4', title: 'One Punch Man', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F598%2F1496471.jpg', year: '2015', match: '98', age: 'TV-14' },
-  { id: 'pw5', title: 'Mob Psycho 100', image: 'https://cdn.myanimelist.net/images/anime/8/80356.jpg', year: '2016', match: '97', age: 'TV-14' }
+  { id: 'pw5', title: 'Mob Psycho 100', image: 'https://cdn.myanimelist.net/images/anime/8/80356.jpg', year: '2016', match: '97', age: 'TV-14', videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776215078/Trailer_Mob_Psycho_100_720P_HD_laiy6g.mp4' }
 ];
 
 export const romanticAnime = [
   { id: 'ra1', title: 'Your Lie in April', image: 'https://cdn.myanimelist.net/images/anime/3/67177.jpg', year: '2014', match: '98', age: 'TV-14',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774338077/Your_lie_in_April_Trailer_1080P_HD_gczizb.mp4' },
   { id: 'ra2', title: 'Violet Evergarden', image: 'https://cdn.myanimelist.net/images/anime/1795/95088.jpg', year: '2018', match: '97', age: 'TV-14',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774338203/Violet_Evergarden__the_Movie___Official_Trailer___Netflix_Anime_1080P_HD_gwahjn.mp4' },
   { id: 'ra3', title: 'Horimiya', image: 'https://wsrv.nl/?url=https%3A%2F%2Fstatic.tvmaze.com%2Fuploads%2Fimages%2Foriginal_untouched%2F284%2F710358.jpg', year: '2021', match: '95', age: 'TV-14' },
-  { id: 'ra4', title: 'Kimi no Na wa', image: 'https://cdn.myanimelist.net/images/anime/5/87048.jpg', year: '2016', match: '99', age: 'PG-13',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/v1774336472/Kimi_no_Na_wa_Your_Name_Trailer_1080P_60FPS_uhc1sv.mp4' },
+  { id: 'ra4', title: 'Kimi no Na wa', image: 'https://cdn.myanimelist.net/images/anime/5/87048.jpg', year: '2016', match: '99', age: 'PG-13',  videoUrl: 'https://res.cloudinary.com/dvxvc4mbz/video/upload/q_auto/f_auto/v1776184114/Kimi_no_Na_wa_Your_Name_Trailer_1080P_60FPS_b739vp.mp4' },
   { id: 'ra5', title: 'A Silent Voice', image: 'https://cdn.myanimelist.net/images/anime/1122/96435.jpg', year: '2016', match: '98', age: 'PG-13' }
 ];
 export const dramaAnime = romanticAnime;
